@@ -15,7 +15,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd/spdlog/include
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd/pybind11/include
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd/nlohmann/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/3rd/beast/include
+    ${Boost_INCLUDE_DIRS}
 )
 
 set(Boost_USE_STATIC_LIBS ON)
@@ -23,4 +23,5 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog
+    ${Boost_LIBRARIES}
 )
