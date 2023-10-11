@@ -35,7 +35,6 @@ if [ -d "$PROJECT_NAME" ]; then
     cd build
     cmake ..
     make -j16
-    info "COMMPILE SUCCESS!"
 else
     error "UNKNOW PROJECT!"
 fi
