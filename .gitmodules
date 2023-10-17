@@ -7,3 +7,6 @@
 [submodule "core/3rd/nlohmann"]
 	path = core/3rd/nlohmann
 	url = https://github.com/nlohmann/json.git
+[submodule "core/3rd/websocketpp"]
+	path = core/3rd/websocketpp
+	url = https://github.com/zaphoyd/websocketpp
