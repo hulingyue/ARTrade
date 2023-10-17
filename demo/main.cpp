@@ -1,12 +1,10 @@
 #include <iostream>
 
 #include <spdlog/spdlog.h>
-#include "websocket.h"
+#include "ws_client.h"
 
 
 int main() {
-    // core::WebSocket::WebSocket *client = new core::WebSocket::WebSocket_Client();
-    // client->init("localhost", 8080);
-    spdlog::info("hello world!");
+    core::WebSocket::Client client;
     return 0;
 }
