@@ -25,13 +25,6 @@ PROJECT_NAME="$project"
 
 # download third-party libraries
 git submodule update --init
-if [ -d "./core/3rd/uWebSockets" ]; then
-    cd ./core/3rd/uWebSockets
-    git submodule update --init
-    cd ../../../
-else
-    error "Cannot found ./core/3rd/uWebSockets"
-fi
 
 # compile
 if [ -d "$PROJECT_NAME" ]; then
