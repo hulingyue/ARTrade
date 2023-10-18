@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(demo)
 
-set (CMAKE_CXX_FLAGS "-std=c++20 -Wall -DLLVM_USE_LINKER=lld -Wno-missing-braces -Wno-unused-local-typedef")
+set (CMAKE_CXX_FLAGS "-std=c++17 -Wall -DLLVM_USE_LINKER=lld -Wno-missing-braces -Wno-unused-local-typedef")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 #---------------------------------------------------------------
