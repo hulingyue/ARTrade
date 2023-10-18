@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(core)
 
-set (CMAKE_CXX_FLAGS "-std=c++20 -Wall -DLLVM_USE_LINKER=lld -Wno-missing-braces -Wno-unused-local-typedef")
+set (CMAKE_CXX_FLAGS "-std=c++17 -Wall -DLLVM_USE_LINKER=lld -Wno-missing-braces -Wno-unused-local-typedef")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 file(
@@ -25,8 +25,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd/websocketpp
 )
 
+find_package(OpenSSL REQUIRED)
+
 target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog
-    SSL
-    Crypto
+    OpenSSL::SSL
+    OpenSSL::Crypto
 )
