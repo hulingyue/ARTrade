@@ -7,24 +7,24 @@
 #include <spdlog/spdlog.h>
 
 // websocketpp
-// #include <websocketpp/config/asio_client.hpp>
+#include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 
 namespace {
 
 using namespace std::chrono_literals;
-// typedef websocketpp::client<websocketpp::config::asio_tls_client> WSClient;
-// typedef std::shared_ptr<boost::asio::ssl::context> context_ptr;
-// typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
+using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
 
 struct Self {
-    std::string_view uri;
+    std::string uri;
     bool is_security = false;    
+    core::WebSocket::WSEvent *ws_event = nullptr;
 
     time_t interval = 3;
     time_t ts = 0;
 
-    // websocketpp::connection_hdl handle;
+    websocketpp::connection_hdl handle;
     std::thread thread;
     std::mutex mutex;
 
@@ -41,42 +41,42 @@ inline std::string log_head(std::string func) {
     return "[WS_Client::" + func + "]";
 }
 
-// static context_ptr on_tls_init() {
-
-//     context_ptr ctx = std::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::sslv23);
-
-//     try {
-//         ctx->set_options(
-//             boost::asio::ssl::context::default_workarounds |
-//             boost::asio::ssl::context::no_sslv2 |
-//             boost::asio::ssl::context::no_sslv3 |
-//             boost::asio::ssl::context::single_dh_use
-//         );
-//     }
-//     catch(const std::exception& e) {
-//         spdlog::error("{} {}", log_head(__func__), e.what());
-//         return nullptr;
-//     }
-
-//     return ctx;
-
-// }
-
 static void background(Self &self) {
 
-    // do {
-    //     if (time(0) - self.ts >= self.interval) {
-    //         ws_connect(self);
-    //     } else {
-    //         std::this_thread::sleep_for(100ms);
-    //     }
-    // } while (self.run && self.interval);
+    do {
+        if (time(0) - self.ts >= self.interval) {
+            // ws_connect(self);
+        } else {
+            std::this_thread::sleep_for(100ms);
+        }
+    } while (self.run && self.interval);
 
 }
 
 static void ws_connect(Self &self) {
-    auto uri = self.uri;
-    // WSClient client;
+    WSClient client;
+    
+    client.init_asio();
+    client.set_open_handler(bind(&WSEvent::on_open, self.ws_event, ::_1));
+    client.set_close_handler(bind(&WSEvent::on_close, self.ws_event, ::_1));
+    client.set_fail_handler(bind(&WSEvent::on_fail, self.ws_event, ::_1));
+    // client.set_ping_handler(bind(&WSEvent::on_ping, self.ws_event, ::_1, ::_2));
+    client.set_pong_handler(bind(&WSEvent::on_pong, self.ws_event, ::_1, ::_2));
+    client.set_message_handler(bind(&WSEvent::on_message, self.ws_event, ::_1, ::_2));
+
+    client.set_tls_init_handler([](websocketpp::connection_hdl) {
+        return websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
+    });
+
+    websocketpp::lib::error_code ec;
+    WSClient::connection_ptr con = client.get_connection(self.uri, ec);
+    if (ec) {
+        std::cout << "Could not create connection: " << ec.message() << std::endl;
+        return;
+    }
+    
+    client.connect(con);
+    client.run();
 
     // set(self, client);
 }
@@ -89,8 +89,18 @@ Client::~Client() {
     if (&self) { delete &self; }
 }
 
-void Client::set_reconnect(int second) {
+Client* Client::set_event_handler(WSEvent *ws_event) {
+    if (self.ws_event) {
+        delete self.ws_event;
+    }
+
+    self.ws_event = ws_event;
+    return this;
+}
+
+Client* Client::set_reconnect(int second) {
     spdlog::info("{} second: {}", log_head(__func__), second);
+    return this;
 }
 
 int Client::send(std::string const &data) {
@@ -102,14 +112,14 @@ int Client::connect(std::string const &uri, bool is_security, int timeout) {
 
     spdlog::info("{} uri: {} is_security: {} timeout: {}", log_head(__func__), uri, is_security, timeout);
 
-    // if (self.thread.joinable()) {
-    //     return -1;
-    // }
+    if (self.thread.joinable()) {
+        return -1;
+    }
 
-    // self.uri = uri;
-    // self.is_security = is_security;
+    self.uri = uri;
+    self.is_security = is_security;
 
-    // self.thread = std::thread([&](){ background(self); } );
+    self.thread = std::thread([&](){ background(self); } );
     return 0;
 }
 
