@@ -18,7 +18,7 @@ public:
 
     int send(std::string const &data);
 
-    int connect(std::string const &uri, bool is_security = false, int timeout = 0);
+    int connect(std::string const &uri, int timeout = 0);
 
     void stop();
 

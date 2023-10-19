@@ -106,16 +106,24 @@ int Client::send(std::string const &data) {
     return 0;
 }
 
-int Client::connect(std::string const &uri, bool is_security, int timeout) {
+int Client::connect(std::string const &uri, int timeout) {
 
-    spdlog::info("{} uri: {} is_security: {} timeout: {}", log_head(__func__), uri, is_security, timeout);
+    spdlog::info("{} uri: {} timeout: {}", LOGHEAD, uri, timeout);
 
     if (self.thread.joinable()) {
         return -1;
     }
 
     self.uri = uri;
-    self.is_security = is_security;
+
+    if (self.uri.compare(0, 5, "ws://") == 0) {
+        self.is_security = false;
+    } else if (self.uri.compare(0, 6, "wss://") == 0) {
+        self.is_security = true;
+    } else {
+        spdlog::error("{} Wrong uri!", LOGHEAD);
+        return -1;
+    }
 
     self.thread = std::thread([&](){ background(self); } );
     return 0;
