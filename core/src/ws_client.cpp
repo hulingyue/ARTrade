@@ -10,6 +10,8 @@
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 
+#define LOGHEAD ("[WS_Client::" + std::string(__func__) + "]")
+
 namespace {
 
 using namespace std::chrono_literals;
@@ -36,10 +38,6 @@ struct Self {
 
 namespace core {
 namespace WebSocket {
-
-inline std::string log_head(std::string func) {
-    return "[WS_Client::" + func + "]";
-}
 
 static void background(Self &self) {
 
