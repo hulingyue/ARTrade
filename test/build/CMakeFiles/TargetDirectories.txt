@@ -1,3 +1,0 @@
-/home/ubuntu/ARTrade/test/build/CMakeFiles/websocketpp_demo.dir
-/home/ubuntu/ARTrade/test/build/CMakeFiles/edit_cache.dir
-/home/ubuntu/ARTrade/test/build/CMakeFiles/rebuild_cache.dir
