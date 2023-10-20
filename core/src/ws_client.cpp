@@ -32,6 +32,9 @@ struct Self {
 
     std::atomic<bool> run = true;
 
+    WSSClient *wss_client = nullptr;
+    WSClient *ws_client = nullptr;
+
     core::WebSocket::Client::Client *obj;
     core::WebSocket::Client::Client *operator->() { return obj; }
 };
@@ -93,6 +96,8 @@ static void pp_connect(T &client, Self &self) {
 
     client.connect(con);
     spdlog::info("{} Successful connected, ready to run!", LOGHEAD);
+    
+    self.handle = con->get_handle();
     client.run();
 }
 
@@ -104,9 +109,11 @@ static void background(Self &self) {
                 WSSClient client;
                 set_sls_init(client);
                 pp_connect(client, self);
+                self.wss_client = &client;
             } else {
                 WSClient client;
                 pp_connect(client, self);
+                self.ws_client = &client;
             }
         } else {
             std::this_thread::sleep_for(100ms);
@@ -130,6 +137,20 @@ Client* Client::set_reconnect(int second) {
 
 int Client::send(std::string const &data) {
     spdlog::info("{} data: {}", LOGHEAD, data);
+
+    try {
+        if (self.is_security && self.wss_client != nullptr) {
+            self.wss_client->send(self.handle, data, websocketpp::frame::opcode::text);
+        } else if (!self.is_security && self.ws_client != nullptr) {
+            self.ws_client->send(self.handle, data, websocketpp::frame::opcode::text);
+        } else {
+            spdlog::error("{} error code: -1 , error msg: {} client is nullptr ", LOGHEAD, self.is_security ? "wss" : "ws");
+            return -1;
+        }
+    } catch(const std::exception& e) {
+        spdlog::error("{} catch info: {}", LOGHEAD, std::string(e.what()));
+    }
+    
     return 0;
 }
 
