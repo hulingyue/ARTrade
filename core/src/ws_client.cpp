@@ -10,7 +10,8 @@
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 
-#define LOGHEAD ("[WS_Client::" + std::string(__func__) + "]")
+#define LOG_HEAD(func) ("[WS_Client::" + std::string(func) + "]")
+#define LOGHEAD LOG_HEAD(__func__)
 
 namespace {
 
@@ -20,8 +21,7 @@ using websocketpp::lib::placeholders::_2;
 
 struct Self {
     std::string uri;
-    bool is_security = false;    
-    core::WebSocket::WSEvent *ws_event = nullptr;
+    bool is_security = false;
 
     time_t interval = 3;
     time_t ts = 0;
@@ -31,6 +31,9 @@ struct Self {
     std::mutex mutex;
 
     std::atomic<bool> run = true;
+
+    core::WebSocket::Client::Client *obj;
+    core::WebSocket::Client::Client *operator->() { return obj; }
 };
 
 } // namespace
@@ -40,63 +43,57 @@ namespace core {
 namespace WebSocket {
 namespace Client {
 
+static inline void set_sls_init(WSSClient &client) {
+    client.set_tls_init_handler([](websocketpp::connection_hdl) {
+        return websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
+    });
+}
+
 template <typename T>
-static void client_init(Self &self, T &client) {
-    client.set_open_handler(bind(&WSEvent::on_open, self.ws_event, ::_1));
-    client.set_close_handler(bind(&WSEvent::on_close, self.ws_event, ::_1));
-    client.set_fail_handler(bind(&WSEvent::on_fail, self.ws_event, ::_1));
-    // client.set_ping_handler(bind(&WSEvent::on_ping, self.ws_event, ::_1, ::_2));
-    client.set_pong_handler(bind(&WSEvent::on_pong, self.ws_event, ::_1, ::_2));
-    client.set_message_handler(bind(&WSEvent::on_message, self.ws_event, ::_1, ::_2));
-}
-
-static void ws_connect(Self &self) {
-    try {
-        WSClient client;
-
-        client.init_asio();
-        client_init(self, client);
-
-        websocketpp::lib::error_code ec;
-        WSClient::connection_ptr con = client.get_connection(self.uri, ec);
-        if (ec) {
-            spdlog::error("{} Could not create connection: {}", LOGHEAD, ec.message());
-            return;
+static void pp_connect(T &client, Self &self) {
+    client.init_asio();
+    client.set_open_handler([&self](websocketpp::connection_hdl hdl) {
+        if (self->on_open) {
+            self->on_open(*self.obj);
+        } else {
+            spdlog::info("{}", LOG_HEAD("on_open"));
         }
+    });
 
-        client.connect(con);
-        spdlog::info("{} Successful connected, ready to run!", LOGHEAD);
-        client.run();
-    } catch (std::exception &e) {
-        spdlog::error("{} Error in context pointer: {}", LOGHEAD, e.what());
-    }
-}
-
-static void wss_connect(Self &self) {
-    try {
-        WSSClient client;
-
-        client.init_asio();
-        client_init(self, client);
-
-        client.set_tls_init_handler([](websocketpp::connection_hdl) {
-            return websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
-        });
-
-        websocketpp::lib::error_code ec;
-        WSSClient::connection_ptr con = client.get_connection(self.uri, ec);
-        if (ec) {
-            spdlog::error("{} Could not create connection: {}", LOGHEAD, ec.message());
-            return;
+    client.set_close_handler([&self](websocketpp::connection_hdl hdl) {
+        if (self->on_close) {
+            self->on_close(*self.obj);
+        } else {
+            spdlog::info("{}", LOG_HEAD("on_close"));
         }
+    });
 
-        client.connect(con);
-        spdlog::info("{} Successful connected, ready to run!", LOGHEAD);
-        client.run();
-    } catch (std::exception &e) {
-        spdlog::error("{} Error in context pointer: {}", LOGHEAD, e.what());
+    client.set_fail_handler([&self](websocketpp::connection_hdl hdl) {
+        if (self->on_fail) {
+            self->on_fail(*self.obj);
+        } else {
+            spdlog::info("{}", LOG_HEAD("on_fail"));
+        }
+    });
+
+    client.set_message_handler([&self](websocketpp::connection_hdl hdl, WSClient::message_ptr msg) {
+        if (self->on_message) {
+            self->on_message(*self.obj, msg->get_payload());
+        } else {
+            spdlog::info("{} msg: {}", LOG_HEAD("on_message"), msg->get_payload());
+        }
+    });
+
+    websocketpp::lib::error_code ec;
+    auto con = client.get_connection(self.uri, ec);
+    if (ec) {
+        spdlog::error("{} Could not create connection: {}", LOGHEAD, ec.message());
+        return;
     }
 
+    client.connect(con);
+    spdlog::info("{} Successful connected, ready to run!", LOGHEAD);
+    client.run();
 }
 
 static void background(Self &self) {
@@ -104,9 +101,12 @@ static void background(Self &self) {
     do {
         if (time(0) - self.ts >= self.interval) {
             if (self.is_security) {
-                wss_connect(self);
+                WSSClient client;
+                set_sls_init(client);
+                pp_connect(client, self);
             } else {
-                ws_connect(self);
+                WSClient client;
+                pp_connect(client, self);
             }
         } else {
             std::this_thread::sleep_for(100ms);
@@ -115,21 +115,12 @@ static void background(Self &self) {
 
 }
 
-Client::Client() : self {*new Self{}} {
+Client::Client() : self {*new Self{ .obj = this }} {
 
 }
 
 Client::~Client() {
     if (&self) { delete &self; }
-}
-
-Client* Client::set_event_handler(WSEvent *ws_event) {
-    if (self.ws_event) {
-        delete self.ws_event;
-    }
-
-    self.ws_event = ws_event;
-    return this;
 }
 
 Client* Client::set_reconnect(int second) {
@@ -174,3 +165,4 @@ void Client::stop() {
 } // namespace core 
 
 #undef LOGHEAD
+#undef LOG_HEAD
