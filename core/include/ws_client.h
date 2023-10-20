@@ -6,6 +6,7 @@
 
 namespace core {
 namespace WebSocket {
+namespace Client {
     
 class Client {
 public:
@@ -26,5 +27,6 @@ private:
     Self &self;
 };
 
+} // namespace Client
 } // namespace name
 } // namespace cor 

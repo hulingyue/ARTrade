@@ -8,6 +8,7 @@ struct Self {
 
 namespace core {
 namespace WebSocket {
+namespace Server {
     
 Server::Server() : self {*new Self{}} {}
 Server::~Server() {
@@ -15,5 +16,6 @@ Server::~Server() {
 }
 
 
+} // namespace Server
 } // namespace WebSocket
 } // namespace core 

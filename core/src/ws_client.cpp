@@ -38,6 +38,9 @@ struct Self {
 
 namespace core {
 namespace WebSocket {
+namespace Client {
+
+
 
 static void ws_connect(Self &self) {
     try {
@@ -168,6 +171,7 @@ void Client::stop() {
     spdlog::info("{}", LOGHEAD);
 }
 
+} // namespace Client
 } // namespace WebSocket
 } // namespace core 
 
