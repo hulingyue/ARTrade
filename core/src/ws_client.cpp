@@ -170,3 +170,5 @@ void Client::stop() {
 
 } // namespace WebSocket
 } // namespace core 
+
+#undef LOGHEAD

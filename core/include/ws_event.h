@@ -47,3 +47,5 @@ namespace WebSocket {
 
 } // namespace WebSocket
 } // namespace core
+
+#undef LOGHEAD
