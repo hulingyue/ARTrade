@@ -108,12 +108,12 @@ static void background(Self &self) {
             if (self.is_security) {
                 WSSClient client;
                 set_sls_init(client);
-                pp_connect(client, self);
                 self.wss_client = &client;
+                pp_connect(client, self);
             } else {
                 WSClient client;
-                pp_connect(client, self);
                 self.ws_client = &client;
+                pp_connect(client, self);
             }
         } else {
             std::this_thread::sleep_for(100ms);
