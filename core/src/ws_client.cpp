@@ -40,19 +40,22 @@ namespace core {
 namespace WebSocket {
 namespace Client {
 
-
+template <typename T>
+static void client_init(Self &self, T &client) {
+    client.set_open_handler(bind(&WSEvent::on_open, self.ws_event, ::_1));
+    client.set_close_handler(bind(&WSEvent::on_close, self.ws_event, ::_1));
+    client.set_fail_handler(bind(&WSEvent::on_fail, self.ws_event, ::_1));
+    // client.set_ping_handler(bind(&WSEvent::on_ping, self.ws_event, ::_1, ::_2));
+    client.set_pong_handler(bind(&WSEvent::on_pong, self.ws_event, ::_1, ::_2));
+    client.set_message_handler(bind(&WSEvent::on_message, self.ws_event, ::_1, ::_2));
+}
 
 static void ws_connect(Self &self) {
     try {
         WSClient client;
 
         client.init_asio();
-        client.set_open_handler(bind(&WSEvent::on_open, self.ws_event, ::_1));
-        client.set_close_handler(bind(&WSEvent::on_close, self.ws_event, ::_1));
-        client.set_fail_handler(bind(&WSEvent::on_fail, self.ws_event, ::_1));
-        // client.set_ping_handler(bind(&WSEvent::on_ping, self.ws_event, ::_1, ::_2));
-        client.set_pong_handler(bind(&WSEvent::on_pong, self.ws_event, ::_1, ::_2));
-        client.set_message_handler(bind(&WSEvent::on_message, self.ws_event, ::_1, ::_2));
+        client_init(self, client);
 
         websocketpp::lib::error_code ec;
         WSClient::connection_ptr con = client.get_connection(self.uri, ec);
@@ -74,12 +77,7 @@ static void wss_connect(Self &self) {
         WSSClient client;
 
         client.init_asio();
-        client.set_open_handler(bind(&WSEvent::on_open, self.ws_event, ::_1));
-        client.set_close_handler(bind(&WSEvent::on_close, self.ws_event, ::_1));
-        client.set_fail_handler(bind(&WSEvent::on_fail, self.ws_event, ::_1));
-        // client.set_ping_handler(bind(&WSEvent::on_ping, self.ws_event, ::_1, ::_2));
-        client.set_pong_handler(bind(&WSEvent::on_pong, self.ws_event, ::_1, ::_2));
-        client.set_message_handler(bind(&WSEvent::on_message, self.ws_event, ::_1, ::_2));
+        client_init(self, client);
 
         client.set_tls_init_handler([](websocketpp::connection_hdl) {
             return websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
