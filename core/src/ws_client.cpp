@@ -87,6 +87,7 @@ static void pp_connect(T &client, Self &self) {
         }
     });
 
+    self.ts = time(0);
     websocketpp::lib::error_code ec;
     auto con = client.get_connection(self.uri, ec);
     if (ec) {
@@ -134,6 +135,7 @@ Client::~Client() {
 
 Client* Client::set_reconnect(int second) {
     spdlog::info("{} second: {}", LOGHEAD, second);
+    self.interval = second;
     return this;
 }
 
