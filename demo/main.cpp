@@ -27,6 +27,8 @@ int main() {
     std::cout << json_str << std::endl;
 
     client.send(json_str);
+    std::this_thread::sleep_for(10000ms);
+    client.stop();
 
     while (true) {
 

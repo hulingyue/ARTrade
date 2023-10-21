@@ -118,7 +118,9 @@ static void background(Self &self) {
         } else {
             std::this_thread::sleep_for(100ms);
         }
-    } while (self.run && self.interval);
+    } while (self.run.load() && self.interval);
+    
+    spdlog::info("{} backgound death!", LOGHEAD);
 
 }
 
@@ -173,12 +175,27 @@ int Client::connect(std::string const &uri, int timeout) {
         return -1;
     }
 
+    self.run.store(true);
     self.thread = std::thread([&](){ background(self); } );
     return 0;
 }
 
 void Client::stop() {
     spdlog::info("{}", LOGHEAD);
+    try {
+        if (self.is_security && self.wss_client != nullptr) {
+            self.wss_client->close(self.handle, websocketpp::close::status::normal, "Closing connection");
+        } else if (!self.is_security && self.ws_client != nullptr) {
+            self.ws_client->close(self.handle, websocketpp::close::status::normal, "Closing connection");
+        } else {
+            spdlog::error("{} error code: -1 , error msg: {} client is nullptr ", LOGHEAD, self.is_security ? "wss" : "ws");
+            return;
+        }
+
+        self.run.store(false);
+    } catch(const std::exception& e) {
+        spdlog::error("{} catch info: {}", LOGHEAD, std::string(e.what()));
+    }
 }
 
 } // namespace Client
