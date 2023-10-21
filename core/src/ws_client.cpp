@@ -142,6 +142,8 @@ Client* Client::set_reconnect(int second) {
 int Client::send(std::string const &data) {
     spdlog::info("{} data: {}", LOGHEAD, data);
 
+    std::scoped_lock lock(self.mutex);
+
     try {
         if (self.is_security && self.wss_client != nullptr) {
             self.wss_client->send(self.handle, data, websocketpp::frame::opcode::text);
@@ -184,6 +186,9 @@ int Client::connect(std::string const &uri, int timeout) {
 
 void Client::stop() {
     spdlog::info("{}", LOGHEAD);
+
+    std::scoped_lock lock(self.mutex);
+
     try {
         if (self.is_security && self.wss_client != nullptr) {
             self.wss_client->close(self.handle, websocketpp::close::status::normal, "Closing connection");
