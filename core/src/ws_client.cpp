@@ -57,7 +57,7 @@ static void pp_connect(T &client, Self &self) {
     client.init_asio();
     client.set_open_handler([&self](websocketpp::connection_hdl hdl) {
         if (self->on_open) {
-            self->on_open(*self.obj);
+            self->on_open();
         } else {
             spdlog::info("{}", LOG_HEAD("on_open"));
         }
@@ -65,7 +65,7 @@ static void pp_connect(T &client, Self &self) {
 
     client.set_close_handler([&self](websocketpp::connection_hdl hdl) {
         if (self->on_close) {
-            self->on_close(*self.obj);
+            self->on_close();
         } else {
             spdlog::info("{}", LOG_HEAD("on_close"));
         }
@@ -73,7 +73,7 @@ static void pp_connect(T &client, Self &self) {
 
     client.set_fail_handler([&self](websocketpp::connection_hdl hdl) {
         if (self->on_fail) {
-            self->on_fail(*self.obj);
+            self->on_fail();
         } else {
             spdlog::info("{}", LOG_HEAD("on_fail"));
         }
@@ -81,7 +81,7 @@ static void pp_connect(T &client, Self &self) {
 
     client.set_message_handler([&self](websocketpp::connection_hdl hdl, WSClient::message_ptr msg) {
         if (self->on_message) {
-            self->on_message(*self.obj, msg->get_payload());
+            self->on_message(msg->get_payload());
         } else {
             spdlog::info("{} msg: {}", LOG_HEAD("on_message"), msg->get_payload());
         }

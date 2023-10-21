@@ -22,10 +22,10 @@ public:
     Client();
     ~Client();
 
-    std::function<void(Client &)> on_open;
-    std::function<void(Client &)> on_close;
-    std::function<void(Client &)> on_fail;
-    std::function<void(Client &, std::string const &msg)> on_message;
+    std::function<void()> on_open;
+    std::function<void()> on_close;
+    std::function<void()> on_fail;
+    std::function<void(std::string const &msg)> on_message;
 
     Client* set_reconnect(int second);
 
