@@ -78,6 +78,17 @@ void Modules::default_config() {
     core::config::Config::init(default_config);
 }
 
+// 
+bool Modules::is_ready() {
+    if (self.trade && self.market) {
+        return self.trade->is_ready() && self.market->is_ready();
+    } else if (self.trade) {
+        return self.trade->is_ready();
+    } else if (self.market) {
+        return self.market->is_ready();
+    } 
+    return false;
+}
 
 void handle_sigint(int signal) {
     std::cout << std::endl;

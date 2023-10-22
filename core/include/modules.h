@@ -28,6 +28,7 @@ public:
     virtual void init_config();
 
     // 
+    virtual bool is_ready();
     virtual void run();
 
 private:
