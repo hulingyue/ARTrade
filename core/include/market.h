@@ -9,6 +9,9 @@ using MarketOperateResult = core::base::datas::MarketOperateResult;
 
 class Market {
     public:
+        Market() = default;
+        virtual ~Market() = default;
+
         virtual bool is_ready() = 0;
 
         virtual MarketOperateResult subscribe() = 0;
