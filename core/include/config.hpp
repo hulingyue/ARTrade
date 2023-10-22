@@ -81,3 +81,5 @@ std::string Config::file_path;
 
 } // namespace config
 } // namespace core
+
+#undef LOGHEAD
