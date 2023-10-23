@@ -1,4 +1,3 @@
-#pragma once
 #include "modules.h"
 #include "config.h"
 #include "files.hpp"
