@@ -4,7 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace CORE {
+namespace core {
 namespace Private {
 
 bool create_folder(const std::string path, const std::string name) {
@@ -19,5 +19,5 @@ bool create_folder(const std::string path, const std::string name) {
     return false;
 }
 
-} // namespace FILES
-} // namespace CORE
+} // namespace Private
+} // namespace core
