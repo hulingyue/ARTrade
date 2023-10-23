@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
 #include "ws_client.h"
+#include "binance.h"
 
 using namespace core::WebSocket;
 using namespace std::chrono_literals;
@@ -46,10 +47,12 @@ private:
 };
 
 int main() {
-    Demo d;
-    d.run();
-    while (true) {
+    // Demo d;
+    // d.run();
+    // while (true) {
 
-    }
+    // }
+    Binance binance;
+    binance.run();
     return 0;
 }
