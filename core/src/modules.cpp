@@ -65,6 +65,7 @@ bool Modules::is_trade_ready() {
 // Config
 void Modules::init_config() {
     default_config();
+    spdlog::info("{} init config with default config!", LOGHEAD);
 }
 
 void Modules::default_config() {
