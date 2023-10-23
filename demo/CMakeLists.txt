@@ -9,18 +9,20 @@ set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 set(CORE ${CMAKE_CURRENT_SOURCE_DIR}/../core)
 message(STATUS "core: ${CORE}")
-
 add_subdirectory(${CORE} core)
-include_directories(
-  ${CORE}/include
-  ${CORE}/3rd/spdlog/include
-)
 message(STATUS "Build with core source code 🆗")
 
 #---------------------------------------------------------------
 # app
+file(GLOB SOURCES "src/*.cpp" "main.cpp")
 add_executable(${PROJECT_NAME}
-  main.cpp
+  ${SOURCES}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE core)
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+  ${CORE}/include
+  ${CORE}/3rd/spdlog/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
