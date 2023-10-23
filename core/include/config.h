@@ -10,7 +10,7 @@ namespace config {
 
 class Config final {
 public:
-    static void init(nlohmann::json Config);
+    static void init(nlohmann::json config);
 
     static bool read(std::string file_path);
 

@@ -11,7 +11,7 @@ namespace config {
 nlohmann::json Config::config;
 std::string Config::file_path;
 
-void Config::init(nlohmann::json Config) {
+void Config::init(nlohmann::json config) {
     Config::config = config;
 }
 
