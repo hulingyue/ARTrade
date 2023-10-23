@@ -10,6 +10,8 @@ public:
 
     void init_config();
 
+    BinanceMarket& market();
+
 private:
     Self &self;
 };

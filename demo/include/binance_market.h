@@ -1,10 +1,11 @@
 #include "market.h"
 #include "datas.h"
+#include "pimpl.h"
 
 using MarketOperateResult = core::base::datas::MarketOperateResult;
 
 
-class BinanceMarket final: core::api::market::Market {
+class BinanceMarket final: public core::api::market::Market {
 public:
     BinanceMarket();
     ~BinanceMarket();
@@ -13,4 +14,10 @@ public:
 
     MarketOperateResult subscribe() override;
     MarketOperateResult unsubscribe() override;
+
+private:
+    void on_open();
+
+private:
+    Self &self;
 };

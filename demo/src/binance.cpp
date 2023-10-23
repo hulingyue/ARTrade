@@ -14,7 +14,7 @@ struct Self {
 
 
 Binance::Binance() : self { *new Self{} } {
-    // set_market_obj(&self.market);
+    set_market_obj(&self.market);
 }
 
 Binance::~Binance() {
@@ -33,6 +33,10 @@ void Binance::init_config() {
 
     core::config::Config::init(binance_config);
     spdlog::info("{} config: \n{}", LOGHEAD, core::config::Config::get().dump(4));
+}
+
+BinanceMarket& Binance::market() {
+    return self.market;
 }
 
 #undef LOGHEAD
