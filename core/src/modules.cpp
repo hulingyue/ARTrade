@@ -1,5 +1,6 @@
+#pragma once
 #include "modules.h"
-#include "config.hpp"
+#include "config.h"
 
 
 #define LOGHEAD "[Modules::" + std::string(__func__) + "]"
