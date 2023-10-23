@@ -1,6 +1,7 @@
 #pragma once
 #include "modules.h"
 #include "config.h"
+#include "files.hpp"
 
 
 #define LOGHEAD "[Modules::" + std::string(__func__) + "]"
@@ -101,6 +102,11 @@ void handle_sigint(int signal) {
 
 void Modules::run() {
     std::signal(SIGINT, handle_sigint);
+
+    // config
+    init_config();
+    core::Private::create_folder("./", "log");
+    core::config::Config::read("./log/app.json");
 
     while (true) {
 
