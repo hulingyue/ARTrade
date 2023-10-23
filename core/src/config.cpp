@@ -43,6 +43,7 @@ bool Config::read(std::string file_path) {
     }
     
     spdlog::error("{} cannot open {}", LOGHEAD, Config::file_path);
+    Config::save();
     return false;
 }
 
