@@ -10,3 +10,6 @@
 [submodule "core/3rd/websocketpp"]
 	path = core/3rd/websocketpp
 	url = https://github.com/zaphoyd/websocketpp
+[submodule "core/3rd/CLI11"]
+	path = core/3rd/CLI11
+	url = https://github.com/CLIUtils/CLI11.git
