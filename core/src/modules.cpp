@@ -108,9 +108,20 @@ void Modules::run() {
     core::Private::create_folder("./", "log");
     core::config::Config::read("./log/app.json");
 
+    auto ts = std::chrono::system_clock::now();
     while (true) {
-
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        
+        auto now = std::chrono::system_clock::now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - ts) >= std::chrono::seconds(1)) {
+            interval_1s();
+            ts = now;
+        }
     }
+}
+
+void Modules::interval_1s() {
+    spdlog::info("{}", LOGHEAD);
 }
 
 } // namespace modules

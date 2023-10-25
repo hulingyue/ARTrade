@@ -30,6 +30,7 @@ public:
     // 
     virtual bool is_ready();
     virtual void run();
+    virtual void interval_1s();
 
 private:
     // Config
