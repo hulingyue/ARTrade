@@ -8,7 +8,9 @@ public:
     Bybit();
     ~Bybit();
 
-    void init_config();
+    void init_config() override;
+
+    void interval_1s() override;
 
     BybitMarket& market();
 

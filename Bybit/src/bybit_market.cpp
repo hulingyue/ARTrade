@@ -10,6 +10,7 @@ namespace {
 struct Self {
     std::atomic<bool> is_ready = false;
     Client *client = nullptr;
+    int interval = 0;
 
     ~Self() {
         if (client) delete client;
@@ -66,6 +67,12 @@ MarketOperateResult BybitMarket::unsubscribe(const std::vector<std::string> symb
     return market_evene(self, "unsubscribe", std::move(symbols));
 }
 
+void BybitMarket::interval_1s() {
+    self.interval += 1;
+    if (self.interval % 30 == 0) {
+        ping();
+    }
+}
 
 /***********************/
 /**  WebSocket Event  **/
@@ -83,6 +90,11 @@ void BybitMarket::on_close() {
 
 void BybitMarket::on_message(const std::string &msg) {
     spdlog::info("{} msg: {}", LOGHEAD, msg);
+}
+
+void BybitMarket::ping() {
+    std::string json_obj = R"({"req_id": "0", "op": "ping"})";
+    self.client->send(json_obj);
 }
 
 #undef LOGHEAD

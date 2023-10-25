@@ -17,10 +17,14 @@ public:
     MarketOperateResult subscribe(const std::vector<std::string> symbols) override;
     MarketOperateResult unsubscribe(const std::vector<std::string> symbols) override;
 
+    void interval_1s();
+
 private:
     void on_open();
     void on_close();
     void on_message(std::string const &msg);
+
+    void ping();
 
 private:
     Self &self;

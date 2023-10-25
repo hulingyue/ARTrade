@@ -35,6 +35,10 @@ void Bybit::init_config() {
     spdlog::info("{} config: \n{}", LOGHEAD, core::config::Config::get().dump(4));
 }
 
+void Bybit::interval_1s() {
+    self.market.interval_1s();
+}
+
 BybitMarket& Bybit::market() {
     return self.market;
 }

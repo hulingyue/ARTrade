@@ -13,6 +13,7 @@ class Market {
         virtual ~Market() = default;
 
         virtual bool is_ready() = 0;
+        virtual void interval_1s() {}
 
         virtual MarketOperateResult subscribe(const std::vector<std::string> symbols) = 0;
         virtual MarketOperateResult unsubscribe(const std::vector<std::string> symbols) = 0;
