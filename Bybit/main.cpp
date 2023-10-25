@@ -15,7 +15,7 @@ int main() {
     } while (!bybit.is_market_ready());
 
     std::this_thread::sleep_for(1000ms);
-    bybit.market().subscribe();
+    bybit.market().subscribe({"tickers.BTCUSDT"});
     bybit.run();
     return 0;
 }

@@ -14,8 +14,8 @@ class Market {
 
         virtual bool is_ready() = 0;
 
-        virtual MarketOperateResult subscribe() = 0;
-        virtual MarketOperateResult unsubscribe() = 0;
+        virtual MarketOperateResult subscribe(const std::vector<std::string> symbols) = 0;
+        virtual MarketOperateResult unsubscribe(const std::vector<std::string> symbols) = 0;
 };            
 
 } // namespace market

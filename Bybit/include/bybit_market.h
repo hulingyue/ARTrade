@@ -14,8 +14,8 @@ public:
 
     bool is_ready() override;
 
-    MarketOperateResult subscribe() override;
-    MarketOperateResult unsubscribe() override;
+    MarketOperateResult subscribe(const std::vector<std::string> symbols) override;
+    MarketOperateResult unsubscribe(const std::vector<std::string> symbols) override;
 
 private:
     void on_open();

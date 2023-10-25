@@ -40,30 +40,30 @@ bool BybitMarket::is_ready() {
     return self.is_ready.load();
 }
 
-MarketOperateResult BybitMarket::subscribe() {
+static MarketOperateResult market_evene(Self &self, std::string op, const std::vector<std::string> symbols) {
     nlohmann::json json_obj;
-    json_obj["req_id"] = "test";
-    json_obj["op"] = "subscribe";
+    json_obj["req_id"] = op;
+    json_obj["op"] = op;
     json_obj["args"] = {};
-    json_obj["args"].push_back("tickers.BTCUSDT");
+    for (auto symbol: symbols) {
+        json_obj["args"].push_back(symbol);
+    }
     std::string json_str = json_obj.dump();
 
-    std::cout << json_str << std::endl;
-
-    self.client->send(json_str);
+    auto code = self.client->send(json_str);
 
     return {
-        .code = 0,
+        .code = code,
         .msg = ""
     };
 }
 
-MarketOperateResult BybitMarket::unsubscribe() {
+MarketOperateResult BybitMarket::subscribe(const std::vector<std::string> symbols) {
+    return market_evene(self, "subscribe", std::move(symbols));
+}
 
-    return {
-        .code = 0,
-        .msg = ""
-    };
+MarketOperateResult BybitMarket::unsubscribe(const std::vector<std::string> symbols) {
+    return market_evene(self, "unsubscribe", std::move(symbols));
 }
 
 
