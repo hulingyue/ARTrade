@@ -1,6 +1,6 @@
 #include "modules.h"
 #include "config.h"
-#include "files.hpp"
+#include "util.hpp"
 
 
 #define LOGHEAD "[Modules::" + std::string(__func__) + "]"
@@ -105,7 +105,7 @@ void Modules::run() {
 
     // config
     init_config();
-    core::Private::create_folder("./", "log");
+    core::util::create_folder("./", "log");
     core::config::Config::read("./log/app.json");
 
     auto ts = std::chrono::system_clock::now();
