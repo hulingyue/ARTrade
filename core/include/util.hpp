@@ -4,8 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace core {
-namespace util {
+namespace core::util {
 
 bool create_folder(const std::string path, const std::string name) {
     auto folder_path = std::filesystem::path(path) / std::filesystem::path(name);
@@ -19,5 +18,4 @@ bool create_folder(const std::string path, const std::string name) {
     return false;
 }
 
-} // namespace Util
-} // namespace core
+} // namespace core::util
