@@ -3,10 +3,11 @@
 #include <filesystem>
 
 #include <spdlog/spdlog.h>
+#include <CLI/CLI.hpp>
 
 namespace core::util {
 
-bool create_folder(const std::string path, const std::string name) {
+inline bool create_folder(const std::string path, const std::string name) {
     auto folder_path = std::filesystem::path(path) / std::filesystem::path(name);
     try {
         std::filesystem::create_directory(folder_path);
@@ -16,6 +17,20 @@ bool create_folder(const std::string path, const std::string name) {
         spdlog::error("create direcroty - failure! msg: {}", e.what());
     }
     return false;
+}
+
+struct Arguments {
+    std::string log_path;
+
+    Arguments() : log_path("./") {}
+};
+
+inline int cli_parse(const std::string describe, Arguments &result, int argc, char** argv) {
+    CLI::App app {describe};
+    argv = app.ensure_utf8(argv);
+    app.add_option("-f,--file", result.log_path, "log/ path")->required();
+
+    CLI11_PARSE(app, argc, argv);
 }
 
 } // namespace core::util
