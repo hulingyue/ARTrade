@@ -32,3 +32,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     OpenSSL::SSL
     OpenSSL::Crypto
 )
+
+install(TARGETS ${PROJECT_NAME}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include/${PROJECT_NAME})
