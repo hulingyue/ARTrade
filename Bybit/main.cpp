@@ -3,6 +3,8 @@
 
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
+
+#include <core/util.hpp>
 #include "bybit.h"
 
 using namespace std::chrono_literals;

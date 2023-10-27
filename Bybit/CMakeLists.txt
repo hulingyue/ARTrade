@@ -22,7 +22,5 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE core)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-  ${CORE}/include
-  ${CORE}/3rd/spdlog/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
