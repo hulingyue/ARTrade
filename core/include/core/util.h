@@ -42,7 +42,7 @@ struct Arguments {
 
 extern Arguments arguments;
 
-inline void startup(core::modules::Modules * const module, int argc, char** argv, std::string_view log_level = "info", size_t log_size = 5 * 1024 * 1024, size_t log_files = 10) {
+inline void startup(core::modules::Modules * const module, int argc, char** argv, size_t log_size = 5 * 1024 * 1024, size_t log_files = 10) {
     // startup command
     int cli_parse_code = cli_parse(argc, argv);
     if (cli_parse_code != 0) {
@@ -75,7 +75,8 @@ inline void startup(core::modules::Modules * const module, int argc, char** argv
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
 
-    set_log_level(log_level);
+    auto config = core::config::Config::get();
+    set_log_level(config.value("log_level", "info"));
 }
 
 inline std::filesystem::path log_path() {
