@@ -9,29 +9,33 @@
 # ARTrade (اسم مبدئي)
 > المعنى: نظام تداول يعمل دائمًا دون توقف
 
+### أحدث فرع
+[develop_2310](https://github.com/hulingyue/ARTrade/tree/develop_2310)
+
 ### كيف تستعمل؟ (خذ بيئة أوبونتو كمثال)
-1. تحميل cmake
+1. تحميل cmake  
     ``` shell
     sudo apt install cmake
     ```
-2. تحميل g++
+2. تحميل g++  
     ```shell
     sudo apt install g++
     ```
-3. تحميل OpenSSL
+3. تحميل OpenSSL  
     ```shell
     sudo apt-get install libssl-dev
     ```
-4. تحميل Boost
+4. تحميل Boost  
     ```shell
     sudo apt-get install libboost-all-dev
     ```
-5. مترجم
+5. مترجم   
     ``` shell
-    compile bybit
+    <!-- compile bybit -->
     > sh compile.sh -p bybit
     ```
-6. التنفيذ (خذ **bybit** كمثال)
+6. التنفيذ (خذ **bybit** كمثال)  
+
     ```shell
     > cd bybit
     > ./bybit -r ./
