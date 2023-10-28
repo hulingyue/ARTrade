@@ -51,9 +51,9 @@ inline void startup(const std::string describe, int argc, char** argv, std::stri
 
     // log
     std::filesystem::path log_file_path = log_path() / std::filesystem::path("log.txt");
-    auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file_path, log_size, log_files);
-    auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    auto logger = std::make_shared<spdlog::logger>("file_logger", spdlog::sinks_init_list{fileSink, consoleSink});
+    auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file_path, log_size, log_files);
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto logger = std::make_shared<spdlog::logger>("file_logger", spdlog::sinks_init_list{file_sink, console_sink});
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
 
