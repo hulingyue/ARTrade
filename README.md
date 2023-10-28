@@ -21,9 +21,11 @@
     ```
 5. compile project
     ``` shell
-    compile demo
-    > sh compile.sh -p demo
-
-    compile Bybit
-    > sh compile.sh -p Bybit
+    compile bybit
+    > sh compile.sh -p bybit
+    ```
+6. run (example: bybit)
+    ```shell
+    > cd bybit
+    > ./bybit -r ./
     ```
