@@ -25,6 +25,7 @@ void Bybit::init_config() {
     nlohmann::json bybit_config = nlohmann::json::parse(
         R"(
             {
+                "log_level": "debug",
                 "project": "Bybit",
                 "version:": 1.0
             }
