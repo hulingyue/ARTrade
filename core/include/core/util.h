@@ -7,8 +7,7 @@
 
 namespace core::util {
 
-inline bool create_folder(const std::string path, const std::string name) {
-    auto folder_path = std::filesystem::path(path) / std::filesystem::path(name);
+inline bool create_folder(std::filesystem::path folder_path) {
     try {
         std::filesystem::create_directory(folder_path);
         spdlog::info("create directory  - success!");

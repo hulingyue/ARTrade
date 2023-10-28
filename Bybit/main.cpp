@@ -9,7 +9,13 @@
 
 using namespace std::chrono_literals;
 
-int main() {
+int main(int argc, char **argv) {
+    std::string Project = "Bybit";
+    if (core::util::cli_parse(Project, argc, argv) != 0) {
+        spdlog::error("[{}] Parameter parsing failed!", Project);
+        exit(-1);
+    }
+
     Bybit bybit;
     do {
         spdlog::info("bybit is market ready? {}", bybit.is_market_ready() ? " true" : "false");
