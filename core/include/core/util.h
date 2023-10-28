@@ -3,6 +3,8 @@
 #include <filesystem>
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <CLI/CLI.hpp>
 
 #define LOGHEAD "[util" + std::string(__func__) + "]"
@@ -13,6 +15,9 @@ namespace {
 }
 
 namespace core::util {
+
+std::filesystem::path log_path();
+std::filesystem::path config_path();
 
 inline bool create_folder(std::filesystem::path folder_path) {
     try {
@@ -26,24 +31,41 @@ inline bool create_folder(std::filesystem::path folder_path) {
 }
 
 struct Arguments {
-    std::string config_path;
-    std::string log_path;
+    std::string root_path;
 
-    Arguments() : config_path("./"), log_path("") {}
+    Arguments() : root_path("./") {}
 };
 
 extern Arguments arguments;
 
 inline void startup(const std::string describe, int argc, char** argv, std::string_view log_level = "info", size_t log_size = 5 * 1024 * 1024, size_t log_files = 10) {
-    // log
-    set_log_level(log_level);
-
     // startup command
     int cli_parse_code = cli_parse(std::move(describe), argc, argv);
     if (cli_parse_code != 0) {
         spdlog::error("{} Parameter parsing failed!", LOGHEAD);
         exit(-1);
     }
+
+    // config
+    core::util::create_folder(config_path());
+
+    // log
+    std::filesystem::path log_file_path = log_path() / std::filesystem::path("log.txt");
+    auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file_path, log_size, log_files);
+    auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto logger = std::make_shared<spdlog::logger>("file_logger", spdlog::sinks_init_list{fileSink, consoleSink});
+    spdlog::register_logger(logger);
+    spdlog::set_default_logger(logger);
+
+    set_log_level(log_level);
+}
+
+inline std::filesystem::path log_path() {
+    return std::move(std::filesystem::path(arguments.root_path) / std::filesystem::path("log"));
+}
+
+inline std::filesystem::path config_path() {
+    return std::move(std::filesystem::path(arguments.root_path) / std::filesystem::path("config"));
 }
 
 } // namespace core::util
@@ -67,14 +89,10 @@ inline void set_log_level(const std::string_view level) {
 inline int cli_parse(const std::string describe, int argc, char** argv) {
     CLI::App app {describe};
     argv = app.ensure_utf8(argv);
-    app.add_option("-c,--config", arguments.config_path, "config/ path")->required();
-    app.add_option("-l,--log", arguments.log_path, "log/ path");
+    app.add_option("-r,--root", arguments.root_path, "root path")->required();
 
     CLI11_PARSE(app, argc, argv);
 
-    if (arguments.log_path.empty()) {
-        arguments.log_path = arguments.config_path;
-    }
     return 0;
 }
 

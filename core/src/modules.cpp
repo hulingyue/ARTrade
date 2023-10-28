@@ -108,9 +108,7 @@ void Modules::run() {
     // config
     init_config();
 
-    std::filesystem::path folder_path = std::filesystem::path(core::util::arguments.config_path) / std::filesystem::path("config");
-    core::util::create_folder(folder_path);
-    core::config::Config::read((folder_path / std::filesystem::path("app.json")).string());
+    core::config::Config::read((core::util::config_path() / std::filesystem::path("app.json")).string());
 
     auto ts = std::chrono::system_clock::now();
     while (true) {
