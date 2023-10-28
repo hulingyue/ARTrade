@@ -11,10 +11,7 @@ using namespace std::chrono_literals;
 
 int main(int argc, char **argv) {
     std::string Project = "Bybit";
-    if (core::util::cli_parse(Project, argc, argv) != 0) {
-        spdlog::error("[{}] Parameter parsing failed!", Project);
-        exit(-1);
-    }
+    core::util::startup(Project, argc, argv);
 
     Bybit bybit;
     do {
