@@ -7,11 +7,15 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <CLI/CLI.hpp>
 
+#include "core/config.h"
+#include "core/modules.h"
+
+
 #define LOGHEAD "[util" + std::string(__func__) + "]"
 
 namespace {
     void set_log_level(const std::string_view level);
-    int cli_parse(const std::string describe, int argc, char** argv);
+    int cli_parse(int argc, char** argv);
 }
 
 namespace core::util {
@@ -38,16 +42,30 @@ struct Arguments {
 
 extern Arguments arguments;
 
-inline void startup(const std::string describe, int argc, char** argv, std::string_view log_level = "info", size_t log_size = 5 * 1024 * 1024, size_t log_files = 10) {
+inline void startup(core::modules::Modules * const module, int argc, char** argv, std::string_view log_level = "info", size_t log_size = 5 * 1024 * 1024, size_t log_files = 10) {
     // startup command
-    int cli_parse_code = cli_parse(std::move(describe), argc, argv);
+    int cli_parse_code = cli_parse(argc, argv);
     if (cli_parse_code != 0) {
         spdlog::error("{} Parameter parsing failed!", LOGHEAD);
         exit(-1);
     }
 
     // config
+    if (module == nullptr) {
+        spdlog::error("{} module pointer is nullpter!", LOGHEAD);
+        exit(-2);
+    }
+    module->init_config();
+
     core::util::create_folder(config_path());
+    bool read_config_status = core::config::Config::read(
+        (core::util::config_path() / std::filesystem::path("app.json")).string()
+    );
+
+    if (read_config_status == false) {
+        spdlog::error("{} cannot found 'app.json' at {}", LOGHEAD, core::util::config_path().string());
+        exit(-3);
+    }
 
     // log
     std::filesystem::path log_file_path = log_path() / std::filesystem::path("log.txt");
@@ -86,8 +104,8 @@ inline void set_log_level(const std::string_view level) {
     else { spdlog::set_level(spdlog::level::info); }
 }
 
-inline int cli_parse(const std::string describe, int argc, char** argv) {
-    CLI::App app {describe};
+inline int cli_parse(int argc, char** argv) {
+    CLI::App app {"ARTrade command"};
     argv = app.ensure_utf8(argv);
     app.add_option("-r,--root", arguments.root_path, "root path")->required();
 

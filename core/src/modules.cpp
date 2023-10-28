@@ -105,11 +105,6 @@ void handle_sigint(int signal) {
 void Modules::run() {
     std::signal(SIGINT, handle_sigint);
 
-    // config
-    init_config();
-
-    core::config::Config::read((core::util::config_path() / std::filesystem::path("app.json")).string());
-
     auto ts = std::chrono::system_clock::now();
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
