@@ -4,6 +4,7 @@ while getopts ":p:" opt; do
     case $opt in
         p)
             project="$OPTARG"
+            project=${project%/}
             ;;
         \?)
             echo "无效的选项: -$OPTARG" >&2
@@ -35,6 +36,8 @@ if [ -d "$PROJECT_NAME" ]; then
     cd build
     cmake ..
     make -j16
+
+    cp ./"$PROJECT_NAME" ./../../"$PROJECT_NAME"
 else
     error "UNKNOW PROJECT!"
 fi
