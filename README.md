@@ -1,8 +1,14 @@
-# ARTrade
+[中文](./language/Chinese.md)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+[English](./README.md)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+[한국어](./language/Korean.md)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+[بالعربية](./language/Arabic.md)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
 
-## always running trading system
+<hr/>
 
-### how to use? (Ubuntu)
+# ARTrade (Tentative name)
+> meaning: A trading system that always runs without downtime
+
+### how to use? (Take the **Ubuntu** as an example)
 1. download cmake
     ``` shell
     sudo apt install cmake
@@ -24,7 +30,7 @@
     compile bybit
     > sh compile.sh -p bybit
     ```
-6. run (example: bybit)
+6. run (Take the **bybit** as an example)
     ```shell
     > cd bybit
     > ./bybit -r ./
