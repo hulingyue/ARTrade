@@ -3,6 +3,7 @@ project(bybit)
 
 set (CMAKE_CXX_FLAGS "-std=c++17 -Wall -DLLVM_USE_LINKER=lld -Wno-missing-braces")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
+add_compile_options(-Wno-subobject-linkage)
 
 #---------------------------------------------------------------
 # core
