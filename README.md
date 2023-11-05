@@ -9,7 +9,7 @@
 > meaning: A trading system that always runs without downtime
 
 ### Latest Branch
-[develop_2310](https://github.com/hulingyue/ARTrade/tree/develop_2310)
+[develop_2311](https://github.com/hulingyue/ARTrade/tree/develop_2311)
 
 ### how to use? (Take the **Ubuntu** as an example)
 1. download cmake

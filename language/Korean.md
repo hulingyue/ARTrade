@@ -10,7 +10,7 @@
 > 의미: 다운타임 없이 항상 실행되는 거래 시스템
 
 ### 최신 지점
-[develop_2310](https://github.com/hulingyue/ARTrade/tree/develop_2310)
+[develop_2311](https://github.com/hulingyue/ARTrade/tree/develop_2311)
 
 ### 사용하는 방법? (우분투 환경을 예로 들어보겠습니다)
 1. cmake 다운로드

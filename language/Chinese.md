@@ -9,7 +9,7 @@
 > 含义: 永远运行，无需停机的交易系统
 
 ### 最新分支
-[develop_2310](https://github.com/hulingyue/ARTrade/tree/develop_2310)
+[develop_2311](https://github.com/hulingyue/ARTrade/tree/develop_2311)
 
 ### 如何使用？（以 **Ubuntu** 环境为例）
 1. 下载 cmake
