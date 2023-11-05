@@ -1,11 +1,48 @@
+#pragma once
+#include <iostream>
+#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <fcntl.h>
+
 #include <spdlog/spdlog.h>
 
-#include "core/sharememory.h"
-#include "core/time.hpp"
-#include "core/util.h"
-
+#include "time.hpp"
+#include "util.h"
+#include "pimpl.h"
 
 #define LOGHEAD "[SHAREMEMORY::" + std::string(__func__) + "]"
+
+
+namespace core::sharememory {
+
+enum class memory_type {
+    unknow = 0,
+    market = 1,
+    trade = 10
+};
+
+template<typename T>
+class ShareMemory {
+public:
+    ShareMemory(std::string name, int proj_id, memory_type _type);
+    virtual ~ShareMemory();
+
+public:
+    bool create();
+    bool connect();
+
+    bool write(T data, bool is_safe = true, bool is_cover = false);
+    T* read();
+
+private:
+    template_Self<T> &self;
+};
+    
+} // namespace core::sharememory
+
+
+/********************************/ 
 
 namespace {
 
@@ -97,7 +134,19 @@ struct template_Self {
 template<typename T>
 static inline key_t generate_key(const template_Self<T>& self) {
     // core::util::create_folder()
+    int fd = open(self.name.c_str(), O_CREAT | O_RDWR, 0666);
+    if (fd == -1) {
+        spdlog::error("{} Failed to create temporary file!", LOGHEAD);
+        exit(-1);
+    }
     key_t key = ftok(self.name.c_str(), self.proj_id);
+
+    close(fd);
+    if (unlink(self.name.c_str()) == -1) {
+        spdlog::error("{} Failed to delete temporary file!", LOGHEAD);
+        exit(-1);
+    }
+
     if (key == -1) {
         spdlog::error("{} generate key error! pathname: {} proj_id: {}", LOGHEAD, self.name.c_str(), self.proj_id);
         exit(-1);
