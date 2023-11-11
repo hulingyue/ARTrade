@@ -1,9 +1,7 @@
 #pragma once
 #include "datas.hpp"
 
-namespace core {
-namespace api {
-namespace market {
+namespace core::api::market {
     
 using MarketOperateResult = core::base::datas::MarketOperateResult;
 
@@ -19,8 +17,4 @@ class Market {
         virtual MarketOperateResult unsubscribe(const std::vector<std::string> symbols) = 0;
 };            
 
-} // namespace market
-    
-} // namespace api
-    
-} // namespace core
+} // namespace core::api::market

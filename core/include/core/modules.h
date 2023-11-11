@@ -8,8 +8,7 @@
 #include "market.h"
 
 
-namespace core {
-namespace modules {
+namespace core::modules {
 
 class Modules {
 public:
@@ -39,5 +38,4 @@ private:
     Self &self;
 };
 
-} // namespace modules
-} // namespace core
+} // namespace core::modules

@@ -42,9 +42,7 @@ struct Self {
 } // namespace
 
 
-namespace core {
-namespace WebSocket {
-namespace Client {
+namespace core::WebSocket::Client {
 
 static inline void set_sls_init(WSSClient &client) {
     client.set_tls_init_handler([](websocketpp::connection_hdl) {
@@ -205,9 +203,7 @@ void Client::stop() {
     }
 }
 
-} // namespace Client
-} // namespace WebSocket
-} // namespace core 
+} // namespace core::WebSocket::Client 
 
 #undef LOGHEAD
 #undef LOG_HEAD

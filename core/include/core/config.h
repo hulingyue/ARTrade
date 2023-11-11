@@ -5,8 +5,7 @@
 #include <spdlog/spdlog.h>
 
 
-namespace core {
-namespace config {
+namespace core::config {
 
 class Config final {
 public:
@@ -28,5 +27,4 @@ private:
     static std::string file_path;
 };
 
-} // namespace config
-} // namespace core
+} // namespace core::config

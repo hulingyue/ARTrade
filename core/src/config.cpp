@@ -3,8 +3,7 @@
 
 #define LOGHEAD "[Config::" + std::string(__func__) + "]"
 
-namespace core {
-namespace config {
+namespace core::config {
 
 // static init
 nlohmann::json Config::config;
@@ -64,7 +63,6 @@ nlohmann::json& Config::get() {
     return Config::config;
 }
 
-} // namespace config
-} // namespace core
+} // namespace core::config
 
 #undef LOGHEAD

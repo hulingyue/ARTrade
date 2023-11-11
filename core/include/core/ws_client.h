@@ -13,9 +13,7 @@ typedef websocketpp::client<websocketpp::config::asio_client> WSClient;
 typedef std::shared_ptr<boost::asio::ssl::context> context_ptr;
 typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
-namespace core {
-namespace WebSocket {
-namespace Client {
+namespace core::WebSocket::Client {
     
 class Client {
 public:
@@ -39,6 +37,4 @@ private:
     Self &self;
 };
 
-} // namespace Client
-} // namespace name
-} // namespace cor 
+} // namespace core::WebSocket::Client

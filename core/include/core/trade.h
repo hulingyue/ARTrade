@@ -1,9 +1,7 @@
 #pragma once 
 #include "datas.hpp"
 
-namespace core {
-namespace api {
-namespace trade {
+namespace core::api::trade {
     
 using TradeOperateResult = core::base::datas::TradeOperateResult;
 
@@ -18,8 +16,4 @@ class Trade {
         virtual TradeOperateResult cancel() = 0;
 };            
 
-} // namespace trade
-    
-} // namespace api
-    
-} // namespace core
+} // namespace core::api::trade

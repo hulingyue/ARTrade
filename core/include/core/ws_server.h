@@ -3,9 +3,7 @@
 #include <functional>
 #include "pimpl.h"
 
-namespace core {
-namespace WebSocket {
-namespace Server {
+namespace core::WebSocket::Server {
     
 class Server {
 public:
@@ -23,6 +21,4 @@ private:
     Self &self;
 };
 
-} // namespace Server
-} // namespace name
-} // namespace cor 
+} // namespace core::WebSocket::Server 

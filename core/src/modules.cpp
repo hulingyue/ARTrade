@@ -21,8 +21,7 @@ struct Self {
 
 }
 
-namespace core {
-namespace modules {
+namespace core::modules {
 
 Modules::Modules() : self { *new Self{} } {
 
@@ -121,7 +120,6 @@ void Modules::interval_1s() {
     spdlog::info("{}", LOGHEAD);
 }
 
-} // namespace modules
-} // namespace core
+} // namespace core::modules
 
 #undef LOGHEAD
