@@ -16,10 +16,10 @@
 
 namespace core::sharememory {
 
-enum class memory_type {
-    unknow = 0,
-    market = 1,
-    trade = 10
+enum class memory_type : char {
+      unknow
+    , market
+    , command
 };
 
 template<typename T>
@@ -46,7 +46,7 @@ private:
 
 namespace {
 
-const int buffer_size = 256;
+const int buffer_size = 1023;
 
 template<typename T>
 class Buffer {
@@ -163,7 +163,7 @@ static inline int generate_permission(const template_Self<T>& self, const int mo
     case core::sharememory::memory_type::market:
         permission = 0666;
         break;
-    case core::sharememory::memory_type::trade:
+    case core::sharememory::memory_type::command:
         permission = 0611;
         break;
     default:
@@ -177,7 +177,11 @@ static inline int generate_permission(const template_Self<T>& self, const int mo
 template<typename T>
 static inline Buffer<T>* connect_memory(template_Self<T>& self, int permission) {
     key_t key = generate_key(self);
-    self.shmid = shmget(key, sizeof(Buffer<T>), permission);
+
+    int capacity = sizeof(Buffer<T>);
+    int size = ((capacity + 4095) / 4096) * 4096;
+
+    self.shmid = shmget(key, size, permission);
     if (self.shmid == -1) {
         spdlog::error("{} shmget error!", LOGHEAD);
         // exit(-1);
