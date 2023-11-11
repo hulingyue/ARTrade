@@ -13,7 +13,7 @@ struct Self {
 }
 
 
-Bybit::Bybit() : self { *new Self{} } {
+Bybit::Bybit(int argc, char** argv) : Modules(argc, argv), self { *new Self{} } {
     set_market_obj(&self.market);
 }
 

@@ -12,9 +12,7 @@ using namespace std::chrono_literals;
 using namespace core::message;
 
 int main(int argc, char **argv) {
-    Bybit bybit;
-
-    core::util::startup(&bybit, argc, argv);
+    Bybit bybit(argc, argv);
 
     do {
         spdlog::info("bybit is market ready? {}", bybit.is_market_ready() ? " true" : "false");

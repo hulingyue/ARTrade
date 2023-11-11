@@ -12,8 +12,9 @@ namespace core::modules {
 
 class Modules {
 public:
-    Modules();
+    Modules(int argc, char** argv);
     virtual ~Modules();
+    virtual void init(int argc, char** argv, size_t log_size = 5 * 1024 * 1024, size_t log_files = 10);
 
     // Market
     virtual void set_market_obj(core::api::market::Market* market_obj = nullptr);

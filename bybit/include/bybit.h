@@ -5,7 +5,7 @@
 
 class Bybit final : public core::modules::Modules {
 public:
-    Bybit();
+    Bybit(int argc, char** argv);
     ~Bybit();
 
     void init_config() override;

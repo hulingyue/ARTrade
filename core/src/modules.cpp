@@ -23,12 +23,17 @@ struct Self {
 
 namespace core::modules {
 
-Modules::Modules() : self { *new Self{} } {
-
+Modules::Modules(int argc, char** argv) : self { *new Self{} } {
+    // default setting
+    init(argc, argv);
 }
 
 Modules::~Modules() {
     if (&self) { delete &self; }
+}
+
+void Modules::init(int argc, char** argv, size_t log_size, size_t log_files) {
+    core::util::startup(this, argc, argv, log_size, log_files);
 }
 
 // Market
