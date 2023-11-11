@@ -6,7 +6,7 @@
 
 #include <core/util.h>
 #include <core/message.hpp>
-// #include "bybit.h"
+#include "bybit.h"
 
 using namespace std::chrono_literals;
 using namespace core::message;
