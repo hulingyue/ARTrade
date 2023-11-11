@@ -8,7 +8,7 @@
 #include <spdlog/spdlog.h>
 
 #include "time.hpp"
-#include "util.hpp"
+#include "util.h"
 #include "pimpl.h"
 
 #define LOGHEAD "[SHAREMEMORY::" + std::string(__func__) + "]"

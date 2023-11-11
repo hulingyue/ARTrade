@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
 
-#include <core/util.hpp>
+#include <core/util.h>
 #include <core/message.hpp>
 // #include "bybit.h"
 
