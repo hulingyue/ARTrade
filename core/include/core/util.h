@@ -11,7 +11,7 @@
 #include "core/modules.h"
 
 
-#define LOGHEAD "[util" + std::string(__func__) + "]"
+#define LOGHEAD "[util::" + std::string(__func__) + "]"
 
 namespace __util {
     void set_log_level(const std::string_view level);
