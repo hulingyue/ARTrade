@@ -2,7 +2,7 @@
 
 #include "core/modules.h"
 #include "core/config.h"
-#include "core/util.h"
+#include "core/util.hpp"
 
 
 #define LOGHEAD "[Modules::" + std::string(__func__) + "]"

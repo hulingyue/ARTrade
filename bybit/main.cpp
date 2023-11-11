@@ -4,10 +4,12 @@
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
 
-#include <core/util.h>
-#include "bybit.h"
+#include <core/util.hpp>
+#include <core/message.hpp>
+// #include "bybit.h"
 
 using namespace std::chrono_literals;
+using namespace core::message;
 
 int main(int argc, char **argv) {
     Bybit bybit;
