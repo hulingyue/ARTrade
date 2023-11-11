@@ -117,15 +117,15 @@ private:
 
 
 /*****************************************************************
- ** STRUCT: Self                                                **
+ ** STRUCT: MessageSelf                                                **
 ******************************************************************/
-struct Self {
+struct MessageSelf {
     std::string proj_name;
     MessageType type;
     BaseMessage* message;
     
 
-    Self(std::string proj_name, MessageType type, Identity identity) 
+    MessageSelf(std::string proj_name, MessageType type, Identity identity)
         : proj_name(proj_name)
         , type(type)
         , message(message) {
@@ -141,7 +141,7 @@ struct Self {
         }
     }
 
-    ~Self() {
+    ~MessageSelf() {
         if (message) { delete message; }
     }
 
@@ -153,7 +153,7 @@ namespace core::message {
 
 class Message final {
 public:
-    Message(std::string proj_name, MessageType type, Identity identity = Identity::Slave) : self { *new Self(proj_name, type, identity) } {}
+    Message(std::string proj_name, MessageType type, Identity identity = Identity::Slave) : self { *new MessageSelf(proj_name, type, identity) } {}
 
     ~Message() {
         delete &self;
@@ -192,7 +192,7 @@ public:
 
 
 private:
-    Self &self;
+    MessageSelf &self;
 };
 
 } // namespace core::message
