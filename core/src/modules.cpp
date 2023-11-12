@@ -1,3 +1,5 @@
+#include <iostream>
+#include <ctime>
 #include <filesystem>
 
 #include "core/modules.h"
@@ -108,6 +110,12 @@ void handle_sigint(int signal) {
 
 void Modules::run() {
     std::signal(SIGINT, handle_sigint);
+
+    // check if it is ready
+    do {
+        spdlog::info("modules is ready? {}", is_ready() ? "true" : "false");
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    } while (!is_ready());
 
     auto ts = std::chrono::system_clock::now();
     while (true) {
