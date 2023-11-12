@@ -123,29 +123,8 @@ struct MessageSelf {
     std::string proj_name;
     MessageType type;
     BaseMessage* message;
-    
-
-    MessageSelf(std::string proj_name, MessageType type, Identity identity)
-        : proj_name(proj_name)
-        , type(type)
-        , message(message) {
-
-        if (type == MessageType::ShareMemory) {
-            message = new ShareMemoryMessage(proj_name, identity);
-        } else if (type == MessageType::WebSocket) {
-            message = nullptr;
-        } else if (type == MessageType::Socket) {
-            message = nullptr;
-        } else {
-            message = nullptr;
-        }
-    }
-
-    ~MessageSelf() {
-        if (message) { delete message; }
-    }
-
 };
+
 } // namespace 
 
 
@@ -153,9 +132,24 @@ namespace core::message {
 
 class Message final {
 public:
-    Message(std::string proj_name, MessageType type, Identity identity = Identity::Slave) : self { *new MessageSelf(proj_name, type, identity) } {}
+    Message(std::string proj_name, MessageType type, Identity identity = Identity::Slave)
+     : self { *new MessageSelf{} } {
+        self.proj_name = proj_name;
+        self.type = type;
+
+        if (type == MessageType::ShareMemory) {
+            self.message = new ShareMemoryMessage(proj_name, identity);
+        } else if (type == MessageType::WebSocket) {
+            self.message = nullptr;
+        } else if (type == MessageType::Socket) {
+            self.message = nullptr;
+        } else {
+            self.message = nullptr;
+        }
+    }
 
     ~Message() {
+        if (self.message) { delete self.message; }
         delete &self;
     }
 
