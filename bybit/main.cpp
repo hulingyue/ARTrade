@@ -15,9 +15,9 @@ int main(int argc, char **argv) {
     Bybit bybit(argc, argv);
 
     do {
-        spdlog::info("bybit is market ready? {}", bybit.is_market_ready() ? " true" : "false");
+        spdlog::info("bybit is market ready? {}", bybit.is_ready() ? " true" : "false");
         std::this_thread::sleep_for(1000ms);
-    } while (!bybit.is_market_ready());
+    } while (!bybit.is_ready());
 
     std::this_thread::sleep_for(1000ms);
     bybit.market().subscribe({"tickers.BTCUSDT"});
