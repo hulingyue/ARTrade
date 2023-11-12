@@ -6,6 +6,7 @@
 #include "pimpl.h"
 #include "trade.h"
 #include "market.h"
+#include "datas.hpp"
 
 
 namespace core::modules {
@@ -32,9 +33,14 @@ public:
     virtual void run();
     virtual void interval_1s();
 
+public:
+    virtual std::string project_name() = 0;
+    virtual core::base::datas::MessageType message_type() = 0;
+
 private:
     // Config
     void default_config();
+    void custom_init();
 private:
     Self &self;
 };

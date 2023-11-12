@@ -7,23 +7,8 @@
 #define LOGHEAD "[Message::" + std::string(__func__) + "]"
 
 
-namespace core::message {
-
-enum class MessageType : char {
-      ShareMemory
-    , WebSocket
-    , Socket
-};
-} // namespace core::message
-
-enum class Identity : char {
-      Master = 'M'
-    , Slave = 'S'
-};
-
 namespace {
 
-using namespace core::message;
 using namespace core::base::datas;
 using namespace core::sharememory;
 

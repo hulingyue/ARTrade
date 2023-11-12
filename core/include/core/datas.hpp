@@ -14,6 +14,18 @@ struct TradeOperateResult {
 };
 
 
+enum class MessageType : char {
+      ShareMemory
+    , WebSocket
+    , Socket
+};
+
+enum class Identity : char {
+      Master = 'M'
+    , Slave = 'S'
+};
+
+
 enum class CommandType : char {
       SUBSCRIBE
     , UNSUBSCRIBE

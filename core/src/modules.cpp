@@ -5,6 +5,7 @@
 #include "core/modules.h"
 #include "core/config.h"
 #include "core/util.h"
+#include "core/message.hpp"
 
 
 #define LOGHEAD "[Modules::" + std::string(__func__) + "]"
@@ -14,10 +15,12 @@ namespace {
 struct Self {
     core::api::market::Market *market = nullptr;
     core::api::trade::Trade *trade = nullptr;
+    core::message::Message *message = nullptr;
 
     ~Self() {
         if (market) { delete market; }
         if (trade) { delete trade; }
+        if (message) { delete message; }
     }
 };
 
@@ -107,9 +110,19 @@ void handle_sigint(int signal) {
     exit(signal);
 }
 
+void Modules::custom_init() {
+    // something init after custom modules init
+    
+    core::base::datas::MessageType type = message_type();
+    std::string proj = project_name();
+    self.message = new core::message::Message(proj, type, Identity::Master);
+}
+
 
 void Modules::run() {
     std::signal(SIGINT, handle_sigint);
+
+    custom_init();
 
     // check if it is ready
     do {

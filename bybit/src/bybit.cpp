@@ -21,6 +21,14 @@ Bybit::~Bybit() {
 
 }
 
+std::string Bybit::project_name() {
+    return "Bybit";
+}
+
+core::base::datas::MessageType Bybit::message_type() {
+    return core::base::datas::MessageType::ShareMemory;
+}
+
 void Bybit::init_config() {
     nlohmann::json bybit_config = nlohmann::json::parse(
         R"(
