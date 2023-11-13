@@ -2,6 +2,8 @@
 #include <string>
 
 namespace core::base::datas {
+static const int SUBSCRIBE_MAX_SIZE = 10;
+static const int SYMBOL_MAX_LENGTH = 16;
 
 struct MarketOperateResult {
     int code;
@@ -81,8 +83,8 @@ enum class OrderStatus {
 
 // 256 bytes
 struct MarketObj {
-    char symbol[16];
-    char exchange[16];
+    char symbol[SYMBOL_MAX_LENGTH];
+    char exchange[SYMBOL_MAX_LENGTH];
     MarketType market_type;
     // 7 bytes
     long time;
@@ -101,13 +103,13 @@ struct MarketObj {
 
 // 160 bytes
 struct SubscribeObj {
-    char symbols[10][16];
+    char symbols[SUBSCRIBE_MAX_SIZE][SYMBOL_MAX_LENGTH];
 };
 
 // 64bytes
 struct OrderObj {
-    char symbol[16];
-    char exchange[16];
+    char symbol[SYMBOL_MAX_LENGTH];
+    char exchange[SYMBOL_MAX_LENGTH];
 
     OrderSide side;
     OrderOffset offset;
@@ -125,8 +127,8 @@ struct OrderObj {
 
 // 36 bytes
 struct CancelObj {
-    char symbol[16];
-    char exchange[16];
+    char symbol[SYMBOL_MAX_LENGTH];
+    char exchange[SYMBOL_MAX_LENGTH];
 
     int order_id;
 };
