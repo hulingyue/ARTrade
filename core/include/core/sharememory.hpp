@@ -20,6 +20,7 @@ enum class memory_type : char {
       unknow
     , market
     , command
+    , response
 };
 
 template<typename T>
@@ -161,10 +162,11 @@ static inline int generate_permission(const template_Self<T>& self, const int mo
     int permission = 0000;
     switch (self._type) {
     case core::sharememory::memory_type::market:
-        permission = 0666;
+        permission = 0644;
         break;
     case core::sharememory::memory_type::command:
-        permission = 0611;
+    case core::sharememory::memory_type::response:
+        permission = 0666;
         break;
     default:
         spdlog::error("{} memory_type error: {}", LOGHEAD, static_cast<int>(self._type));
@@ -183,7 +185,7 @@ static inline Buffer<T>* connect_memory(template_Self<T>& self, int permission) 
 
     self.shmid = shmget(key, size, permission);
     if (self.shmid == -1) {
-        spdlog::error("{} shmget error!", LOGHEAD);
+        spdlog::error("{} shmget error! name: {} permission: {}", LOGHEAD, self.name, permission);
         // exit(-1);
         return nullptr;
     }
@@ -195,6 +197,7 @@ static inline Buffer<T>* connect_memory(template_Self<T>& self, int permission) 
         exit(-2);
     }
 
+    spdlog::info("{} Successfully connected!", LOGHEAD);
     return buffer;
 }
 
