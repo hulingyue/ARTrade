@@ -28,6 +28,8 @@ public:
     virtual MarketObj* read_market() = 0;
     virtual bool write_command(const CommandObj obj) = 0;
     virtual CommandObj* read_command() = 0;
+    virtual bool write_response(const ResponseObj obj) = 0;
+    virtual ResponseObj* read_response() = 0;
 
 public:
     std::string proj_name;
@@ -43,13 +45,16 @@ public:
     ShareMemoryMessage(std::string proj_name, Identity identity) : 
         BaseMessage(proj_name, identity)
         , share_memory_market(new ShareMemory<MarketObj>(proj_name + "_market.txt", 1, memory_type::market))
-        , share_memory_command(new ShareMemory<CommandObj>(proj_name + "_command.txt", 2, memory_type::command)) {
+        , share_memory_command(new ShareMemory<CommandObj>(proj_name + "_command.txt", 2, memory_type::command))
+        , share_memory_response(new ShareMemory<ResponseObj>(proj_name + "_response.txt", 3, memory_type::response)) {
             if (identity == Identity::Master) {
                 share_memory_market->create();
                 share_memory_command->create();
+                share_memory_response->create();
             } else if (identity == Identity::Slave) {
                 share_memory_market->connect();
                 share_memory_command->connect();
+                share_memory_response->connect();
             } else {
                 spdlog::error("{} unknow identity: {}", LOGHEAD, static_cast<char>(identity));
                 exit(-1);
@@ -78,10 +83,19 @@ public:
         return share_memory_command->read();
     }
 
+    virtual bool write_response(const ResponseObj obj) override {
+        return share_memory_response->write(obj, true, false);
+    }
+
+    virtual ResponseObj* read_response() override {
+        return share_memory_response->read();
+    }
+
 private:
     // ShareMemory
     ShareMemory<MarketObj>* share_memory_market;
     ShareMemory<CommandObj>* share_memory_command;
+    ShareMemory<ResponseObj>* share_memory_response;
 };
 
 
@@ -165,6 +179,21 @@ public:
     CommandObj* read_command() {
         if (self.message) {
             return self.message->read_command();
+        }
+        return nullptr;
+    }
+
+    // response
+    bool write_response(const ResponseObj obj) {
+        if (self.message) {
+            return self.message->write_response(obj);
+        }
+        return true;
+    }
+
+    ResponseObj* read_response() {
+        if (self.message) {
+            return self.message->read_response();
         }
         return nullptr;
     }
