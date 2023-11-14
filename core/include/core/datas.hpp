@@ -137,7 +137,7 @@ struct CancelObj {
 // 168 bytes
 struct CommandObj {
     CommandType type;
-    int session_id;
+    uint32_t session_id;
     union {
         SubscribeObj symbols;
         OrderObj order;
@@ -149,7 +149,7 @@ struct CommandObj {
 // 272
 struct ResponseObj {
     CommandType type;
-    int session_id;
+    uint32_t session_id;
 
     int code;
     char msg[100];
