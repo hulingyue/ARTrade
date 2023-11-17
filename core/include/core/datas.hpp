@@ -29,10 +29,10 @@ enum class Identity : char {
 
 
 enum class CommandType : char {
-      SUBSCRIBE
-    , UNSUBSCRIBE
-    , ORDER
-    , CANCEL
+      SUBSCRIBE = 'S'
+    , UNSUBSCRIBE = 'U'
+    , ORDER = 'O'
+    , CANCEL = 'C'
 };
 
 enum class MarketType: char {
