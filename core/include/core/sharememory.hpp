@@ -34,7 +34,8 @@ public:
     bool connect();
 
     bool write(T data, bool is_safe = true, bool is_cover = false);
-    T* read();
+    T* read_tail();
+    T* read_next(uint32_t id);
 
 private:
     template_Self<T> &self;
@@ -67,25 +68,33 @@ public:
         return (tail + 1) % buffer_size == head;
     }
 
-    T* lastest() {
+    T* get_tail() {
         if (is_empty()) { return nullptr; }
         return &data[tail];
     }
 
-    T* oldest() {
+    T* get_head() {
         if (is_empty()) { return nullptr; }
         return &data[head];
     }
 
-    T* read_by_index(int index) {
-        if (index < 0 || index >= buffer_size || is_empty()) { return nullptr; }
-        return &data[index];
+    T* next(uint32_t id) {
+        int current = (id + 1) % buffer_size;
+        if (
+            (head <= id && id < tail)
+            || (tail < head && head <= id)
+            || (id < tail && tail <= head)
+        ) {
+            return &data[current];
+        }
+
+        return nullptr;
     }
 
-    T* read_by_offset(int offset) {
-        if (is_empty()) { return nullptr; }
-        int index = (head + offset) % buffer_size;
-        return &data[index];
+    T* next_or_head(uint32_t id) {
+        T* data = next(id);
+        if (data) { return data; }
+        return nullptr;
     }
 
     bool write(T &&value, bool is_safe, bool is_cover) {
@@ -246,13 +255,23 @@ bool ShareMemory<T>::write(T data, bool is_safe, bool is_cover) {
 }
 
 template<typename T>
-T* ShareMemory<T>::read() {
+T* ShareMemory<T>::read_tail() {
     if (self.buffer == nullptr) {
         spdlog::error("{} buffer is nullptr! ", LOGHEAD);
         exit(-1);
     }
 
-    return self.buffer->lastest();
+    return self.buffer->tail();
+}
+
+template<typename T>
+T* ShareMemory<T>::read_next(uint32_t id) {
+    if (self.buffer == nullptr) {
+        spdlog::error("{} buffer is nullptr! ", LOGHEAD);
+        exit(-1);
+    }
+
+    return self.buffer->next(id);
 }
 
 } // namespace core::sharememory
