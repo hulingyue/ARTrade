@@ -1,6 +1,7 @@
 #include "bybit_market.h"
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+#include <regex>
 
 
 #define LOGHEAD "[BybitMarket::" + std::string(__func__) + "]"
@@ -89,7 +90,43 @@ void BybitMarket::on_close() {
 }
 
 void BybitMarket::on_message(const std::string &msg) {
-    spdlog::info("{} msg: {}", LOGHEAD, msg);
+    nlohmann::json message = nlohmann::json::parse(msg);
+
+    std::string topic = message.value("topic", "");
+    
+    std::regex pattern("([\\w]+)(\\.([\\w\\d]+))?\\.([\\w\\d]+)");
+    std::smatch match;
+
+    if (!std::regex_search(topic, match, pattern)) {
+        spdlog::info("{} msg: {}", LOGHEAD, msg);
+        return;
+    }
+    
+    std::string mode = match[1];
+    std::string frequence = match[3];
+    std::string symbols = match[4];
+
+    if (mode == "orderbook") {  //  orderbook.{depth}.{symbol} e.g., orderbook.1.BTCUSDT
+
+    } else if (mode == "publicTrade") {  //  publicTrade.{symbol} 注意: 期權使用baseCoin, e.g., publicTrade.BTC
+
+    } else if (mode == "tickers") {  //  tickers.{symbol}
+        spdlog::info("{} tickers: {}", LOGHEAD, msg);
+
+    } else if (mode == "kline") {  //  kline.{interval}.{symbol} e.g., kline.30.BTCUSDT
+
+    } else if (mode == "liquidation") {  //  liquidation.{symbol} e.g., liquidation.BTCUSDT
+
+    } else if (mode == "kline_lt") {  //  kline_lt.{interval}.{symbol} e.g., kline_lt.30.BTC3SUSDT
+
+    } else if (mode == "tickers_lt") {  //  tickers_lt.{symbol} e.g.,tickers_lt.BTC3SUSDT
+
+    } else if (mode == "lt") {  //  lt.{symbol} e.g.,lt.BTC3SUSDT
+
+    } else {
+        spdlog::info("{} msg: {}", LOGHEAD, msg);
+    }
+
 }
 
 void BybitMarket::ping() {
