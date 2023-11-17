@@ -4,6 +4,7 @@
 namespace core::base::datas {
 static const int SUBSCRIBE_MAX_SIZE = 10;
 static const int SYMBOL_MAX_LENGTH = 16;
+static const int MARKET_MAX_DEPTH = 10;
 
 struct MarketOperateResult {
     int code;
@@ -92,8 +93,8 @@ struct MarketObj {
     double price;
     double volumn;
 
-    double asks[10];
-    double bids[10];
+    double asks[MARKET_MAX_DEPTH];
+    double bids[MARKET_MAX_DEPTH];
 
     double high;
     double low;
