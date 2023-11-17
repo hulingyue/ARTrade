@@ -131,6 +131,8 @@ void Modules::run() {
     } while (!is_ready());
 
     auto ts = std::chrono::system_clock::now();
+
+    core::base::datas::CommandObj* command = nullptr;
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         
@@ -138,6 +140,40 @@ void Modules::run() {
         if (std::chrono::duration_cast<std::chrono::seconds>(now - ts) >= std::chrono::seconds(1)) {
             interval_1s();
             ts = now;
+        }
+
+        // read commands & deal with commands
+        command = self.message->read_command();
+        if (command) {
+            if (command->type == CommandType::SUBSCRIBE) {
+                std::vector<std::string> symbols;
+                for (auto item: command->symbols.symbols) {
+                    if (std::strlen(item) > 0) {
+                        symbols.emplace_back(item);
+                    }
+                }
+
+                if (symbols.size() > 0) {
+                    self.market->subscribe(std::move(symbols));
+                }
+            } else if (command->type == CommandType::UNSUBSCRIBE) {
+                std::vector<std::string> symbols;
+                for (auto item: command->symbols.symbols) {
+                    if (std::strlen(item) > 0) {
+                        symbols.emplace_back(item);
+                    }
+                }
+
+                if (symbols.size() > 0) {
+                    self.market->unsubscribe(std::move(symbols));
+                }
+            } else if (command->type == CommandType::ORDER) {
+
+            } else if (command->type == CommandType::CANCEL) {
+
+            } else {
+                spdlog::error("{} type: {}", LOGHEAD, static_cast<char>(command->type));
+            }
         }
     }
 }
