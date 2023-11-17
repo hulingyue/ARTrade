@@ -13,7 +13,7 @@ public:
 
     virtual void task() override {
         std::vector<std::string> symbols {
-            "BTCUSDT"
+            "tickers.BTCUSDT", "tickers.ETHUSDT"
         };
 
         subscribe(std::move(symbols));
