@@ -25,11 +25,11 @@ public:
 
 public:
     virtual bool write_market(const MarketObj obj) = 0;
-    virtual MarketObj* read_market() = 0;
+    virtual MarketObj* read_market(uint32_t id) = 0;
     virtual bool write_command(const CommandObj obj) = 0;
-    virtual CommandObj* read_command() = 0;
+    virtual CommandObj* read_command(uint32_t id) = 0;
     virtual bool write_response(const ResponseObj obj) = 0;
-    virtual ResponseObj* read_response() = 0;
+    virtual ResponseObj* read_response(uint32_t id) = 0;
 
 public:
     std::string proj_name;
@@ -71,24 +71,24 @@ public:
         return share_memory_market->write(obj, false, true);
     }
 
-    virtual MarketObj* read_market() override {
-        return share_memory_market->read();
+    virtual MarketObj* read_market(uint32_t id) override {
+        return share_memory_market->read_next(id);
     }
 
     virtual bool write_command(const CommandObj obj) override {
         return share_memory_command->write(obj, true, false);
     }
 
-    virtual CommandObj* read_command() override {
-        return share_memory_command->read();
+    virtual CommandObj* read_command(uint32_t id) override {
+        return share_memory_command->read_next(id);
     }
 
     virtual bool write_response(const ResponseObj obj) override {
         return share_memory_response->write(obj, true, false);
     }
 
-    virtual ResponseObj* read_response() override {
-        return share_memory_response->read();
+    virtual ResponseObj* read_response(uint32_t id) override {
+        return share_memory_response->read_next(id);
     }
 
 private:
@@ -122,6 +122,10 @@ struct MessageSelf {
     std::string proj_name;
     MessageType type;
     BaseMessage* message;
+
+    u_int32_t market_id = 0;
+    u_int32_t command_id = 0;
+    u_int32_t response_id = 0;
 };
 
 } // namespace 
@@ -163,7 +167,11 @@ public:
 
     MarketObj* read_market() {
         if (self.message) {
-            return self.message->read_market();
+            auto it = self.message->read_market(self.market_id);
+            if (it) {
+                self.market_id++;
+                return it; 
+            }
         }
         return nullptr;
     }
@@ -178,7 +186,11 @@ public:
 
     CommandObj* read_command() {
         if (self.message) {
-            return self.message->read_command();
+            auto it = self.message->read_command(self.command_id);
+            if (it) {
+                self.command_id++; 
+                return it; 
+            }
         }
         return nullptr;
     }
@@ -193,7 +205,11 @@ public:
 
     ResponseObj* read_response() {
         if (self.message) {
-            return self.message->read_response();
+            auto it = self.message->read_response(self.response_id);
+            if (it) {
+                self.response_id++;
+                return it; 
+            }
         }
         return nullptr;
     }
