@@ -139,7 +139,17 @@ void BybitMarket::on_message(const std::string &msg) {
     } else if (mode == "publicTrade") {  //  publicTrade.{symbol} 注意: 期權使用baseCoin, e.g., publicTrade.BTC
 
     } else if (mode == "tickers") {  //  tickers.{symbol}
-        spdlog::info("{} tickers: {}", LOGHEAD, msg);
+        // spdlog::info("{} tickers: {}", LOGHEAD, msg);
+        core::base::datas::MarketObj obj;
+        obj.market_type = core::base::datas::MarketType::Bbo;
+        std::strcpy(obj.symbol, symbols.c_str());
+        std::strcpy(obj.exchange, "Bybit");
+        obj.time = message.value("ts", 0);
+        obj.price = std::stod(message["data"]["lastPrice"].get<std::string>());
+        obj.volumn = 0;
+
+        on_market(obj);
+        return;
 
     } else if (mode == "kline") {  //  kline.{interval}.{symbol} e.g., kline.30.BTCUSDT
 
