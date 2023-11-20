@@ -35,7 +35,15 @@ void Bybit::init_config() {
             {
                 "log_level": "debug",
                 "project": "Bybit",
-                "version:": 1.0
+                "version:": 1.0,
+                "is_spot": true,
+                "is_test": true,
+                "market_test_spot_url": "wss://stream-testnet.bybit.com/v5/public/spot",
+                "market_test_future_url": "wss://stream-testnet.bybit.com/v5/public/linear",
+                "market_spot_url": "wss://stream.bybit.com/v5/public/spot",
+                "market_future_url": "wss://stream.bybit.com/v5/public/linear",
+                "trade_test_url": "wss://stream-testnet.bybit.com/v5/private",
+                "trade_url": "wss://stream.bybit.com/v5/private"
             }
         )"
     );
