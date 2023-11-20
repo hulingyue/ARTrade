@@ -128,7 +128,10 @@ void Modules::custom_init() {
     core::base::datas::MessageType type = message_type();
     std::string proj = project_name();
     self.message = new core::message::Message(proj, type, Identity::Master);
-    if (self.market) { self.market->set_message(self.message); }
+    if (self.market) {
+        self.market->set_message(self.message);
+        self.market->init();
+    }
     if (self.trade) { self.trade->set_message(self.message); }
 }
 

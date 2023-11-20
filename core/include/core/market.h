@@ -19,6 +19,8 @@ class Market {
         Market();
         virtual ~Market();
 
+        virtual void init() = 0;
+
         virtual bool is_ready() = 0;
         virtual void interval_1s();
 

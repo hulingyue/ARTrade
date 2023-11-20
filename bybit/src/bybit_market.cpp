@@ -1,4 +1,5 @@
 #include "bybit_market.h"
+#include <core/util.h>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <regex>
@@ -20,6 +21,14 @@ struct Self {
 }
 
 BybitMarket::BybitMarket() : self { *new Self{} } {
+
+}
+
+BybitMarket::~BybitMarket() {
+    if (&self) delete &self;
+}
+
+void BybitMarket::init() {
     self.client = new Client();
     self.client->on_open = std::function<void()>([this]() {
         on_open();
@@ -31,11 +40,30 @@ BybitMarket::BybitMarket() : self { *new Self{} } {
         on_message(msg);
     });
 
-    self.client->connect("wss://stream-testnet.bybit.com/v5/public/spot");
-}
+    auto config = core::config::Config::get();
 
-BybitMarket::~BybitMarket() {
-    if (&self) delete &self;
+    if (!config.contains("is_test") || !config["is_test"].is_boolean()) {
+        spdlog::error("{} config error! cannot find 'is_test' or it's not a variable of bool");
+        exit(-1);
+    }
+
+    if (!config.contains("is_spot") || !config["is_spot"].is_boolean()) {
+        spdlog::error("{} config error! cannot find 'is_spot' or it's not a variable of bool");
+        exit(-1);
+    }
+
+    bool is_test = config.value("is_test", true);
+    bool is_spot = config.value("is_spot", true);
+
+    std::string url;
+    if (is_test) {
+        url = is_spot ? config.value("market_test_spot_url", "") : config.value("market_spot_url", "");
+    } else {
+        url = is_spot ? config.value("market_test_future_url", "") : config.value("market_future_url", "");
+    }
+
+    spdlog::info("{} is_test: {} is_spot: {} url: {}", LOGHEAD, is_test, is_spot, url);
+    self.client->connect(url);
 }
 
 bool BybitMarket::is_ready() {

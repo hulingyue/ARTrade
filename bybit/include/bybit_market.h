@@ -12,6 +12,8 @@ public:
     BybitMarket();
     ~BybitMarket();
 
+    void init() override;
+
     bool is_ready() override;
 
     MarketOperateResult subscribe(const std::vector<std::string> symbols) override;
