@@ -2,6 +2,8 @@
 #include <core/message.hpp>
 
 
+#define LOGHEAD "[Strategy::" + std::string(__func__) + "]"
+
 namespace {
 struct Self {
     core::message::Message* message = nullptr;
@@ -89,3 +91,5 @@ void Strategy::custom_init() {
     self.message = new core::message::Message(proj, type,Identity::Slave);
 
 }
+
+#undef LOGHEAD
