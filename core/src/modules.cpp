@@ -112,6 +112,18 @@ void handle_sigint(int signal) {
 
 void Modules::custom_init() {
     // something init after custom modules init
+
+    // config
+    init_config();
+    core::util::create_folder(core::util::config_path());
+    bool read_config_status = core::config::Config::read(
+        (core::util::config_path() / std::filesystem::path("app.json")).string()
+    );
+
+    if (read_config_status == false) {
+        spdlog::error("{} cannot found 'app.json' at {}", LOGHEAD, core::util::config_path().string());
+        exit(-3);
+    }
     
     core::base::datas::MessageType type = message_type();
     std::string proj = project_name();

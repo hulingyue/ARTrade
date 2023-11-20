@@ -57,16 +57,6 @@ inline void startup(core::modules::Modules * const module, int argc, char** argv
     }
     module->init_config();
 
-    core::util::create_folder(config_path());
-    bool read_config_status = core::config::Config::read(
-        (core::util::config_path() / std::filesystem::path("app.json")).string()
-    );
-
-    if (read_config_status == false) {
-        spdlog::error("{} cannot found 'app.json' at {}", LOGHEAD, core::util::config_path().string());
-        exit(-3);
-    }
-
     // log
     std::filesystem::path log_file_path = log_path() / std::filesystem::path("log.txt");
     auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file_path, log_size, log_files);
