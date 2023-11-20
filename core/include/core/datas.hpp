@@ -88,7 +88,7 @@ struct MarketObj {
     char exchange[SYMBOL_MAX_LENGTH];
     MarketType market_type;
     // 7 bytes
-    long time;
+    unsigned long time;
 
     double price;
     double volumn;
