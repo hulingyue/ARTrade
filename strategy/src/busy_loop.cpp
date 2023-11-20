@@ -78,8 +78,17 @@ void Strategy::run() {
 
     while (true) {
         // read commands
+        core::base::datas::CommandObj* command_obj = self.message->read_command();
+        if (command_obj) {
+            continue;
+        }
 
         // read market
+        core::base::datas::MarketObj* market_obj = self.message->read_market();
+        if (market_obj) {
+            spdlog::info("{} symbol: {} price: {} time: {}", LOGHEAD, market_obj->symbol, market_obj->price, market_obj->time);
+            continue;
+        }
 
         // 
     }
