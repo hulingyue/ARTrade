@@ -17,6 +17,11 @@ struct TradeOperateResult {
 };
 
 
+struct TradePair {
+    double price;
+    double quantity;
+};
+
 enum class MessageType : char {
       ShareMemory
     , WebSocket
@@ -82,7 +87,7 @@ enum class OrderStatus {
     , CANCEL // cancel
 };
 
-// 256 bytes
+// 416 bytes
 struct MarketObj {
     char symbol[SYMBOL_MAX_LENGTH];
     char exchange[SYMBOL_MAX_LENGTH];
@@ -90,11 +95,10 @@ struct MarketObj {
     // 7 bytes
     unsigned long time;
 
-    double price;
-    double volumn;
+    TradePair newest;
 
-    double asks[MARKET_MAX_DEPTH];
-    double bids[MARKET_MAX_DEPTH];
+    TradePair asks[MARKET_MAX_DEPTH];
+    TradePair bids[MARKET_MAX_DEPTH];
 
     double high;
     double low;

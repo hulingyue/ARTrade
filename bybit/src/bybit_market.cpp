@@ -145,8 +145,8 @@ void BybitMarket::on_message(const std::string &msg) {
         std::strcpy(obj.symbol, symbols.c_str());
         std::strcpy(obj.exchange, "Bybit");
         obj.time = message.value("ts", 0);
-        obj.price = std::stod(message["data"]["lastPrice"].get<std::string>());
-        obj.volumn = 0;
+        obj.newest.price = std::stod(message["data"]["lastPrice"].get<std::string>());
+        obj.newest.quantity = 0;
 
         on_market(obj);
         return;

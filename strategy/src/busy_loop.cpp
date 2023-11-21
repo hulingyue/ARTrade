@@ -86,7 +86,14 @@ void Strategy::run() {
         // read market
         core::datas::MarketObj* market_obj = self.message->read_market();
         if (market_obj) {
-            spdlog::info("{} symbol: {} price: {} time: {}", LOGHEAD, market_obj->symbol, market_obj->price, market_obj->time);
+            spdlog::info("{} symbol: {} price: {} time: {}", LOGHEAD, market_obj->symbol, market_obj->newest.price, market_obj->time);
+            if (market_obj->market_type == MarketType::Bbo) {
+
+            } else if (market_obj->market_type == MarketType::Depth) {
+
+            } else if (market_obj->market_type == MarketType::Kline) {
+
+            }
             continue;
         }
 
