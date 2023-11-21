@@ -42,9 +42,9 @@ enum class CommandType : char {
 };
 
 enum class MarketType: char {
-      Depth
-    , Kline
-    , Bbo
+      Depth = 'd'
+    , Kline = 'k'
+    , Bbo = 'b'
 };
 
 enum class CommandStatus : char {
