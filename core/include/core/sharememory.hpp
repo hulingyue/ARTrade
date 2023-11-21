@@ -78,12 +78,11 @@ public:
         return &data[head];
     }
 
-    T* next(uint32_t id) {
-        int current = (id + 1) % buffer_size;
+    T* next(uint32_t current) {
         if (
-            (head <= id && id < tail)
-            || (tail < head && head <= id)
-            || (id < tail && tail <= head)
+            (head <= current && current < tail)
+            || (tail < head && head <= current)
+            || (current < tail && tail <= head)
         ) {
             return &data[current];
         }
@@ -119,13 +118,13 @@ public:
             if (is_cover && is_full()) {
                 head = (head + 1) % buffer_size;
             }
-            tail = (tail + 1) % buffer_size;
             data[tail] = value;
+            tail = (tail + 1) % buffer_size;
             id++;
             sign = 0;
             return true;
         }
-
+        sign = 0;
         return false;
     }
 

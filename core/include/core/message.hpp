@@ -169,7 +169,7 @@ public:
         if (self.message) {
             auto it = self.message->read_market(self.market_id);
             if (it) {
-                self.market_id++;
+                self.market_id = (self.market_id + 1) % buffer_size;
                 return it; 
             }
         }
@@ -188,7 +188,7 @@ public:
         if (self.message) {
             auto it = self.message->read_command(self.command_id);
             if (it) {
-                self.command_id++; 
+                self.command_id = (self.command_id + 1) % buffer_size;
                 return it; 
             }
         }
@@ -207,7 +207,7 @@ public:
         if (self.message) {
             auto it = self.message->read_response(self.response_id);
             if (it) {
-                self.response_id++;
+                self.response_id = (self.response_id + 1) % buffer_size;
                 return it; 
             }
         }
