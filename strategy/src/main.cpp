@@ -7,8 +7,8 @@ public:
         return "Bybit";
     }
 
-    virtual core::base::datas::MessageType message_type() override {
-        return core::base::datas::MessageType::ShareMemory;
+    virtual core::datas::MessageType message_type() override {
+        return core::datas::MessageType::ShareMemory;
     }
 
     virtual void task() override {

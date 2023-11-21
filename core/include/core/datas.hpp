@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace core::base::datas {
+namespace core::datas {
 static const int SUBSCRIBE_MAX_SIZE = 10;
 static const int SYMBOL_MAX_LENGTH = 16;
 static const int MARKET_MAX_DEPTH = 10;
@@ -163,4 +163,4 @@ struct ResponseObj {
 };
 
 
-} // namespace core::base::datas
+} // namespace core::datas

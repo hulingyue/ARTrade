@@ -30,7 +30,7 @@ void Market::set_message(core::message::Message* message) {
 /*****************************/
 /** event                   **/
 /*****************************/
-void Market::on_market(core::base::datas::MarketObj obj) {
+void Market::on_market(core::datas::MarketObj obj) {
     if (self.message == nullptr) {
         return;
     }

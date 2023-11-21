@@ -140,8 +140,8 @@ void BybitMarket::on_message(const std::string &msg) {
 
     } else if (mode == "tickers") {  //  tickers.{symbol}
         // spdlog::info("{} tickers: {}", LOGHEAD, msg);
-        core::base::datas::MarketObj obj;
-        obj.market_type = core::base::datas::MarketType::Bbo;
+        core::datas::MarketObj obj;
+        obj.market_type = core::datas::MarketType::Bbo;
         std::strcpy(obj.symbol, symbols.c_str());
         std::strcpy(obj.exchange, "Bybit");
         obj.time = message.value("ts", 0);

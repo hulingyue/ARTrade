@@ -4,7 +4,7 @@
 #include <core/datas.hpp>
 #include <core/pimpl.h>
 
-using MarketOperateResult = core::base::datas::MarketOperateResult;
+using MarketOperateResult = core::datas::MarketOperateResult;
 
 
 class BybitMarket final : public core::api::market::Market {

@@ -10,7 +10,7 @@ public:
     ~Bybit();
     
     std::string project_name() override;
-    core::base::datas::MessageType message_type() override;
+    core::datas::MessageType message_type() override;
 
     void init_config() override;
 

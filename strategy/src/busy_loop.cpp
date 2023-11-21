@@ -9,7 +9,7 @@ struct Self {
     core::message::Message* message = nullptr;
 };
 
-using namespace core::base::datas;
+using namespace core::datas;
 
 
 static inline bool market(core::message::Message* message, std::vector<std::string> symbols, bool is_subscribe) {
@@ -78,13 +78,13 @@ void Strategy::run() {
 
     while (true) {
         // read commands
-        core::base::datas::CommandObj* command_obj = self.message->read_command();
+        core::datas::CommandObj* command_obj = self.message->read_command();
         if (command_obj) {
             continue;
         }
 
         // read market
-        core::base::datas::MarketObj* market_obj = self.message->read_market();
+        core::datas::MarketObj* market_obj = self.message->read_market();
         if (market_obj) {
             spdlog::info("{} symbol: {} price: {} time: {}", LOGHEAD, market_obj->symbol, market_obj->price, market_obj->time);
             continue;

@@ -9,7 +9,7 @@
 
 namespace {
 
-using namespace core::base::datas;
+using namespace core::datas;
 using namespace core::sharememory;
 
 

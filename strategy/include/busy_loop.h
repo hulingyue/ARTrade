@@ -13,7 +13,7 @@ public:
 
 public:
     virtual std::string project_name() = 0;
-    virtual core::base::datas::MessageType message_type() = 0;
+    virtual core::datas::MessageType message_type() = 0;
 
     virtual void task() = 0;
     

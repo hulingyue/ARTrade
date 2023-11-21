@@ -12,7 +12,7 @@ namespace core::message {
 
 namespace core::api::market {
     
-using MarketOperateResult = core::base::datas::MarketOperateResult;
+using MarketOperateResult = core::datas::MarketOperateResult;
 
 class Market {
     public:
@@ -30,7 +30,7 @@ class Market {
         virtual void set_message(core::message::Message* messsage) final;
 
         // event
-        virtual void on_market(core::base::datas::MarketObj obj) final;
+        virtual void on_market(core::datas::MarketObj obj) final;
     private:
         Self &self;
 };         

@@ -11,7 +11,7 @@ namespace core::message {
 
 namespace core::api::trade {
     
-using TradeOperateResult = core::base::datas::TradeOperateResult;
+using TradeOperateResult = core::datas::TradeOperateResult;
 
 class Trade {
     public:

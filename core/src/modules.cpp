@@ -125,7 +125,7 @@ void Modules::custom_init() {
         exit(-3);
     }
     
-    core::base::datas::MessageType type = message_type();
+    core::datas::MessageType type = message_type();
     std::string proj = project_name();
     self.message = new core::message::Message(proj, type, Identity::Master);
     if (self.market) {
@@ -149,7 +149,7 @@ void Modules::run() {
 
     auto ts = std::chrono::system_clock::now();
 
-    core::base::datas::CommandObj* command = nullptr;
+    core::datas::CommandObj* command = nullptr;
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         
