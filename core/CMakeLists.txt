@@ -14,6 +14,7 @@ add_subdirectory(3rd/pybind11)
 add_subdirectory(3rd/nlohmann)
 add_subdirectory(3rd/CLI11)
 add_subdirectory(3rd/websocketpp)
+add_subdirectory(3rd/cpp-httplib)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -22,6 +23,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd/nlohmann/include
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd/CLI11/include
     ${CMAKE_CURRENT_SOURCE_DIR}/3rd/websocketpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rd/cpp-httplib
 )
 
 find_package(OpenSSL REQUIRED)
