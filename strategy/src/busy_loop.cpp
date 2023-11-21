@@ -21,7 +21,7 @@ static inline bool market(core::message::Message* message, std::vector<std::stri
         obj.type = is_subscribe ? CommandType::SUBSCRIBE : CommandType::UNSUBSCRIBE;
         for (std::size_t index = 0; index < symbols.size(); index++) {
             std::strncpy(obj.symbols.symbols[index], symbols[index].c_str(), SYMBOL_MAX_LENGTH);
-            obj.symbols.symbols[index][15] = '\0';
+            // obj.symbols.symbols[index][15] = '\0';
         }
 
         status &= message->write_command(obj);
