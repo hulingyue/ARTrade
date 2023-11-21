@@ -1,3 +1,4 @@
+#include <iostream>
 #include "busy_loop.h"
 
 
@@ -35,6 +36,13 @@ public:
     
     }
 
+    virtual void on_market_bbo(strategy::datas::MarketResponseBbo* bbo) {
+        if (bbo) {
+            std::cout << bbo->exchange << " " << bbo->symbol << " " << bbo->time << " " << bbo->price << " " << bbo->quantity << std::endl;
+        } else {
+            std::cout << "bbo is nullptr" << std::endl;
+        }
+    }
 
 };
 

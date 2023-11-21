@@ -10,6 +10,7 @@ struct Self {
 };
 
 using namespace core::datas;
+using namespace strategy::datas;
 
 
 static inline bool market(core::message::Message* message, std::vector<std::string> symbols, bool is_subscribe) {
@@ -20,7 +21,7 @@ static inline bool market(core::message::Message* message, std::vector<std::stri
         CommandObj obj;
         obj.type = is_subscribe ? CommandType::SUBSCRIBE : CommandType::UNSUBSCRIBE;
         for (std::size_t index = 0; index < symbols.size(); index++) {
-            std::strncpy(obj.symbols.symbols[index], symbols[index].c_str(), SYMBOL_MAX_LENGTH);
+            std::strncpy(obj.symbols.symbols[index], symbols[index].c_str(), core::datas::SYMBOL_MAX_LENGTH);
             // obj.symbols.symbols[index][15] = '\0';
         }
 
@@ -29,7 +30,7 @@ static inline bool market(core::message::Message* message, std::vector<std::stri
 
     for (std::size_t count = 0; count < symbols.size(); count++) {
 
-        if (container.size() >=SUBSCRIBE_MAX_SIZE) {
+        if (container.size() >= core::datas::SUBSCRIBE_MAX_SIZE) {
             market_event(container, is_subscribe);
         }
 
@@ -86,13 +87,35 @@ void Strategy::run() {
         // read market
         core::datas::MarketObj* market_obj = self.message->read_market();
         if (market_obj) {
-            spdlog::info("{} symbol: {} price: {} time: {}", LOGHEAD, market_obj->symbol, market_obj->newest.price, market_obj->time);
             if (market_obj->market_type == MarketType::Bbo) {
+                MarketResponseBbo bbo;
+                std::memcpy(bbo.exchange, market_obj->exchange, strategy::datas::SYMBOL_MAX_LENGTH);
+                std::memcpy(bbo.symbol, market_obj->symbol, strategy::datas::SYMBOL_MAX_LENGTH);
+                bbo.time = market_obj->time;
 
+                bbo.price = market_obj->newest.price;
+                bbo.quantity = market_obj->newest.quantity;
+                on_market_bbo(&bbo);
             } else if (market_obj->market_type == MarketType::Depth) {
+                MarketResponseDepth depth;
+                std::memcpy(depth.exchange, market_obj->exchange, strategy::datas::SYMBOL_MAX_LENGTH);
+                std::memcpy(depth.symbol, market_obj->symbol, strategy::datas::SYMBOL_MAX_LENGTH);
+                depth.time = market_obj->time;
 
+                std::memcpy(depth.asks, market_obj->asks, sizeof(strategy::datas::TradePair) * strategy::datas::MARKET_MAX_DEPTH);
+                std::memcpy(depth.bids, market_obj->bids, sizeof(strategy::datas::TradePair) * strategy::datas::MARKET_MAX_DEPTH);
+                on_market_depth(&depth);
             } else if (market_obj->market_type == MarketType::Kline) {
+                MarketResponseKline kline;
+                std::memcpy(kline.exchange, market_obj->exchange, strategy::datas::SYMBOL_MAX_LENGTH);
+                std::memcpy(kline.symbol, market_obj->symbol, strategy::datas::SYMBOL_MAX_LENGTH);
+                kline.time = market_obj->time;
 
+                kline.high = market_obj->high;
+                kline.low = market_obj->low;
+                kline.open = market_obj->open;
+                kline.close = market_obj->close;
+                on_market_kline(&kline);
             }
             continue;
         }
@@ -105,6 +128,18 @@ void Strategy::custom_init() {
     std::string proj = project_name();
    MessageType type = message_type();
     self.message = new core::message::Message(proj, type,Identity::Slave);
+
+}
+
+void Strategy::on_market_bbo(strategy::datas::MarketResponseBbo* bbo) {
+
+}
+
+void Strategy::on_market_depth(strategy::datas::MarketResponseDepth* depth) {
+
+}
+
+void Strategy::on_market_kline(strategy::datas::MarketResponseKline* kline) {
 
 }
 
