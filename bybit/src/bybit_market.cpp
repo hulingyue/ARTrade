@@ -14,6 +14,9 @@ struct Self {
     Client *client = nullptr;
     int interval = 0;
 
+    // market
+    double market_bbo_price = 0.0;
+
     ~Self() {
         if (client) delete client;
     }
@@ -118,6 +121,7 @@ void BybitMarket::on_close() {
 }
 
 void BybitMarket::on_message(const std::string &msg) {
+    // delta: 如果delta數據中缺失一些字段，表明該字段自上次推送以來沒有發生變化。
     nlohmann::json message = nlohmann::json::parse(msg);
 
     std::string topic = message.value("topic", "");
@@ -145,7 +149,12 @@ void BybitMarket::on_message(const std::string &msg) {
         std::strcpy(obj.symbol, symbols.c_str());
         std::strcpy(obj.exchange, "Bybit");
         obj.time = message.value("ts", 0);
-        obj.newest.price = std::stod(message["data"]["lastPrice"].get<std::string>());
+        if (message["data"].is_null() || message["data"]["lastPrice"].is_null()) {
+            obj.newest.price = self.market_bbo_price;
+        } else {
+            obj.newest.price = std::stod(message["data"]["lastPrice"].get<std::string>());
+        }
+        self.market_bbo_price = obj.newest.price;
         obj.newest.quantity = 0;
 
         on_market(obj);
