@@ -10,7 +10,7 @@ using namespace core::WebSocket::Client;
 
 namespace {
 struct Self {
-    std::atomic<bool> is_ready = false;
+    std::atomic<bool> is_ready;
     Client *client = nullptr;
     int interval = 0;
 
@@ -24,7 +24,7 @@ struct Self {
 }
 
 BybitMarket::BybitMarket() : self { *new Self{} } {
-
+    self.is_ready.store(false);
 }
 
 BybitMarket::~BybitMarket() {
