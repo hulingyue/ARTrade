@@ -1,6 +1,8 @@
 #include "bybit_trade.h"
 
 
+#define LOGHEAD "[BybitTrade::" std::string(__func__) "]"
+
 namespace {
 struct Self {
     std::atomic<bool> is_ready;
@@ -51,3 +53,5 @@ void BybitTrade::on_message(std::string const &msg) {
 void BybitTrade::ping() {
 
 }
+
+#undef LOGHEAD
