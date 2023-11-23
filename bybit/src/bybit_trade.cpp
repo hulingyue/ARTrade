@@ -3,13 +3,13 @@
 
 namespace {
 struct Self {
-    std::atomic<bool> is_ready = false;
+    std::atomic<bool> is_ready;
 };
 }
 
 
 BybitTrade::BybitTrade() : self ( *new Self {} ) {
-
+    self.is_ready.store(false);
 }
 
 BybitTrade::~BybitTrade() {
