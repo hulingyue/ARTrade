@@ -9,12 +9,14 @@
 namespace {
 struct Self {
     BybitMarket market;
+    BybitTrade trade;
 };
 }
 
 
 Bybit::Bybit(int argc, char** argv) : Modules(argc, argv), self { *new Self{} } {
     set_market_obj(&self.market);
+    set_trade_obj(&self.trade);
 }
 
 Bybit::~Bybit() {
@@ -62,6 +64,10 @@ void Bybit::interval_1s() {
 
 BybitMarket& Bybit::market() {
     return self.market;
+}
+
+BybitTrade& Bybit::trade() {
+    return self.trade;
 }
 
 #undef HEADLOG

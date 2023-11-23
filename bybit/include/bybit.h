@@ -3,6 +3,7 @@
 #include <core/datas.hpp>
 
 #include "bybit_market.h"
+#include "bybit_trade.h"
 
 class Bybit final : public core::modules::Modules {
 public:
@@ -17,6 +18,7 @@ public:
     void interval_1s() override;
 
     BybitMarket& market();
+    BybitTrade& trade();
 
 private:
     Self &self;
