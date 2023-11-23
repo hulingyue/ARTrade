@@ -1,4 +1,6 @@
 #include <cassert>
+#include <openssl/hmac.h>
+#include <openssl/sha.h>
 #include "bybit_trade.h"
 #include <core/util.h>
 #include <core/time.hpp>
@@ -21,6 +23,16 @@ struct Self {
         if (client) { delete client; }
     }
 };
+
+std::string generate_signature(uint64_t expires, std::string& api_secret) {
+    std::string message = "GET/realtime" + std::to_string(expires);
+    unsigned char* digest = HMAC(EVP_sha256(), api_secret.c_str(), api_secret.length(), reinterpret_cast<const unsigned char*>(message.c_str()), message.length(), nullptr, nullptr);
+    char mdString[SHA256_DIGEST_LENGTH*2+1];
+    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+        sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
+    return std::string(mdString);
+}
+
 }
 
 
@@ -94,10 +106,12 @@ void BybitTrade::on_open() {
     nlohmann::json json_obj;
     json_obj["req_id"] = self.reqid;
     json_obj["op"] = "auth";
+
+    auto exipres = core::time::Time::now_millisecond() + 1000;
     json_obj["args"] = {
         self.api_key,
-        core::time::Time::now_millisecond() + 5000,
-        ""
+        exipres,
+         generate_signature(exipres, self.api_secret)
     };
 
     std::string json_str = json_obj.dump();
