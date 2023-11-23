@@ -1,7 +1,8 @@
 #include "bybit_trade.h"
 
 
-#define LOGHEAD "[BybitTrade::" std::string(__func__) "]"
+#define LOGHEAD "[BybitTrade::" + std::string(__func__) + "]"
+using namespace core::WebSocket::Client;
 
 namespace {
 struct Self {
