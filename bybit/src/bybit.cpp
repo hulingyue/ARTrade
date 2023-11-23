@@ -43,7 +43,9 @@ void Bybit::init_config() {
                 "market_spot_url": "wss://stream.bybit.com/v5/public/spot",
                 "market_future_url": "wss://stream.bybit.com/v5/public/linear",
                 "trade_test_url": "wss://stream-testnet.bybit.com/v5/private",
-                "trade_url": "wss://stream.bybit.com/v5/private"
+                "trade_url": "wss://stream.bybit.com/v5/private",
+                "trade_test_restful_url": "https://api-testnet.bybit.com",
+                "trade_restful_url": "https://api.bybit.com"
             }
         )"
     );
