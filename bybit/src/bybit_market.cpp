@@ -32,6 +32,7 @@ BybitMarket::~BybitMarket() {
 }
 
 void BybitMarket::init() {
+    if (self.client) { delete self.client; }
     self.client = new Client();
     self.client->on_open = std::function<void()>([this]() {
         on_open();
