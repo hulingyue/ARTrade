@@ -132,7 +132,10 @@ void Modules::custom_init() {
         self.market->set_message(self.message);
         self.market->init();
     }
-    if (self.trade) { self.trade->set_message(self.message); }
+    if (self.trade) {
+        self.trade->set_message(self.message);
+        self.trade->init();
+    }
 }
 
 
