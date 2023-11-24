@@ -81,7 +81,7 @@ void BybitTrade::init() {
     bool is_spot = config.value("is_spot", true);
     self.category = is_spot ? "spot" : "linear";
 
-    spdlog::info("{}", LOGHEAD);
+    spdlog::info("{} is_test: {} is_spot: {} url: {}", LOGHEAD, is_test, is_spot, url);
     self.client->connect(url);
 }
 
