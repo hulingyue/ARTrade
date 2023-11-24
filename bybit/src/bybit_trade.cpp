@@ -14,7 +14,7 @@ namespace {
 struct Self {
     std::atomic<bool> is_ready;
     core::websocket::client::WebSocketClient *websocket_client = nullptr;
-    core::http::client::HttpClient *http_client = nullptr;
+    core::http::client::HttpClient http_client;
 
     std::string api_key;
     std::string api_secret;
@@ -25,7 +25,6 @@ struct Self {
 
     ~Self() {
         if (websocket_client) { delete websocket_client; }
-        if (http_client) { delete http_client; }
     }
 };
 
@@ -79,13 +78,17 @@ void BybitTrade::init() {
     }
 
     bool is_test = config.value("is_test", true);
-    std::string url = is_test ? config.value("trade_test_url", "") : config.value("trade_url", "");
+    std::string websocket_url = is_test ? config.value("trade_test_url", "") : config.value("trade_url", "");
+    std::string restful_url = is_test ? config.value("trade_test_restful_url", "") : config.value("trade_restful_url", "");
 
     bool is_spot = config.value("is_spot", true);
     self.category = is_spot ? "spot" : "linear";
 
-    spdlog::info("{} is_test: {} is_spot: {} url: {}", LOGHEAD, is_test, is_spot, url);
-    self.websocket_client->connect(url);
+    spdlog::info("{} is_test: {} is_spot: {} websocket_url: {} restful_url: {}", LOGHEAD, is_test, is_spot, websocket_url, restful_url);
+    // restful
+    self.http_client.set_base_uri(restful_url);
+    // websocket
+    self.websocket_client->connect(websocket_url);
 }
 
 bool BybitTrade::is_ready() {
