@@ -4,6 +4,7 @@
 
 namespace {
 struct Self {
+    std::string uri;
     std::string protocol;
     std::string host;
     int port = 80;
@@ -25,13 +26,24 @@ HttpClient::~HttpClient() {
     // if (&self) delete &self;
 }
 
+HttpClient HttpClient::set_base_uri(std::string uri) {
+    self.uri = uri;
+    return *this;
+}
+
 HttpClient HttpClient::set_protocol(std::string protocol) {
     self.protocol = protocol;
+    if (self.protocol.length() > 0 && self.host.length() > 0) {
+        self.uri = (std::filesystem::path(self.protocol) / self.host).string();
+    }
     return *this;
 }
 
 HttpClient HttpClient::set_host(std::string host) {
     self.host = host;
+    if (self.protocol.length() > 0 && self.host.length() > 0) {
+        self.uri = (std::filesystem::path(self.protocol) / self.host).string();
+    }
     return *this;
 }
 
@@ -62,7 +74,7 @@ httplib::Result HttpClient::post(std::string path, httplib::Params params) {
 }
 
 inline std::string HttpClient::generate_uri(std::string path) {
-    return (std::filesystem::path(self.protocol) / self.host / path).string();
+    return (std::filesystem::path(self.uri) / path).string();
 }
 
 } // core::http::client

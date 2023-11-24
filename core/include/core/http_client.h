@@ -11,6 +11,7 @@ public:
     virtual ~HttpClient();
 
 public:
+    HttpClient set_base_uri(std::string uri);
     HttpClient set_protocol(std::string protocol);
     HttpClient set_host(std::string host);
     HttpClient set_port(int port);
