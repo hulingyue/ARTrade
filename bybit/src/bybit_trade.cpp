@@ -17,6 +17,8 @@ struct Self {
     std::string api_key;
     std::string api_secret;
 
+    std::string category;
+
     unsigned long long reqid = 0;
 
     ~Self() {
@@ -74,13 +76,11 @@ void BybitTrade::init() {
     }
 
     bool is_test = config.value("is_test", true);
+    std::string url = is_test ? config.value("trade_test_url", "") : config.value("trade_url", "");
 
-    std::string url;
-    if (is_test) {
-        url = config.value("trade_test_url", "");
-    } else {
-        url = config.value("trade_url", "");
-    }
+    bool is_spot = config.value("is_spot", true);
+    self.category = is_spot ? "spot" : "linear";
+
     spdlog::info("{}", LOGHEAD);
     self.client->connect(url);
 }
