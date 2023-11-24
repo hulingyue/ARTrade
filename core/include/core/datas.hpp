@@ -53,26 +53,30 @@ enum class CommandStatus : char {
 };
 
 enum class OrderSide : char {
-      BUY
+      UNKNOW
+    , BUY
     , SELL
 };
 
 enum class OrderOffset : char {
-      OPEN
+      UNKNOW
+    , OPEN
     , CLOSE
     , CLOSETODAY
     , CLOSEYESTERDAY
 };
 
 enum class OrderType : char {
-      MARKET
+      UNKNOW
+    , MARKET
     , LIMIT
     , STOPLOSS
     , TAKEPROFIT
 };
 
 enum class OrderTIF : char {
-      GTC // good till canceled
+      UNKNOW
+    , GTC // good till canceled
     , IOC // immediately or cancel
     , FOK // full or kill
 };
