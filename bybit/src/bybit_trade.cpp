@@ -142,7 +142,8 @@ void BybitTrade::on_message(std::string const &msg) {
 }
 
 void BybitTrade::ping() {
-
+    std::string json_obj = R"({"req_id": "0", "op": "ping"})";
+    self.client->send(json_obj);
 }
 
 #undef LOGHEAD
