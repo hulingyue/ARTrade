@@ -13,7 +13,8 @@
 namespace {
 struct Self {
     std::atomic<bool> is_ready;
-    Client *client = nullptr;
+    core::WebSocket::Client::Client *websocket_client = nullptr;
+    core::http::client::HttpClient *http_client = nullptr;
 
     std::string api_key;
     std::string api_secret;
@@ -23,7 +24,8 @@ struct Self {
     unsigned long long reqid = 0;
 
     ~Self() {
-        if (client) { delete client; }
+        if (websocket_client) { delete websocket_client; }
+        if (http_client) { delete http_client; }
     }
 };
 
@@ -54,15 +56,15 @@ void BybitTrade::init() {
     self.api_secret = config.value("api_secret", "");
     assert(self.api_key.length() > 0 && self.api_secret.length() > 0);
 
-    if (self.client) { delete self.client; }
-    self.client = new Client;
-    self.client->on_open = std::function<void()>([this]() {
+    if (self.websocket_client) { delete self.websocket_client; }
+    self.websocket_client = new core::WebSocket::Client::Client;
+    self.websocket_client->on_open = std::function<void()>([this]() {
         on_open();
     });
-    self.client->on_close = std::function<void()>([this]() {
+    self.websocket_client->on_close = std::function<void()>([this]() {
         on_close();
     });
-    self.client->on_message = std::function<void(std::string const &msg)>([this](std::string const &msg) {
+    self.websocket_client->on_message = std::function<void(std::string const &msg)>([this](std::string const &msg) {
         on_message(msg);
     });
 
@@ -83,7 +85,7 @@ void BybitTrade::init() {
     self.category = is_spot ? "spot" : "linear";
 
     spdlog::info("{} is_test: {} is_spot: {} url: {}", LOGHEAD, is_test, is_spot, url);
-    self.client->connect(url);
+    self.websocket_client->connect(url);
 }
 
 bool BybitTrade::is_ready() {
@@ -116,7 +118,7 @@ void BybitTrade::on_open() {
     };
 
     std::string json_str = json_obj.dump();
-    auto code = self.client->send(json_str);
+    auto code = self.websocket_client->send(json_str);
     if (code == 0) {
         self.reqid = (self.reqid + 1) % ULLONG_MAX;
     }
@@ -144,7 +146,7 @@ void BybitTrade::on_message(std::string const &msg) {
 
 void BybitTrade::ping() {
     std::string json_obj = R"({"req_id": "0", "op": "ping"})";
-    self.client->send(json_obj);
+    self.websocket_client->send(json_obj);
 }
 
 #undef LOGHEAD
