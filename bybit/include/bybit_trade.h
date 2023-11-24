@@ -1,5 +1,4 @@
 #pragma once
-#include <core/ws_client.h>
 #include <core/trade.h>
 #include <core/datas.hpp>
 #include <core/pimpl.h>

@@ -2,12 +2,13 @@
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
 #include "bybit_trade.h"
+#include <core/ws_client.h>
+#include <core/http_client.h>
 #include <core/util.h>
 #include <core/time.hpp>
 
 
 #define LOGHEAD "[BybitTrade::" + std::string(__func__) + "]"
-using namespace core::WebSocket::Client;
 
 namespace {
 struct Self {
