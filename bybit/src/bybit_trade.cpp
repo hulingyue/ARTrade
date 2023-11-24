@@ -13,7 +13,7 @@
 namespace {
 struct Self {
     std::atomic<bool> is_ready;
-    core::WebSocket::Client::Client *websocket_client = nullptr;
+    core::websocket::client::WebSocketClient *websocket_client = nullptr;
     core::http::client::HttpClient *http_client = nullptr;
 
     std::string api_key;
@@ -57,7 +57,7 @@ void BybitTrade::init() {
     assert(self.api_key.length() > 0 && self.api_secret.length() > 0);
 
     if (self.websocket_client) { delete self.websocket_client; }
-    self.websocket_client = new core::WebSocket::Client::Client;
+    self.websocket_client = new core::websocket::client::WebSocketClient;
     self.websocket_client->on_open = std::function<void()>([this]() {
         on_open();
     });

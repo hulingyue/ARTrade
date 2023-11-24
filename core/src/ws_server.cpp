@@ -6,12 +6,12 @@ struct Self {
 } // namespace
 
 
-namespace core::WebSocket::Server {
+namespace core::websocket::server {
     
-Server::Server() : self {*new Self{}} {}
-Server::~Server() {
+WebSocketServer::WebSocketServer() : self {*new Self{}} {}
+WebSocketServer::~WebSocketServer() {
     if (&self) { delete &self; }
 }
 
 
-} // namespace core::WebSocket::Server 
+} // namespace core::websocket::server 

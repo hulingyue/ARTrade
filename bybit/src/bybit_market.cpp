@@ -6,12 +6,12 @@
 
 
 #define LOGHEAD "[BybitMarket::" + std::string(__func__) + "]"
-using namespace core::WebSocket::Client;
+using namespace core::websocket::client;
 
 namespace {
 struct Self {
     std::atomic<bool> is_ready;
-    Client *client = nullptr;
+    WebSocketClient *client = nullptr;
     int interval = 0;
 
     // market
@@ -33,7 +33,7 @@ BybitMarket::~BybitMarket() {
 
 void BybitMarket::init() {
     if (self.client) { delete self.client; }
-    self.client = new Client();
+    self.client = new WebSocketClient();
     self.client->on_open = std::function<void()>([this]() {
         on_open();
     });

@@ -35,14 +35,14 @@ struct Self {
     WSSClient *wss_client = nullptr;
     WSClient *ws_client = nullptr;
 
-    core::WebSocket::Client::Client *obj;
-    core::WebSocket::Client::Client *operator->() { return obj; }
+    core::websocket::client::WebSocketClient *obj;
+    core::websocket::client::WebSocketClient *operator->() { return obj; }
 };
 
 } // namespace
 
 
-namespace core::WebSocket::Client {
+namespace core::websocket::client {
 
 static inline void set_sls_init(WSSClient &client) {
     client.set_tls_init_handler([](websocketpp::connection_hdl) {
@@ -123,21 +123,21 @@ static void background(Self &self) {
 
 }
 
-Client::Client() : self {*new Self{ .obj = this }} {
+WebSocketClient::WebSocketClient() : self {*new Self{ .obj = this }} {
 
 }
 
-Client::~Client() {
+WebSocketClient::~WebSocketClient() {
     if (&self) { delete &self; }
 }
 
-Client* Client::set_reconnect(int second) {
+WebSocketClient* WebSocketClient::set_reconnect(int second) {
     spdlog::info("{} second: {}", LOGHEAD, second);
     self.interval = second;
     return this;
 }
 
-int Client::send(std::string const &data) {
+int WebSocketClient::send(std::string const &data) {
     spdlog::info("{} data: {}", LOGHEAD, data);
 
     std::scoped_lock lock(self.mutex);
@@ -158,7 +158,7 @@ int Client::send(std::string const &data) {
     return 0;
 }
 
-int Client::connect(std::string const &uri, int timeout) {
+int WebSocketClient::connect(std::string const &uri, int timeout) {
 
     spdlog::info("{} uri: {} timeout: {}", LOGHEAD, uri, timeout);
 
@@ -182,7 +182,7 @@ int Client::connect(std::string const &uri, int timeout) {
     return 0;
 }
 
-void Client::stop() {
+void WebSocketClient::stop() {
     spdlog::info("{}", LOGHEAD);
 
     std::scoped_lock lock(self.mutex);
@@ -203,7 +203,7 @@ void Client::stop() {
     }
 }
 
-} // namespace core::WebSocket::Client 
+} // namespace core::websocket::client 
 
 #undef LOGHEAD
 #undef LOG_HEAD
