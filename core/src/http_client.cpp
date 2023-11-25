@@ -12,7 +12,7 @@ struct Self {
     int port = 80;
     httplib::Headers headers;
 
-    httplib::Client* client = nullptr;
+    httplib::SSLClient* client = nullptr;
 };
 }
 
@@ -42,15 +42,18 @@ HttpClient HttpClient::set_base_uri(const std::string uri) {
 
 HttpClient HttpClient::set_host(const std::string host) {
     self.host = host;
+    spdlog::info("{} host: {}", LOGHEAD, self.host);
     return *this;
 }
 
 HttpClient HttpClient::set_port(const int port) {
     self.port = port;
+    spdlog::info("{} port: {}", LOGHEAD, self.port);
     return *this;
 }
 
 HttpClient HttpClient::set_header(const httplib::Headers headers) {
+    spdlog::info("{}", LOGHEAD);
     self.headers = headers;
     return *this;
 }
@@ -66,24 +69,27 @@ HttpClient HttpClient::update_header(const httplib::Headers headers) {
 }
 
 httplib::Result HttpClient::get(const std::string path) {
+    spdlog::info("{}", LOGHEAD);
     if (self.client == nullptr) {
-        self.client = new httplib::Client(self.host, self.port);
+        self.client = new httplib::SSLClient(self.host, self.port);
     }
 
     return self.client->Get(path, self.headers);
 }
 
 httplib::Result HttpClient::get(const std::string path, const httplib::Params params) {
+    spdlog::info("{}", LOGHEAD);
     if (self.client == nullptr) {
-        self.client = new httplib::Client(self.host, self.port);
+        self.client = new httplib::SSLClient(self.host, self.port);
     }
 
     return self.client->Get(path, params, self.headers);
 }
 
 httplib::Result HttpClient::post(const std::string path, const httplib::Params params) {
+    spdlog::info("{}", LOGHEAD);
     if (self.client == nullptr) {
-        self.client = new httplib::Client(self.host, self.port);
+        self.client = new httplib::SSLClient(self.host, self.port);
     }
 
     return self.client->Post(path, self.headers, params);
