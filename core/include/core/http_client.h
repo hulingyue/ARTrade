@@ -11,17 +11,16 @@ public:
     virtual ~HttpClient();
 
 public:
-    HttpClient set_base_uri(std::string uri);
-    HttpClient set_protocol(std::string protocol);
-    HttpClient set_host(std::string host);
-    HttpClient set_port(int port);
-    HttpClient set_header(httplib::Headers headers);
+    HttpClient set_base_uri(const std::string uri);
+    HttpClient set_host(const std::string host);
+    HttpClient set_port(const int port);
+    HttpClient set_header(const httplib::Headers headers);
 
-    httplib::Result get(std::string path);
-    httplib::Result post(std::string path, httplib::Params params);
+    HttpClient update_header(const httplib::Headers headers);
 
-private:
-    std::string generate_uri(std::string path);
+    httplib::Result get(const std::string path);
+    httplib::Result get(const std::string path, const httplib::Params params);
+    httplib::Result post(const std::string path, const httplib::Params params);
 
 private:
     Self &self;

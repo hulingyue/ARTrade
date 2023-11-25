@@ -1,11 +1,13 @@
 #include <filesystem>
+#include <regex>
+#include <spdlog/spdlog.h>
 #include "core/http_client.h"
+
+#define LOGHEAD "[HttpClient::" + std::string(__func__) + "]"
 
 
 namespace {
 struct Self {
-    std::string uri;
-    std::string protocol;
     std::string host;
     int port = 80;
     httplib::Headers headers;
@@ -26,55 +28,67 @@ HttpClient::~HttpClient() {
     // if (&self) delete &self;
 }
 
-HttpClient HttpClient::set_base_uri(std::string uri) {
-    self.uri = uri;
-    return *this;
-}
+HttpClient HttpClient::set_base_uri(const std::string uri) {
+    std::regex rgx("(https?://)?([^/]+)");
+    std::smatch match;
 
-HttpClient HttpClient::set_protocol(std::string protocol) {
-    self.protocol = protocol;
-    if (self.protocol.length() > 0 && self.host.length() > 0) {
-        self.uri = (std::filesystem::path(self.protocol) / self.host).string();
+    if (std::regex_search(uri, match, rgx)) {
+        self.host = match[2];
     }
+    
+    spdlog::info("{} uri: {} host: {}", LOGHEAD, uri, self.host);
     return *this;
 }
 
-HttpClient HttpClient::set_host(std::string host) {
+HttpClient HttpClient::set_host(const std::string host) {
     self.host = host;
-    if (self.protocol.length() > 0 && self.host.length() > 0) {
-        self.uri = (std::filesystem::path(self.protocol) / self.host).string();
-    }
     return *this;
 }
 
-HttpClient HttpClient::set_port(int port) {
+HttpClient HttpClient::set_port(const int port) {
     self.port = port;
     return *this;
 }
 
-HttpClient HttpClient::set_header(httplib::Headers headers) {
+HttpClient HttpClient::set_header(const httplib::Headers headers) {
     self.headers = headers;
     return *this;
 }
 
-httplib::Result HttpClient::get(std::string path) {
+HttpClient HttpClient::update_header(const httplib::Headers headers) {
+    for (auto it = headers.begin(); it != headers.end(); it++) {
+        auto range = self.headers.equal_range(it->first);
+        for (auto r_it = range.first; r_it != range.second; r_it++) {
+            r_it->second = it->second;
+        }
+    }
+    return *this;
+}
+
+httplib::Result HttpClient::get(const std::string path) {
     if (self.client == nullptr) {
         self.client = new httplib::Client(self.host, self.port);
     }
 
-    return self.client->Get(generate_uri(path), self.headers);
+    return self.client->Get(path, self.headers);
 }
 
-httplib::Result HttpClient::post(std::string path, httplib::Params params) {
+httplib::Result HttpClient::get(const std::string path, const httplib::Params params) {
     if (self.client == nullptr) {
         self.client = new httplib::Client(self.host, self.port);
     }
 
-    return self.client->Post(generate_uri(path), self.headers, params);
+    return self.client->Get(path, params, self.headers);
 }
 
-inline std::string HttpClient::generate_uri(std::string path) {
-    return (std::filesystem::path(self.uri) / path).string();
+httplib::Result HttpClient::post(const std::string path, const httplib::Params params) {
+    if (self.client == nullptr) {
+        self.client = new httplib::Client(self.host, self.port);
+    }
+
+    return self.client->Post(path, self.headers, params);
 }
 
 } // core::http::client
+
+#undef LOGHEAD
