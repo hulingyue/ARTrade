@@ -130,7 +130,7 @@ struct OrderObj {
     // space 4 bytes
 
     double price;
-    double volumn;
+    double quantity;
 };
 
 
