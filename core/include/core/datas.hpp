@@ -124,6 +124,7 @@ struct OrderObj {
     OrderOffset offset;
     OrderType type;
     OrderStatus status;
+    OrderTIF tif;
 
     int client_id;
     int order_id;
