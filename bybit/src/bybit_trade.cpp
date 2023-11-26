@@ -7,6 +7,8 @@
 #include <core/util.h>
 #include <core/time.hpp>
 
+#include "format.hpp"
+
 
 #define LOGHEAD "[BybitTrade::" + std::string(__func__) + "]"
 
@@ -35,6 +37,16 @@ std::string generate_signature(uint64_t expires, std::string& api_secret) {
     for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
         sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
     return std::string(mdString);
+}
+
+void update_headers(Self *self) {
+    uint64_t timestamp = core::time::Time::now_millisecond();
+    httplib::Headers headers = {
+        {"X-BAPI-SIGN", generate_signature(timestamp, self->api_secret)},
+        {"X-BAPI-API-KEY", self->api_key},
+        {"X-BAPI-TIMESTAMP", std::to_string(timestamp)}
+    };
+    self->http_client.update_header(headers);
 }
 
 }
@@ -87,6 +99,15 @@ void BybitTrade::init() {
     spdlog::info("{} is_test: {} is_spot: {} websocket_url: {} restful_url: {}", LOGHEAD, is_test, is_spot, websocket_url, restful_url);
     // restful
     self.http_client.set_base_uri(restful_url);
+    httplib::Headers headers = {
+        {"Content-Type", "application/json"},
+        {"X-BAPI-SIGN", ""},
+        {"X-BAPI-API-KEY", ""},
+        {"X-BAPI-TIMESTAMP", "0"},
+        {"X-BAPI-RECV-WINDOW", "5000"}
+    };
+    self.http_client.set_header(headers);
+
     // websocket
     self.websocket_client->connect(websocket_url);
 }
@@ -96,7 +117,42 @@ bool BybitTrade::is_ready() {
 }
 
 TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
+    std::string path = "/v5/order/create";
 
+    httplib::Params params;
+    params.emplace("category", self.category);
+    params.emplace("symbol", std::string(order.symbol));
+    params.emplace("side", side_to_bybit(order.side));
+    params.emplace("orderType", type_to_bybit(order.type));
+    params.emplace("qty", std::to_string(order.quantity));
+    params.emplace("price", std::to_string(order.price));
+    params.emplace("timeInForce", tif_to_bybit(order.tif));
+
+    update_headers(&self);
+    httplib::Result res = self.http_client.get(path, params);
+
+    TradeOperateResult result {
+        .code = -1,
+        .msg = ""
+    };
+
+    if (res) {
+        if (res->status == 200) {
+            result.code = 0;
+            result.msg = res->body;
+            spdlog::info("{} Request success, code: {} msg: {}", LOGHEAD, result.code, result.msg);
+        } else {
+            spdlog::error("{} Request failed, code: {} msg: {}", LOGHEAD, result.code, result.msg);
+            result.code = res->status;
+        }
+    } else {
+        int err_code = static_cast<int>(res.error()) * -1;
+        result.code = err_code;
+        result.msg = "";
+        spdlog::error("{} Request failed, code: {} msg: {}", LOGHEAD, result.code, result.msg);
+    }
+
+    return result;
 }
 
 TradeOperateResult BybitTrade::cancel(core::datas::CancelObj const &order) {
