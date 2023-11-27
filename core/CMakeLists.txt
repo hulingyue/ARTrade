@@ -14,8 +14,6 @@ add_subdirectory(3rd/pybind11)
 add_subdirectory(3rd/nlohmann)
 add_subdirectory(3rd/CLI11)
 add_subdirectory(3rd/websocketpp)
-
-add_definitions(-DCPPHTTPLIB_OPENSSL_SUPPORT)
 add_subdirectory(3rd/cpp-httplib)
 
 target_include_directories(${PROJECT_NAME} PUBLIC

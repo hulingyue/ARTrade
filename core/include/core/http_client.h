@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CPPHTTPLIB_OPENSSL_SUPPORT
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#endif
 #include <httplib.h>
 #include "pimpl.h"
 
