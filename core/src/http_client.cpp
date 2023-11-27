@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <regex>
 #include <spdlog/spdlog.h>
-#include "core/http_client.h"
+#include "core/http/client.h"
 
 #define LOGHEAD "[HttpClient::" + std::string(__func__) + "]"
 
@@ -9,7 +9,6 @@
 namespace {
 struct Self {
     std::string host;
-    int port = 80;
     httplib::Headers headers;
 
     httplib::SSLClient* ssl_client = nullptr;
@@ -49,12 +48,6 @@ HttpClient HttpClient::set_host(const std::string host) {
     return *this;
 }
 
-HttpClient HttpClient::set_port(const int port) {
-    self.port = port;
-    spdlog::info("{} port: {}", LOGHEAD, self.port);
-    return *this;
-}
-
 HttpClient HttpClient::set_header(const httplib::Headers headers) {
     spdlog::info("{}", LOGHEAD);
     self.headers = headers;
@@ -74,7 +67,7 @@ HttpClient HttpClient::update_header(const httplib::Headers headers) {
 httplib::Result HttpClient::get(const std::string path) {
     spdlog::info("{}", LOGHEAD);
     if (self.ssl_client == nullptr) {
-        self.ssl_client = new httplib::SSLClient(self.host, self.port);
+        self.ssl_client = new httplib::SSLClient(self.host);
     }
 
     return self.ssl_client->Get(path, self.headers);
@@ -83,7 +76,7 @@ httplib::Result HttpClient::get(const std::string path) {
 httplib::Result HttpClient::get(const std::string path, const httplib::Params params) {
     spdlog::info("{}", LOGHEAD);
     if (self.ssl_client == nullptr) {
-        self.ssl_client = new httplib::SSLClient(self.host, self.port);
+        self.ssl_client = new httplib::SSLClient(self.host);
     }
 
     return self.ssl_client->Get(path, params, self.headers);
@@ -92,7 +85,7 @@ httplib::Result HttpClient::get(const std::string path, const httplib::Params pa
 httplib::Result HttpClient::post(const std::string path, const httplib::Params params) {
     spdlog::info("{}", LOGHEAD);
     if (self.ssl_client == nullptr) {
-        self.ssl_client = new httplib::SSLClient(self.host, self.port);
+        self.ssl_client = new httplib::SSLClient(self.host);
     }
 
     return self.ssl_client->Post(path, self.headers, params);

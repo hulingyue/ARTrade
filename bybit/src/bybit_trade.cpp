@@ -3,7 +3,8 @@
 #include <openssl/sha.h>
 #include "bybit_trade.h"
 #include <core/ws_client.h>
-#include <core/http_client.h>
+#include <core/http/util.hpp>
+#include <core/http/client.h>
 #include <core/util.h>
 #include <core/time.hpp>
 
@@ -137,18 +138,19 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
     };
 
     if (res) {
+        result.code = res->status;
+        result.msg = res->body;
+
         if (res->status == 200) {
             result.code = 0;
-            result.msg = res->body;
             spdlog::info("{} Request success, code: {} msg: {}", LOGHEAD, result.code, result.msg);
         } else {
             spdlog::error("{} Request failed, code: {} msg: {}", LOGHEAD, result.code, result.msg);
-            result.code = res->status;
         }
     } else {
-        int err_code = static_cast<int>(res.error()) * -1;
-        result.code = err_code;
-        result.msg = "";
+        httplib::Error err = res.error();
+        result.code = static_cast<int>(err) * -1;
+        result.msg = core::http::util::err_string(err);
         spdlog::error("{} Request failed, code: {} msg: {}", LOGHEAD, result.code, result.msg);
     }
 
