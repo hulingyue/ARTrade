@@ -12,7 +12,7 @@ struct Self {
     int port = 80;
     httplib::Headers headers;
 
-    httplib::SSLClient* client = nullptr;
+    httplib::SSLClient* ssl_client = nullptr;
 };
 }
 
@@ -24,11 +24,14 @@ HttpClient::HttpClient() : self( *new Self {} ) {
 }
 
 HttpClient::~HttpClient() {
-    if (self.client) { delete self.client; }
+    if (self.ssl_client) {
+        delete self.ssl_client;
+        self.ssl_client = nullptr;
+    }
     // if (&self) delete &self;
 }
 
-HttpClient HttpClient::set_base_uri(const std::string uri) {
+HttpClient HttpClient::set_uri(const std::string uri) {
     std::regex rgx("(https?://)?([^/]+)");
     std::smatch match;
 
@@ -70,29 +73,29 @@ HttpClient HttpClient::update_header(const httplib::Headers headers) {
 
 httplib::Result HttpClient::get(const std::string path) {
     spdlog::info("{}", LOGHEAD);
-    if (self.client == nullptr) {
-        self.client = new httplib::SSLClient(self.host, self.port);
+    if (self.ssl_client == nullptr) {
+        self.ssl_client = new httplib::SSLClient(self.host, self.port);
     }
 
-    return self.client->Get(path, self.headers);
+    return self.ssl_client->Get(path, self.headers);
 }
 
 httplib::Result HttpClient::get(const std::string path, const httplib::Params params) {
     spdlog::info("{}", LOGHEAD);
-    if (self.client == nullptr) {
-        self.client = new httplib::SSLClient(self.host, self.port);
+    if (self.ssl_client == nullptr) {
+        self.ssl_client = new httplib::SSLClient(self.host, self.port);
     }
 
-    return self.client->Get(path, params, self.headers);
+    return self.ssl_client->Get(path, params, self.headers);
 }
 
 httplib::Result HttpClient::post(const std::string path, const httplib::Params params) {
     spdlog::info("{}", LOGHEAD);
-    if (self.client == nullptr) {
-        self.client = new httplib::SSLClient(self.host, self.port);
+    if (self.ssl_client == nullptr) {
+        self.ssl_client = new httplib::SSLClient(self.host, self.port);
     }
 
-    return self.client->Post(path, self.headers, params);
+    return self.ssl_client->Post(path, self.headers, params);
 }
 
 } // core::http::client
