@@ -98,7 +98,7 @@ void BybitTrade::init() {
 
     spdlog::info("{} is_test: {} is_spot: {} websocket_url: {} restful_url: {}", LOGHEAD, is_test, is_spot, websocket_url, restful_url);
     // restful
-    self.http_client.set_base_uri(restful_url);
+    self.http_client.set_uri(restful_url);
     httplib::Headers headers = {
         {"Content-Type", "application/json"},
         {"X-BAPI-SIGN", ""},
