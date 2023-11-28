@@ -130,7 +130,7 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
     params.emplace("timeInForce", tif_to_bybit(order.tif));
 
     update_headers(&self);
-    httplib::Result res = self.http_client.get(path, params);
+    httplib::Result res = self.http_client.post(path, params);
 
     TradeOperateResult result {
         .code = -1,
