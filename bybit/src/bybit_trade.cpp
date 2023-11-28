@@ -1,14 +1,14 @@
 #include <cassert>
-#include <openssl/hmac.h>
-#include <openssl/sha.h>
 #include "bybit_trade.h"
 #include <core/ws_client.h>
 #include <core/http/util.hpp>
 #include <core/http/client.h>
 #include <core/util.h>
 #include <core/time.hpp>
+#include <nlohmann/json.hpp>
 
 #include "format.hpp"
+#include "signature.hpp"
 
 
 #define LOGHEAD "[BybitTrade::" + std::string(__func__) + "]"
@@ -31,21 +31,25 @@ struct Self {
     }
 };
 
-std::string generate_signature(uint64_t expires, std::string& api_secret) {
-    std::string message = "GET/realtime" + std::to_string(expires);
-    unsigned char* digest = HMAC(EVP_sha256(), api_secret.c_str(), api_secret.length(), reinterpret_cast<const unsigned char*>(message.c_str()), message.length(), nullptr, nullptr);
-    char mdString[SHA256_DIGEST_LENGTH*2+1];
-    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
-        sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
-    return std::string(mdString);
-}
+void update_headers(Self *self, const nlohmann::json& parameters, const std::string method) {
+    std::string timestamp = std::to_string(core::time::Time::now_millisecond());
 
-void update_headers(Self *self) {
-    uint64_t timestamp = core::time::Time::now_millisecond();
+    std::string sign;
+    static const std::string recv_window = "5000";
+    if (method == "GET") {
+        sign = restful_get_signature(timestamp, std::move(self->api_secret), self->api_key, recv_window, parameters);
+    } else if (method == "POST") {
+        sign = restful_post_signature(timestamp, std::move(self->api_secret), self->api_key, recv_window, parameters);
+    } else {
+        spdlog::error("{} unsupport this method: {}", LOGHEAD, method);
+        return;
+    }
+
     httplib::Headers headers = {
-        {"X-BAPI-SIGN", generate_signature(timestamp, self->api_secret)},
+        {"X-BAPI-SIGN", sign},
         {"X-BAPI-API-KEY", self->api_key},
-        {"X-BAPI-TIMESTAMP", std::to_string(timestamp)}
+        {"X-BAPI-TIMESTAMP", timestamp},
+        {"X-BAPI-RECV-WINDOW", recv_window}
     };
     self->http_client.update_header(headers);
 }
@@ -120,17 +124,18 @@ bool BybitTrade::is_ready() {
 TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
     std::string path = "/v5/order/create";
 
-    httplib::Params params;
-    params.emplace("category", self.category);
-    params.emplace("symbol", std::string(order.symbol));
-    params.emplace("side", side_to_bybit(order.side));
-    params.emplace("orderType", type_to_bybit(order.type));
-    params.emplace("qty", std::to_string(order.quantity));
-    params.emplace("price", std::to_string(order.price));
-    params.emplace("timeInForce", tif_to_bybit(order.tif));
+    nlohmann::json parameters = {
+        {"category", self.category},
+        {"symbol", std::string(order.symbol)},
+        {"side", side_to_bybit(order.side)},
+        {"orderType", type_to_bybit(order.type)},
+        {"qty", std::to_string(order.quantity)},
+        {"price", std::to_string(order.price)},
+        {"timeInForce", tif_to_bybit(order.tif)}
+    };
 
-    update_headers(&self);
-    httplib::Result res = self.http_client.post(path, params);
+    update_headers(&self, parameters, "POST");
+    httplib::Result res = self.http_client.post(path, parameters.dump());
 
     TradeOperateResult result {
         .code = -1,
@@ -142,7 +147,13 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
         result.msg = res->body;
 
         if (res->status == 200) {
-            result.code = 0;
+            // {"retCode":10004,"retMsg":"error sign! origin_string[1701180667626dHPRDHOkSSKFEC4W0m5000category=linear\u0026orderType=Market\u0026price=28000.000000\u0026qty=0.010000\u0026side=Buy\u0026symbol=BTCUSDT\u0026timeInForce=GTC]","result":{},"retExtInfo":{},"time":1701180668273}
+            nlohmann::json j_msg = nlohmann::json::parse(res->body);
+            result.code = j_msg.value("retCode", 0);
+            result.msg = j_msg.value("retMsg", "");
+        }
+
+        if (result.code == 0) {
             spdlog::info("{} Request success, code: {} msg: {}", LOGHEAD, result.code, result.msg);
         } else {
             spdlog::error("{} Request failed, code: {} msg: {}", LOGHEAD, result.code, result.msg);
@@ -175,7 +186,7 @@ void BybitTrade::on_open() {
     json_obj["args"] = {
         self.api_key,
         exipres,
-         generate_signature(exipres, self.api_secret)
+        websocket_signature(exipres, self.api_secret)
     };
 
     std::string json_str = json_obj.dump();
