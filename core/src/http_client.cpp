@@ -91,6 +91,19 @@ httplib::Result HttpClient::post(const std::string path, const httplib::Params p
     return self.ssl_client->Post(path, self.headers, params);
 }
 
+httplib::Result HttpClient::post(
+      const std::string &path
+    , const std::string &body
+    , const std::string &content_type
+    ) {
+    spdlog::info("{}", LOGHEAD);
+    if (self.ssl_client == nullptr) {
+        self.ssl_client = new httplib::SSLClient(self.host);
+    }
+
+    return self.ssl_client->Post(path, self.headers, body, content_type);
+}
+
 } // core::http::client
 
 #undef LOGHEAD

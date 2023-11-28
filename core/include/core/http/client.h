@@ -23,6 +23,11 @@ public:
     httplib::Result get(const std::string path);
     httplib::Result get(const std::string path, const httplib::Params params);
     httplib::Result post(const std::string path, const httplib::Params params);
+    httplib::Result post(
+        const std::string &path,
+        const std::string &body,
+        const std::string &content_type="application/json"
+    );
 
 private:
     Self &self;
