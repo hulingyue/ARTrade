@@ -169,7 +169,16 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
 }
 
 TradeOperateResult BybitTrade::cancel(core::datas::CancelObj const &order) {
+    std::string path = "/v5/order/cancel";
 
+    nlohmann::json parameters = {
+        {"category", self.category},
+        {"symbol", std::string(order.symbol)},
+        {"orderLinkId", order.order_id}
+    };
+
+    update_headers(&self, parameters, "POST");
+    httplib::Result res = self.http_client.post(path, parameters.dump());
 }
 
 void BybitTrade::interval_1s() {
