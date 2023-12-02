@@ -13,3 +13,6 @@
 [submodule "core/3rd/CLI11"]
 	path = core/3rd/CLI11
 	url = https://github.com/CLIUtils/CLI11.git
+[submodule "core/3rd/cpp-httplib"]
+	path = core/3rd/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git

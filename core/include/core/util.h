@@ -11,9 +11,9 @@
 #include "core/modules.h"
 
 
-#define LOGHEAD "[util" + std::string(__func__) + "]"
+#define LOGHEAD "[util::" + std::string(__func__) + "]"
 
-namespace {
+namespace __util {
     void set_log_level(const std::string_view level);
     int cli_parse(int argc, char** argv);
 }
@@ -44,7 +44,7 @@ extern Arguments arguments;
 
 inline void startup(core::modules::Modules * const module, int argc, char** argv, size_t log_size = 5 * 1024 * 1024, size_t log_files = 10) {
     // startup command
-    int cli_parse_code = cli_parse(argc, argv);
+    int cli_parse_code = __util::cli_parse(argc, argv);
     if (cli_parse_code != 0) {
         spdlog::error("{} Parameter parsing failed!", LOGHEAD);
         exit(-1);
@@ -57,16 +57,6 @@ inline void startup(core::modules::Modules * const module, int argc, char** argv
     }
     module->init_config();
 
-    core::util::create_folder(config_path());
-    bool read_config_status = core::config::Config::read(
-        (core::util::config_path() / std::filesystem::path("app.json")).string()
-    );
-
-    if (read_config_status == false) {
-        spdlog::error("{} cannot found 'app.json' at {}", LOGHEAD, core::util::config_path().string());
-        exit(-3);
-    }
-
     // log
     std::filesystem::path log_file_path = log_path() / std::filesystem::path("log.txt");
     auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_file_path, log_size, log_files);
@@ -76,7 +66,7 @@ inline void startup(core::modules::Modules * const module, int argc, char** argv
     spdlog::set_default_logger(logger);
 
     auto config = core::config::Config::get();
-    set_log_level(config.value("log_level", "info"));
+    __util::set_log_level(config.value("log_level", "info"));
 }
 
 inline std::filesystem::path log_path() {
@@ -90,7 +80,7 @@ inline std::filesystem::path config_path() {
 } // namespace core::util
 
 
-namespace {
+namespace __util {
 
 using namespace core::util;
 
@@ -115,7 +105,7 @@ inline int cli_parse(int argc, char** argv) {
     return 0;
 }
 
-} // namespace
+} // namespace __util
 
 
 #undef LOGHEAD

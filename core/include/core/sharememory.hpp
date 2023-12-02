@@ -1,15 +1,54 @@
+#pragma once
+#include <iostream>
+#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <fcntl.h>
+
 #include <spdlog/spdlog.h>
 
-#include "core/sharememory.h"
-#include "core/time.hpp"
-#include "core/util.h"
-
+#include "time.hpp"
+#include "util.h"
+#include "pimpl.h"
 
 #define LOGHEAD "[SHAREMEMORY::" + std::string(__func__) + "]"
 
+
+namespace core::sharememory {
+
+enum class memory_type : char {
+      unknow
+    , market
+    , command
+    , response
+};
+
+template<typename T>
+class ShareMemory {
+public:
+    ShareMemory(std::string name, int proj_id, memory_type _type);
+    virtual ~ShareMemory();
+
+public:
+    bool create();
+    bool connect();
+
+    bool write(T data, bool is_safe = true, bool is_cover = false);
+    T* read_tail();
+    T* read_next(uint32_t id);
+
+private:
+    template_Self<T> &self;
+};
+    
+} // namespace core::sharememory
+
+
+/********************************/ 
+
 namespace {
 
-const int buffer_size = 256;
+const int buffer_size = 1023;
 
 template<typename T>
 class Buffer {
@@ -29,25 +68,32 @@ public:
         return (tail + 1) % buffer_size == head;
     }
 
-    T* lastest() {
+    T* get_tail() {
         if (is_empty()) { return nullptr; }
         return &data[tail];
     }
 
-    T* oldest() {
+    T* get_head() {
         if (is_empty()) { return nullptr; }
         return &data[head];
     }
 
-    T* read_by_index(int index) {
-        if (index < 0 || index >= buffer_size || is_empty()) { return nullptr; }
-        return &data[index];
+    T* next(uint32_t current) {
+        if (
+            (head <= current && current < tail)
+            || (tail < head && head <= current)
+            || (current < tail && tail <= head)
+        ) {
+            return &data[current];
+        }
+
+        return nullptr;
     }
 
-    T* read_by_offset(int offset) {
-        if (is_empty()) { return nullptr; }
-        int index = (head + offset) % buffer_size;
-        return &data[index];
+    T* next_or_head(uint32_t id) {
+        T* data = next(id);
+        if (data) { return data; }
+        return nullptr;
     }
 
     bool write(T &&value, bool is_safe, bool is_cover) {
@@ -72,13 +118,13 @@ public:
             if (is_cover && is_full()) {
                 head = (head + 1) % buffer_size;
             }
-            tail = (tail + 1) % buffer_size;
             data[tail] = value;
+            tail = (tail + 1) % buffer_size;
             id++;
             sign = 0;
             return true;
         }
-
+        sign = 0;
         return false;
     }
 
@@ -97,7 +143,19 @@ struct template_Self {
 template<typename T>
 static inline key_t generate_key(const template_Self<T>& self) {
     // core::util::create_folder()
+    int fd = open(self.name.c_str(), O_CREAT | O_RDWR, 0666);
+    if (fd == -1) {
+        spdlog::error("{} Failed to create temporary file!", LOGHEAD);
+        exit(-1);
+    }
     key_t key = ftok(self.name.c_str(), self.proj_id);
+
+    close(fd);
+    if (unlink(self.name.c_str()) == -1) {
+        spdlog::error("{} Failed to delete temporary file!", LOGHEAD);
+        exit(-1);
+    }
+
     if (key == -1) {
         spdlog::error("{} generate key error! pathname: {} proj_id: {}", LOGHEAD, self.name.c_str(), self.proj_id);
         exit(-1);
@@ -112,10 +170,11 @@ static inline int generate_permission(const template_Self<T>& self, const int mo
     int permission = 0000;
     switch (self._type) {
     case core::sharememory::memory_type::market:
-        permission = 0666;
+        permission = 0644;
         break;
-    case core::sharememory::memory_type::trade:
-        permission = 0611;
+    case core::sharememory::memory_type::command:
+    case core::sharememory::memory_type::response:
+        permission = 0666;
         break;
     default:
         spdlog::error("{} memory_type error: {}", LOGHEAD, static_cast<int>(self._type));
@@ -128,9 +187,13 @@ static inline int generate_permission(const template_Self<T>& self, const int mo
 template<typename T>
 static inline Buffer<T>* connect_memory(template_Self<T>& self, int permission) {
     key_t key = generate_key(self);
-    self.shmid = shmget(key, sizeof(Buffer<T>), permission);
+
+    int capacity = sizeof(Buffer<T>);
+    int size = ((capacity + 4095) / 4096) * 4096;
+
+    self.shmid = shmget(key, size, permission);
     if (self.shmid == -1) {
-        spdlog::error("{} shmget error!", LOGHEAD);
+        spdlog::error("{} shmget error! name: {} permission: {}", LOGHEAD, self.name, permission);
         // exit(-1);
         return nullptr;
     }
@@ -142,6 +205,7 @@ static inline Buffer<T>* connect_memory(template_Self<T>& self, int permission) 
         exit(-2);
     }
 
+    spdlog::info("{} Successfully connected!", LOGHEAD);
     return buffer;
 }
 
@@ -190,13 +254,23 @@ bool ShareMemory<T>::write(T data, bool is_safe, bool is_cover) {
 }
 
 template<typename T>
-T* ShareMemory<T>::read() {
+T* ShareMemory<T>::read_tail() {
     if (self.buffer == nullptr) {
         spdlog::error("{} buffer is nullptr! ", LOGHEAD);
         exit(-1);
     }
 
-    return self.buffer->lastest();
+    return self.buffer->tail();
+}
+
+template<typename T>
+T* ShareMemory<T>::read_next(uint32_t id) {
+    if (self.buffer == nullptr) {
+        spdlog::error("{} buffer is nullptr! ", LOGHEAD);
+        exit(-1);
+    }
+
+    return self.buffer->next(id);
 }
 
 } // namespace core::sharememory

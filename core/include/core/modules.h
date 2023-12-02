@@ -6,15 +6,16 @@
 #include "pimpl.h"
 #include "trade.h"
 #include "market.h"
+#include "datas.hpp"
 
 
-namespace core {
-namespace modules {
+namespace core::modules {
 
 class Modules {
 public:
-    Modules();
+    Modules(int argc, char** argv);
     virtual ~Modules();
+    virtual void init(int argc, char** argv, size_t log_size = 5 * 1024 * 1024, size_t log_files = 10);
 
     // Market
     virtual void set_market_obj(core::api::market::Market* market_obj = nullptr);
@@ -32,12 +33,16 @@ public:
     virtual void run();
     virtual void interval_1s();
 
+public:
+    virtual std::string project_name() = 0;
+    virtual core::datas::MessageType message_type() = 0;
+
 private:
     // Config
     void default_config();
+    void custom_init();
 private:
     Self &self;
 };
 
-} // namespace modules
-} // namespace core
+} // namespace core::modules

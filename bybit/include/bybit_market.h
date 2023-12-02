@@ -1,16 +1,18 @@
 #pragma once
 #include <core/ws_client.h>
 #include <core/market.h>
-#include <core/datas.h>
+#include <core/datas.hpp>
 #include <core/pimpl.h>
 
-using MarketOperateResult = core::base::datas::MarketOperateResult;
+using MarketOperateResult = core::datas::MarketOperateResult;
 
 
 class BybitMarket final : public core::api::market::Market {
 public:
     BybitMarket();
     ~BybitMarket();
+
+    void init() override;
 
     bool is_ready() override;
 

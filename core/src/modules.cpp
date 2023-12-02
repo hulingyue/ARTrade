@@ -1,8 +1,11 @@
+#include <iostream>
+#include <ctime>
 #include <filesystem>
 
 #include "core/modules.h"
 #include "core/config.h"
 #include "core/util.h"
+#include "core/message.hpp"
 
 
 #define LOGHEAD "[Modules::" + std::string(__func__) + "]"
@@ -12,24 +15,30 @@ namespace {
 struct Self {
     core::api::market::Market *market = nullptr;
     core::api::trade::Trade *trade = nullptr;
+    core::message::Message *message = nullptr;
 
     ~Self() {
         if (market) { delete market; }
         if (trade) { delete trade; }
+        if (message) { delete message; }
     }
 };
 
 }
 
-namespace core {
-namespace modules {
+namespace core::modules {
 
-Modules::Modules() : self { *new Self{} } {
-
+Modules::Modules(int argc, char** argv) : self { *new Self{} } {
+    // default setting
+    init(argc, argv);
 }
 
 Modules::~Modules() {
     if (&self) { delete &self; }
+}
+
+void Modules::init(int argc, char** argv, size_t log_size, size_t log_files) {
+    core::util::startup(this, argc, argv, log_size, log_files);
 }
 
 // Market
@@ -101,11 +110,49 @@ void handle_sigint(int signal) {
     exit(signal);
 }
 
+void Modules::custom_init() {
+    // something init after custom modules init
+
+    // config
+    init_config();
+    core::util::create_folder(core::util::config_path());
+    bool read_config_status = core::config::Config::read(
+        (core::util::config_path() / std::filesystem::path("app.json")).string()
+    );
+
+    if (read_config_status == false) {
+        spdlog::error("{} cannot found 'app.json' at {}", LOGHEAD, core::util::config_path().string());
+        exit(-3);
+    }
+    
+    core::datas::MessageType type = message_type();
+    std::string proj = project_name();
+    self.message = new core::message::Message(proj, type, Identity::Master);
+    if (self.market) {
+        self.market->set_message(self.message);
+        self.market->init();
+    }
+    if (self.trade) {
+        self.trade->set_message(self.message);
+        self.trade->init();
+    }
+}
+
 
 void Modules::run() {
     std::signal(SIGINT, handle_sigint);
 
+    custom_init();
+
+    // check if it is ready
+    do {
+        spdlog::info("modules is ready? {}", is_ready() ? "true" : "false");
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    } while (!is_ready());
+
     auto ts = std::chrono::system_clock::now();
+
+    core::datas::CommandObj* command = nullptr;
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         
@@ -114,6 +161,40 @@ void Modules::run() {
             interval_1s();
             ts = now;
         }
+
+        // read commands & deal with commands
+        command = self.message->read_command();
+        if (command) {
+            if (command->type == CommandType::SUBSCRIBE) {
+                std::vector<std::string> symbols;
+                for (auto item: command->symbols.symbols) {
+                    if (std::strlen(item) > 0) {
+                        symbols.emplace_back(item);
+                    }
+                }
+
+                if (symbols.size() > 0) {
+                    self.market->subscribe(std::move(symbols));
+                }
+            } else if (command->type == CommandType::UNSUBSCRIBE) {
+                std::vector<std::string> symbols;
+                for (auto item: command->symbols.symbols) {
+                    if (std::strlen(item) > 0) {
+                        symbols.emplace_back(item);
+                    }
+                }
+
+                if (symbols.size() > 0) {
+                    self.market->unsubscribe(std::move(symbols));
+                }
+            } else if (command->type == CommandType::ORDER) {
+
+            } else if (command->type == CommandType::CANCEL) {
+
+            } else {
+                spdlog::error("{} type: {}", LOGHEAD, static_cast<char>(command->type));
+            }
+        }
     }
 }
 
@@ -121,7 +202,6 @@ void Modules::interval_1s() {
     spdlog::info("{}", LOGHEAD);
 }
 
-} // namespace modules
-} // namespace core
+} // namespace core::modules
 
 #undef LOGHEAD

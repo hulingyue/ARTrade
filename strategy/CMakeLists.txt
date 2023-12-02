@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
-project(demo)
+project(strategy)
 
 set (CMAKE_CXX_FLAGS "-std=c++17 -Wall -DLLVM_USE_LINKER=lld -Wno-missing-braces")
 set (CMAKE_CXX_FLAGS_RELEASE "-O3")
+add_compile_options(-Wno-subobject-linkage)
 
 #---------------------------------------------------------------
 # core
@@ -22,7 +23,5 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE core)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-  ${CORE}/include
-  ${CORE}/3rd/spdlog/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

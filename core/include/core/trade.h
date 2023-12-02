@@ -1,25 +1,34 @@
 #pragma once 
-#include "datas.h"
+#include "datas.hpp"
+#include "pimpl.h"
 
-namespace core {
-namespace api {
-namespace trade {
+
+// forward declaration
+namespace core::message {
+    class Message;
+}
+
+
+namespace core::api::trade {
     
-using TradeOperateResult = core::base::datas::TradeOperateResult;
+using TradeOperateResult = core::datas::TradeOperateResult;
 
 class Trade {
     public:
-        Trade() = default;
-        virtual ~Trade() = default;
+        Trade();
+        virtual ~Trade();
 
+        virtual void init() = 0;
         virtual bool is_ready() = 0;
 
-        virtual TradeOperateResult order() = 0;
-        virtual TradeOperateResult cancel() = 0;
+        virtual TradeOperateResult order(core::datas::OrderObj const &order) = 0;
+        virtual TradeOperateResult cancel(core::datas::CancelObj const &order) = 0;
+
+        virtual void set_message(core::message::Message* messsage) final;
+    
+        // event
+    private:
+        Self &self;
 };            
 
-} // namespace trade
-    
-} // namespace api
-    
-} // namespace core
+} // namespace core::api::trade

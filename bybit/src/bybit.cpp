@@ -9,16 +9,26 @@
 namespace {
 struct Self {
     BybitMarket market;
+    BybitTrade trade;
 };
 }
 
 
-Bybit::Bybit() : self { *new Self{} } {
+Bybit::Bybit(int argc, char** argv) : Modules(argc, argv), self { *new Self{} } {
     set_market_obj(&self.market);
+    set_trade_obj(&self.trade);
 }
 
 Bybit::~Bybit() {
 
+}
+
+std::string Bybit::project_name() {
+    return "Bybit";
+}
+
+core::datas::MessageType Bybit::message_type() {
+    return core::datas::MessageType::ShareMemory;
 }
 
 void Bybit::init_config() {
@@ -27,7 +37,19 @@ void Bybit::init_config() {
             {
                 "log_level": "debug",
                 "project": "Bybit",
-                "version:": 1.0
+                "version:": 1.0,
+                "is_spot": true,
+                "is_test": true,
+                "market_test_spot_url": "wss://stream-testnet.bybit.com/v5/public/spot",
+                "market_test_future_url": "wss://stream-testnet.bybit.com/v5/public/linear",
+                "market_spot_url": "wss://stream.bybit.com/v5/public/spot",
+                "market_future_url": "wss://stream.bybit.com/v5/public/linear",
+                "trade_test_url": "wss://stream-testnet.bybit.com/v5/private",
+                "trade_url": "wss://stream.bybit.com/v5/private",
+                "trade_test_restful_url": "https://api-testnet.bybit.com",
+                "trade_restful_url": "https://api.bybit.com",
+                "api_key": "",
+                "api_secret": ""
             }
         )"
     );
@@ -42,6 +64,10 @@ void Bybit::interval_1s() {
 
 BybitMarket& Bybit::market() {
     return self.market;
+}
+
+BybitTrade& Bybit::trade() {
+    return self.trade;
 }
 
 #undef HEADLOG

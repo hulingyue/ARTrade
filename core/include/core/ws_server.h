@@ -3,26 +3,22 @@
 #include <functional>
 #include "pimpl.h"
 
-namespace core {
-namespace WebSocket {
-namespace Server {
+namespace core::websocket::server {
     
-class Server {
+class WebSocketServer {
 public:
-    Server();
-    ~Server();
+    WebSocketServer();
+    ~WebSocketServer();
 
-    std::function<void(Server &)> on_open;
-    std::function<void(Server &)> on_close;
-    std::function<void(Server &)> on_fail;
-    std::function<void(Server &, std::string_view msg)> on_ping;
-    std::function<void(Server &)> on_pong;
-    std::function<void(Server &, std::string const &msg)> on_message;
+    std::function<void(WebSocketServer &)> on_open;
+    std::function<void(WebSocketServer &)> on_close;
+    std::function<void(WebSocketServer &)> on_fail;
+    std::function<void(WebSocketServer &, std::string_view msg)> on_ping;
+    std::function<void(WebSocketServer &)> on_pong;
+    std::function<void(WebSocketServer &, std::string const &msg)> on_message;
 
 private:
     Self &self;
 };
 
-} // namespace Server
-} // namespace name
-} // namespace cor 
+} // namespace core::websocket::server 
