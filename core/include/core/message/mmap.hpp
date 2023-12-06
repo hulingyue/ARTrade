@@ -17,20 +17,16 @@ namespace core::message::sharememory {
 
 uintptr_t load(const std::string &path, size_t size, bool is_writing) {
     int fd = open(path.c_str(), (is_writing ? O_RDWR : O_RDONLY) | O_CREAT, (mode_t) 0600);
-    if (fd < 0)
-    {
+    if (fd < 0) {
         throw std::runtime_error(LOGHEAD + " failed to open file for page " + path);
     }
 
-    if (is_writing)
-    {
-        if (lseek(fd, size - 1, SEEK_SET) == -1)
-        {
+    if (is_writing) {
+        if (lseek(fd, size - 1, SEEK_SET) == -1) {
             close(fd);
             throw std::runtime_error(LOGHEAD + " failed to stretch for page " + path);
         }
-        if (write(fd, "", 1) == -1)
-        {
+        if (write(fd, "", 1) == -1) {
             close(fd);
             throw std::runtime_error(LOGHEAD + " unable to write for page " + path);
         }
@@ -38,14 +34,12 @@ uintptr_t load(const std::string &path, size_t size, bool is_writing) {
 
     void *buffer = mmap(0, size, is_writing ? (PROT_READ | PROT_WRITE) : PROT_READ, MAP_SHARED, fd, 0);
 
-    if (buffer == MAP_FAILED)
-    {
+    if (buffer == MAP_FAILED) {
         close(fd);
         throw std::runtime_error(LOGHEAD + " Error mapping file to buffer");
     }
 
-    if (madvise(buffer, size, MADV_RANDOM) != 0 && mlock(buffer, size) != 0)
-    {
+    if (madvise(buffer, size, MADV_RANDOM) != 0 && mlock(buffer, size) != 0) {
         munmap(buffer, size);
         close(fd);
         throw std::runtime_error(LOGHEAD + " failed to lock memory for page " + path);
@@ -59,13 +53,11 @@ uintptr_t load(const std::string &path, size_t size, bool is_writing) {
 bool release(uintptr_t address, size_t size) {
     void *buffer = reinterpret_cast<void *>(address);
     //unlock and unmap
-    if (munlock(buffer, size) != 0)
-    {
+    if (munlock(buffer, size) != 0) {
         return false;
     }
 
-    if (munmap(buffer, size) != 0)
-    {
+    if (munmap(buffer, size) != 0) {
         return false;
     }
 
