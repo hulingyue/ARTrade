@@ -4,6 +4,11 @@
 
 #define LOGHEAD "[message::" + std::string(__func__) + "]"
 
+constexpr int KB = 1024;
+constexpr int MB = 1024 * KB;
+constexpr int GB = 1024 * MB;
+
+
 namespace {
 using namespace core::message::sharememory;
 
