@@ -42,7 +42,8 @@ enum class CommandType : char {
 };
 
 enum class MarketType: char {
-      Depth = 'd'
+      Unknow = 'u'
+    , Depth = 'd'
     , Kline = 'k'
     , Bbo = 'b'
 };
@@ -100,10 +101,29 @@ struct MarketObj {
     unsigned long time;
 
     TradePair newest;
+};
+
+struct Market_base {
+    MarketType market_type;
+    char symbol[SYMBOL_MAX_LENGTH];
+    char exchange[SYMBOL_MAX_LENGTH];
+    unsigned long time;
+};
+
+struct alignas(64) Market_bbo : public Market_base {
+    double price;
+    double quantity;
+};
+
+struct alignas(64) Market_depth : public Market_base {
+    double price;
+    double quantity;
 
     TradePair asks[MARKET_MAX_DEPTH];
     TradePair bids[MARKET_MAX_DEPTH];
+};
 
+struct alignas(64) Market_kline : public Market_base {
     double high;
     double low;
     double open;

@@ -145,18 +145,17 @@ void BybitMarket::on_message(const std::string &msg) {
 
     } else if (mode == "tickers") {  //  tickers.{symbol}
         // spdlog::info("{} tickers: {}", LOGHEAD, msg);
-        core::datas::MarketObj obj;
+        core::datas::Market_bbo obj;
         obj.market_type = core::datas::MarketType::Bbo;
         std::strcpy(obj.symbol, symbols.c_str());
         std::strcpy(obj.exchange, "Bybit");
         obj.time = message.value("ts", 0);
         if (message["data"].is_null() || message["data"]["lastPrice"].is_null()) {
-            obj.newest.price = self.market_bbo_price;
+            obj.price = self.market_bbo_price;
         } else {
-            obj.newest.price = std::stod(message["data"]["lastPrice"].get<std::string>());
+            obj.price = std::stod(message["data"]["lastPrice"].get<std::string>());
         }
-        self.market_bbo_price = obj.newest.price;
-        obj.newest.quantity = 0;
+        obj.quantity = 0;
 
         on_market(obj);
         return;

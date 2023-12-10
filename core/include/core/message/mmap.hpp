@@ -2,6 +2,9 @@
  * Reference declaration: This code draws heavily from [Kungfu].
  * Kungfu: https://github.com/kungfu-origin/kungfu
 */
+#ifndef CORE_MMAP
+#define CORE_MMAP
+
 #pragma once
 #include <iostream>
 #include <sys/mman.h>
@@ -15,7 +18,7 @@
 
 namespace core::message::sharememory {
 
-uintptr_t load(const std::string &path, size_t size, bool is_writing) {
+inline uintptr_t load(const std::string &path, size_t size, bool is_writing) {
     int fd = open(path.c_str(), (is_writing ? O_RDWR : O_RDONLY) | O_CREAT, (mode_t) 0600);
     if (fd < 0) {
         throw std::runtime_error(LOGHEAD + " failed to open file for page " + path);
@@ -50,7 +53,7 @@ uintptr_t load(const std::string &path, size_t size, bool is_writing) {
     return reinterpret_cast<uintptr_t>(buffer);
 }
 
-bool release(uintptr_t address, size_t size) {
+inline bool release(uintptr_t address, size_t size) {
     void *buffer = reinterpret_cast<void *>(address);
     //unlock and unmap
     if (munlock(buffer, size) != 0) {
@@ -67,3 +70,4 @@ bool release(uintptr_t address, size_t size) {
 } // core::message::sharememory
 
 #undef LOGHEAD
+#endif

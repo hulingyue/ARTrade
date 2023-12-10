@@ -1,10 +1,9 @@
 #include "core/market.h"
-#include "core/message.hpp"
 
 
 namespace {
 struct Self {
-    core::message::Message *message;
+    core::message::message::MarketChannel *channel = nullptr;
 };
 }
 
@@ -23,19 +22,22 @@ void Market::interval_1s() {
 
 }
 
-void Market::set_message(core::message::Message* message) {
-    self.message = message;
+void Market::set_channel(core::message::message::MarketChannel *channel) {
+    if (self.channel) {
+        delete self.channel;
+    }
+    self.channel = channel;
 }
 
 /*****************************/
 /** event                   **/
 /*****************************/
-void Market::on_market(core::datas::MarketObj obj) {
-    if (self.message == nullptr) {
+void Market::on_market(core::datas::Market_bbo &obj) {
+    if (self.channel == nullptr) {
         return;
     }
 
-    self.message->write_market(std::move(obj));
+    self.channel->write(obj);
 }
 
 } // core::api::market
