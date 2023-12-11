@@ -22,85 +22,69 @@ struct TradePair {
     double quantity;
 };
 
-enum class MessageType : char {
-      ShareMemory
-    , WebSocket
-    , Socket
+enum class MessageType : int64_t {
+      ShareMemory = 1
+    , WebSocket = 2
+    , ZeroMQ = 3
 };
 
-enum class Identity : char {
-      Master = 'M'
-    , Slave = 'S'
+enum class Identity : int64_t {
+      Master = 1
+    , Slave = 2
 };
 
-
-enum class CommandType : char {
-      SUBSCRIBE = 'S'
-    , UNSUBSCRIBE = 'U'
-    , ORDER = 'O'
-    , CANCEL = 'C'
-};
-
-enum class MarketType: char {
-      Unknow = 'u'
-    , Depth = 'd'
-    , Kline = 'k'
-    , Bbo = 'b'
-};
-
-enum class CommandStatus : char {
+enum class CommandStatus : int64_t {
       APANDING
     , FILLED
 };
 
-enum class OrderSide : char {
-      UNKNOW
-    , BUY
-    , SELL
+enum class OrderSide : int64_t {
+      UNKNOW = -1
+    , BUY = 1
+    , SELL = 2
 };
 
-enum class OrderOffset : char {
-      UNKNOW
-    , OPEN
-    , CLOSE
-    , CLOSETODAY
-    , CLOSEYESTERDAY
+enum class OrderOffset : int64_t {
+      UNKNOW = -1
+    , OPEN = 1
+    , CLOSE = 2
+    , CLOSETODAY = 3
+    , CLOSEYESTERDAY = 4
 };
 
-enum class OrderType : char {
-      UNKNOW
-    , MARKET
-    , LIMIT
-    , STOPLOSS
-    , TAKEPROFIT
+enum class OrderType : int64_t {
+      UNKNOW = -1
+    , MARKET = 1
+    , LIMIT = 2
+    , STOPLOSS = 3
+    , TAKEPROFIT = 4
 };
 
-enum class OrderTIF : char {
-      UNKNOW
-    , GTC // good till canceled
-    , IOC // immediately or cancel
-    , FOK // full or kill
+enum class OrderTIF : int64_t {
+      UNKNOW = -1
+    , GTC = 1 // good till canceled
+    , IOC = 2 // immediately or cancel
+    , FOK = 3 // full or kill
 };
 
-enum class OrderStatus {
-      INIT // strategy create order
-    , PANDING  // system process order
-    , ACCEPTED // exchange accept order
-    , REJECTED // exchange reject order
-    , PARTIALLYFILLED // partially filled
-    , FILLED // filled
-    , CANCEL // cancel
+enum class OrderStatus : int64_t {
+      INIT = 1 // strategy create order
+    , PANDING = 2  // system process order
+    , ACCEPTED = 3 // exchange accept order
+    , REJECTED = 4 // exchange reject order
+    , PARTIALLYFILLED = 5 // partially filled
+    , FILLED = 6 // filled
+    , CANCEL = 7 // cancel
 };
 
-// 416 bytes
-struct MarketObj {
-    char symbol[SYMBOL_MAX_LENGTH];
-    char exchange[SYMBOL_MAX_LENGTH];
-    MarketType market_type;
-    // 7 bytes
-    unsigned long time;
-
-    TradePair newest;
+/******************************************/
+/***    Market - begin                  ***/
+/******************************************/
+enum class MarketType: int64_t {
+      Unknow = -1
+    , Depth = 1
+    , Kline = 2
+    , Bbo = 3
 };
 
 struct Market_base {
@@ -130,13 +114,28 @@ struct alignas(64) Market_kline : public Market_base {
     double close;
 };
 
-// 160 bytes
-struct SubscribeObj {
-    char symbols[SUBSCRIBE_MAX_SIZE][SYMBOL_MAX_LENGTH];
+/******************************************/
+/***    Market - end                    ***/
+/******************************************/
+
+
+/******************************************/
+/***    Command - begin                 ***/
+/******************************************/
+enum class CommandType : int64_t {
+      UNKNOW = -1
+    , SUBSCRIBE = 1
+    , UNSUBSCRIBE = 2
+    , ORDER = 3
+    , CANCEL = 4
 };
 
-// 64bytes
-struct OrderObj {
+// subscribe & unsubscribe
+struct alignas(64) SymbolObj {
+    char symbols[SYMBOL_MAX_LENGTH];
+};
+
+struct alignas(64) OrderObj {
     char symbol[SYMBOL_MAX_LENGTH];
     char exchange[SYMBOL_MAX_LENGTH];
 
@@ -148,48 +147,21 @@ struct OrderObj {
 
     int client_id;
     int order_id;
-    // space 4 bytes
 
     double price;
     double quantity;
 };
 
-
-// 36 bytes
-struct CancelObj {
+struct alignas(64) CancelObj {
     char symbol[SYMBOL_MAX_LENGTH];
     char exchange[SYMBOL_MAX_LENGTH];
 
+    int client_id;
     int order_id;
 };
 
-
-// 168 bytes
-struct CommandObj {
-    CommandType type;
-    uint32_t session_id;
-    union {
-        SubscribeObj symbols;
-        OrderObj order;
-        CancelObj cancel;
-    };
-};
-
-
-// 272
-struct ResponseObj {
-    CommandType type;
-    uint32_t session_id;
-
-    int code;
-    char msg[100];
-
-    union {
-        SubscribeObj symbols;
-        OrderObj order;
-        CancelObj cancel;
-    };
-};
-
+/******************************************/
+/***    Command - end                   ***/
+/******************************************/
 
 } // namespace core::datas
