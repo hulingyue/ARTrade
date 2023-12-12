@@ -52,7 +52,7 @@ public:
         header = reinterpret_cast<Header *>(address);
         header->data_size = size - HeaderSize;
         header->data_front_address = address + HeaderSize;
-        header->data_tail_address = header->data_front_address;
+        header->data_tail_address = address + size;
         header->data_earliest_addresss = header->data_front_address;
         header->data_lastest_address = header->data_front_address;
         header->data_cursor_address = header->data_front_address;
