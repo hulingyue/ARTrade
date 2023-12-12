@@ -135,7 +135,8 @@ private:
         int length = _market_size + MarketDataHeaderSize;
         if (!apply(length)) {
             // cover
-            header->data_next_address = address + HeaderSize;
+            // header->data_next_address = address + HeaderSize;
+            header->data_next_address = header->data_front_address;
 
             if (!apply(length)) { return false; }
         }
@@ -155,7 +156,8 @@ private:
     }
 
     bool apply(int length) {
-        return (((header->data_next_address + length) - address) <= size);
+        // return (((header->data_next_address + length) - address) <= size);
+        return ((header->data_next_address + length) <= header->data_tail_address);
     }
 
 };
