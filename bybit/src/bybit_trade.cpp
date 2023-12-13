@@ -178,7 +178,14 @@ TradeOperateResult BybitTrade::cancel(core::datas::CancelObj const &order) {
     };
 
     update_headers(&self, parameters, "POST");
+    
+    TradeOperateResult result {
+        .code = -1,
+        .msg = ""
+    };
     httplib::Result res = self.http_client.post(path, parameters.dump());
+
+    return result;
 }
 
 void BybitTrade::interval_1s() {
