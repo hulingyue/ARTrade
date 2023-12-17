@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 namespace core::datas {
 static const int SUBSCRIBE_MAX_SIZE = 10;
@@ -34,8 +35,8 @@ enum class Identity : int64_t {
 };
 
 enum class CommandStatus : int64_t {
-      APANDING
-    , FILLED
+      EFFECTIVE // 生效中
+    , INVALID // 失效
 };
 
 enum class OrderSide : int64_t {
@@ -130,12 +131,21 @@ enum class CommandType : int64_t {
     , CANCEL = 4
 };
 
-// subscribe & unsubscribe
-struct alignas(64) SymbolObj {
-    char symbols[SYMBOL_MAX_LENGTH];
+struct Command_base {
+    CommandType command_type;
 };
 
-struct alignas(64) OrderObj {
+// subscribe & unsubscribe
+struct alignas(64) SymbolBaseObj {
+    char symbol[SYMBOL_MAX_LENGTH];
+};
+
+struct alignas(64) SymbolObj : public Command_base {
+    size_t size;
+    std::vector<SymbolBaseObj> symbols;
+};
+
+struct alignas(64) OrderObj : public Command_base {
     char symbol[SYMBOL_MAX_LENGTH];
     char exchange[SYMBOL_MAX_LENGTH];
 
@@ -152,7 +162,7 @@ struct alignas(64) OrderObj {
     double quantity;
 };
 
-struct alignas(64) CancelObj {
+struct alignas(64) CancelObj : public Command_base {
     char symbol[SYMBOL_MAX_LENGTH];
     char exchange[SYMBOL_MAX_LENGTH];
 
