@@ -18,13 +18,13 @@
 
 namespace core::message::sharememory {
 
-inline uintptr_t load(const std::string &path, size_t size, bool is_writing) {
-    int fd = open(path.c_str(), (is_writing ? O_RDWR : O_RDONLY) | O_CREAT, (mode_t) 0600);
+inline uintptr_t load(const std::string &path, size_t size, bool is_writting) {
+    int fd = open(path.c_str(), (is_writting ? O_RDWR : O_RDONLY) | O_CREAT, (mode_t) 0600);
     if (fd < 0) {
         throw std::runtime_error(LOGHEAD + " failed to open file for page " + path);
     }
 
-    if (is_writing) {
+    if (is_writting) {
         if (lseek(fd, size - 1, SEEK_SET) == -1) {
             close(fd);
             throw std::runtime_error(LOGHEAD + " failed to stretch for page " + path);
@@ -35,7 +35,7 @@ inline uintptr_t load(const std::string &path, size_t size, bool is_writing) {
         }
     }
 
-    void *buffer = mmap(0, size, is_writing ? (PROT_READ | PROT_WRITE) : PROT_READ, MAP_SHARED, fd, 0);
+    void *buffer = mmap(0, size, is_writting ? (PROT_READ | PROT_WRITE) : PROT_READ, MAP_SHARED, fd, 0);
 
     if (buffer == MAP_FAILED) {
         close(fd);
@@ -49,7 +49,7 @@ inline uintptr_t load(const std::string &path, size_t size, bool is_writing) {
     }
 
     close(fd);
-    spdlog::info("{} mapped {} - {}", LOGHEAD, path, is_writing ? "rw" : "r");
+    spdlog::debug("{} mapped {} - {}", LOGHEAD, path, is_writting ? "rw" : "r");
     return reinterpret_cast<uintptr_t>(buffer);
 }
 
