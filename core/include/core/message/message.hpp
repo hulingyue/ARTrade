@@ -87,7 +87,7 @@ namespace core::message::message {
 
 class MarketChannel: protected Channel {
 public:
-    MarketChannel(const std::string& filename, size_t size, bool is_writting) : Channel("/tmp/" + filename + "_market", size, is_writting) {
+    MarketChannel(const std::string& filename, size_t size, bool is_writting=false) : Channel("/tmp/" + filename + "_market", size, is_writting) {
 
     }
     virtual ~MarketChannel() = default;
