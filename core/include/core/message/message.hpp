@@ -89,23 +89,23 @@ public:
         return insert(value);
     }
 
-    core::datas::Market_base* read(uintptr_t target__address) {
-        MarketDataHeader *_header = reinterpret_cast<MarketDataHeader*>(target__address);
+    core::datas::Market_base* read(uintptr_t target_address) {
+        MarketDataHeader *_header = reinterpret_cast<MarketDataHeader*>(target_address);
         if (_header == nullptr) { return nullptr; }
 
         if (_header->type == core::datas::MarketType::Bbo && _header->data_size == sizeof(core::datas::Market_bbo)) {
-            return reinterpret_cast<core::datas::Market_bbo*>(target__address + MarketDataHeaderSize);
+            return reinterpret_cast<core::datas::Market_bbo*>(target_address + MarketDataHeaderSize);
         } else if (_header->type == core::datas::MarketType::Depth && _header->data_size == sizeof(core::datas::Market_depth)) {
-            return reinterpret_cast<core::datas::Market_depth*>(target__address + MarketDataHeaderSize);
+            return reinterpret_cast<core::datas::Market_depth*>(target_address + MarketDataHeaderSize);
         } else if (_header->type == core::datas::MarketType::Kline && _header->data_size == sizeof(core::datas::Market_kline)) {
-            return reinterpret_cast<core::datas::Market_kline*>(target__address + MarketDataHeaderSize);
+            return reinterpret_cast<core::datas::Market_kline*>(target_address + MarketDataHeaderSize);
         }
 
         return nullptr;
     }
 
-    core::datas::Market_base* read_next(uintptr_t target__address) {
-        auto result = read(target__address);
+    core::datas::Market_base* read_next(uintptr_t target_address) {
+        auto result = read(target_address);
         if (result) { return result; }
 
         return read(header->data_lastest_address);
