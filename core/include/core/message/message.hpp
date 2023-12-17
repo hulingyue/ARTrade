@@ -248,10 +248,10 @@ private:
         _header->status = core::datas::CommandStatus::EFFECTIVE;
 
         // date_body
-        T* data = reinterpret_cast<T*>(header->data_lastest_address + MarketDataHeaderSize);
+        T* data = reinterpret_cast<T*>(header->data_lastest_address + CommandDataHeaderSize);
         std::memcpy(data, &value, _command_size);
 
-        header->data_next_address = header->data_next_address + MarketDataHeaderSize + _command_size;
+        header->data_next_address = header->data_next_address + CommandDataHeaderSize + _command_size;
         return true;
     }
 
