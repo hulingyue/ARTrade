@@ -37,8 +37,15 @@ struct alignas(64) MarketDataHeader {
     size_t data_size = 0;
 };
 
+struct alignas(64) CommandDataHeader {
+    core::datas::CommandType type;
+    size_t data_size = 0;
+    core::datas::CommandStatus status = core::datas::CommandStatus::INVALID;
+};
+
 constexpr size_t HeaderSize = static_cast<size_t>(sizeof(Header));
 constexpr size_t MarketDataHeaderSize = static_cast<size_t>(sizeof(MarketDataHeader));
+constexpr size_t CommandDataHeaderSize = static_cast<size_t>(sizeof(CommandDataHeader));
 
 class Channel {
 public:
@@ -169,7 +176,90 @@ public:
     }
     virtual ~CommandChannel() = default;
 
+public:
+    template<typename T>
+    bool write(T &value) {
+        return insert(value);
+    }
+
+    core::datas::Command_base* read(uintptr_t &target_address) {
+        CommandDataHeader *_header = reinterpret_cast<CommandDataHeader*>(target_address);
+        if (_header == nullptr) { return nullptr; }
+
+        if (_header->type == core::datas::CommandType::SUBSCRIBE) {
+            return reinterpret_cast<core::datas::SymbolObj*>(target_address + CommandDataHeaderSize);
+        } else if (_header->type == core::datas::CommandType::UNSUBSCRIBE) {
+            return reinterpret_cast<core::datas::SymbolObj*>(target_address + CommandDataHeaderSize);
+        } else if (_header->type == core::datas::CommandType::ORDER && _header->data_size == sizeof(core::datas::OrderObj)) {
+            return reinterpret_cast<core::datas::OrderObj*>(target_address + CommandDataHeaderSize);
+        } else if (_header->type == core::datas::CommandType::CANCEL && _header->data_size == sizeof(core::datas::CancelObj)) {
+            return reinterpret_cast<core::datas::CancelObj*>(target_address + CommandDataHeaderSize);
+        }
+
+        return nullptr;
+    }
+
+    core::datas::Command_base* read_next(uintptr_t &target_address) {
+        auto result = read(target_address);
+        if (result) {
+            target_address = target_address + CommandDataHeaderSize;
+            return result;
+        }
+
+        target_address = header->data_lastest_address;
+        return read(header->data_lastest_address);
+    }
+
 private:
+    template<typename T>
+    bool insert(T &value) {
+        // lock
+
+        int _command_size = 0;
+        core::datas::CommandType _type = core::datas::CommandType::UNKNOW;
+        if (std::is_same<T, core::datas::SymbolObj>::value) {
+            _command_size = sizeof(core::datas::SymbolBaseObj) * value.size;
+            _type = value.command_type;
+        } else if (std::is_same<T, core::datas::OrderObj>::value) {
+            _command_size = sizeof(core::datas::OrderObj);
+            _type = core::datas::CommandType::ORDER;
+        } else if (std::is_same<T, core::datas::CancelObj>::value) {
+            _command_size = sizeof(core::datas::CancelObj);
+            _type = core::datas::CommandType::CANCEL;
+        } else {
+            spdlog::error("{} unsupport type", LOGHEAD);
+            return false;
+        }
+
+        int length = _command_size + CommandDataHeaderSize;
+        if (!apply(length)) {
+            header->data_next_address = header->data_front_address;
+
+            if (!apply(length)) { return false; }
+        }
+
+        // data_header
+        header->data_lastest_address = header->data_next_address;
+        CommandDataHeader* _header = reinterpret_cast<CommandDataHeader*>(header->data_lastest_address);
+        _header->data_size = _command_size;
+        _header->type = _type;
+        _header->status = core::datas::CommandStatus::EFFECTIVE;
+
+        // date_body
+        T* data = reinterpret_cast<T*>(header->data_lastest_address + MarketDataHeaderSize);
+        std::memcpy(data, &value, _command_size);
+
+        header->data_next_address = header->data_next_address + MarketDataHeaderSize + _command_size;
+        return true;
+    }
+
+    bool apply(int length) {
+        if (header->data_earliest_addresss <= header->data_next_address) {
+            return static_cast<int>(header->data_tail_address - header->data_next_address) >= length;
+        } else {
+            return static_cast<int>(header->data_earliest_addresss - header->data_next_address) >= length;
+        }
+    }
 };
 
 } // core::message::message
