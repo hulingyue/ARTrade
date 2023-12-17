@@ -42,8 +42,8 @@ constexpr size_t MarketDataHeaderSize = static_cast<size_t>(sizeof(MarketDataHea
 
 class Channel {
 public:
-    Channel(const std::string& path, size_t size, bool is_writting) : path(path), size(size), is_writting(is_writting) {
-        address = load(std::move(path), size, is_writting);
+    Channel(const std::string& filename, size_t size, bool is_writting) : filename(filename), size(size), is_writting(is_writting) {
+        address = load(std::move(filename), size, is_writting);
 
         if (address < 0) {
             throw std::runtime_error(LOGHEAD + " unable to load buffer!");
@@ -64,7 +64,7 @@ public:
     }
 
 protected:
-    const std::string& path;
+    const std::string& filename;
     size_t size;
     bool is_writting;
 
@@ -78,7 +78,7 @@ namespace core::message::message {
 
 class MarketChannel: protected Channel {
 public:
-    MarketChannel(const std::string& path, size_t size, bool is_writting) : Channel(path, size, is_writting) {
+    MarketChannel(const std::string& filename, size_t size, bool is_writting) : Channel(filename, size, is_writting) {
 
     }
     virtual ~MarketChannel() = default;
