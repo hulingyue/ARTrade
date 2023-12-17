@@ -163,11 +163,11 @@ private:
 };
 
 
-class OrderChannel: protected Channel {
+class CommandChannel: protected Channel {
 public:
-    OrderChannel(const std::string& path, size_t size) : Channel(path, size, true) {
+    CommandChannel(const std::string& filename, size_t size) : Channel(filename, size, true) {
     }
-    virtual ~OrderChannel() = default;
+    virtual ~CommandChannel() = default;
 
 private:
 };
