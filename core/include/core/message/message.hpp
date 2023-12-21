@@ -201,6 +201,7 @@ public:
     }
 
     core::datas::Command_base* read_next(uintptr_t &target_address) {
+        if (target_address == header->data_lastest_address) { return nullptr; }
         auto result = read(target_address);
         if (result) {
             target_address = target_address + CommandDataHeaderSize;
