@@ -17,7 +17,6 @@ namespace {
 using namespace core::message::sharememory;
 
 struct alignas(64) Header {
-    size_t data_size = 0;
     // front address of data
     uintptr_t data_front_address = 0;
     // tail address of data
