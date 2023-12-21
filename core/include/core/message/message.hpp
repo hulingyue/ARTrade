@@ -58,7 +58,6 @@ public:
 
         if (is_writting) {
             header = reinterpret_cast<Header *>(address);
-            header->data_size = size - HeaderSize;
             header->data_front_address = address + HeaderSize;
             header->data_tail_address = address + size;
             header->data_earliest_addresss = header->data_front_address;
@@ -220,7 +219,7 @@ private:
         int _command_size = 0;
         core::datas::CommandType _type = core::datas::CommandType::UNKNOW;
         if (std::is_same<T, core::datas::SymbolObj>::value) {
-            _command_size = sizeof(core::datas::SymbolBaseObj) * value.size;
+            _command_size = sizeof(core::datas::SymbolObj);
             _type = value.command_type;
         } else if (std::is_same<T, core::datas::OrderObj>::value) {
             _command_size = sizeof(core::datas::OrderObj);

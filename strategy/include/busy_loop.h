@@ -28,8 +28,8 @@ public:
     virtual void on_order() = 0;
 
 public:
-    virtual bool subscribe(std::vector<std::string> symbols) final;
-    virtual bool unsubscribe(std::vector<std::string> symbols) final;
+    virtual bool subscribe(core::datas::SymbolObj symbols) final;
+    virtual bool unsubscribe(core::datas::SymbolObj symbols) final;
     virtual bool order() final;
     virtual bool cancel() final;
 

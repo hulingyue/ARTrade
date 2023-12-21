@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
-#include <vector>
+#include <cstring>
 
 namespace core::datas {
 static const int SUBSCRIBE_MAX_SIZE = 10;
 static const int SYMBOL_MAX_LENGTH = 16;
+static const uint64_t SYMBOL_MAX_CAPACITY = 100;
 static const int MARKET_MAX_DEPTH = 10;
 
 struct MarketOperateResult {
@@ -136,13 +137,30 @@ struct Command_base {
 };
 
 // subscribe & unsubscribe
-struct alignas(64) SymbolBaseObj {
-    char symbol[SYMBOL_MAX_LENGTH];
-};
-
 struct alignas(64) SymbolObj : public Command_base {
-    size_t size;
-    std::vector<SymbolBaseObj> symbols;
+    struct alignas(64) SymbolBaseObj {
+        char symbol[SYMBOL_MAX_LENGTH];
+    };
+
+    SymbolBaseObj symbols[SYMBOL_MAX_CAPACITY];
+
+    bool push_back(const char* symbol) {
+        if (_size >= SYMBOL_MAX_CAPACITY) { return false; }
+        std::strncpy(symbols[size()].symbol, symbol, SYMBOL_MAX_LENGTH - 1);
+        _size++;
+        return true;
+    }
+
+    uint64_t size() {
+        return _size;
+    }
+
+    uint64_t capacity() {
+        return SYMBOL_MAX_CAPACITY;
+    }
+
+private:
+    uint64_t _size = 0;    
 };
 
 struct alignas(64) OrderObj : public Command_base {

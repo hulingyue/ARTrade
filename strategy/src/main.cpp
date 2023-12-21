@@ -13,11 +13,12 @@ public:
     }
 
     virtual void task() override {
-        std::vector<std::string> symbols {
-            "tickers.BTCUSDT", "tickers.ETHUSDT"
-        };
+        core::datas::SymbolObj symbol_obj;
+        symbol_obj.command_type = core::datas::CommandType::UNKNOW;
+        symbol_obj.push_back("tickers.BTCUSDT");
+        symbol_obj.push_back("tickers.ETHUSDT");
 
-        subscribe(std::move(symbols));
+        subscribe(symbol_obj);
         while (true) {
 
         }

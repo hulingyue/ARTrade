@@ -15,13 +15,13 @@ struct Self {
     core::api::market::Market *market = nullptr;
     core::api::trade::Trade *trade = nullptr;
     core::message::message::MarketChannel *market_channel = nullptr;
-    core::message::message::OrderChannel *order_channel = nullptr;
+    core::message::message::CommandChannel *command_channel = nullptr;
 
     ~Self() {
         if (market) { delete market; }
         if (trade) { delete trade; }
         if (market_channel) { delete market_channel; }
-        if (order_channel) { delete order_channel; }
+        if (command_channel) { delete command_channel; }
     }
 };
 
@@ -126,15 +126,16 @@ void Modules::custom_init() {
         exit(-3);
     }
     
-    core::datas::MessageType type = message_type();
+    // core::datas::MessageType type = message_type();
     std::string proj = project_name();
     self.market_channel = new core::message::message::MarketChannel(proj, 40 * MB, true);
     if (self.market) {
         self.market->set_channel(self.market_channel);
         self.market->init();
     }
+    self.command_channel = new core::message::message::CommandChannel(proj, 40 * MB);
     if (self.trade) {
-        // self.trade->set_message(self.message);
+        // self.trade->set_message(self.command_channel);
         self.trade->init();
     }
 }
@@ -153,7 +154,7 @@ void Modules::run() {
 
     auto ts = std::chrono::system_clock::now();
 
-    core::datas::CommandObj* command = nullptr;
+    uintptr_t c_address = 0x0;
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         
@@ -164,38 +165,31 @@ void Modules::run() {
         }
 
         // read commands & deal with commands
-        // command = self.message->read_command();
-        // if (command) {
-        //     if (command->type == CommandType::SUBSCRIBE) {
-        //         std::vector<std::string> symbols;
-        //         for (auto item: command->symbols.symbols) {
-        //             if (std::strlen(item) > 0) {
-        //                 symbols.emplace_back(item);
-        //             }
-        //         }
-
-        //         if (symbols.size() > 0) {
-        //             self.market->subscribe(std::move(symbols));
-        //         }
-        //     } else if (command->type == CommandType::UNSUBSCRIBE) {
-        //         std::vector<std::string> symbols;
-        //         for (auto item: command->symbols.symbols) {
-        //             if (std::strlen(item) > 0) {
-        //                 symbols.emplace_back(item);
-        //             }
-        //         }
-
-        //         if (symbols.size() > 0) {
-        //             self.market->unsubscribe(std::move(symbols));
-        //         }
-        //     } else if (command->type == CommandType::ORDER) {
-
-        //     } else if (command->type == CommandType::CANCEL) {
-
-        //     } else {
-        //         spdlog::error("{} type: {}", LOGHEAD, static_cast<char>(command->type));
-        //     }
-        // }
+        auto command = self.command_channel->read_next(c_address);
+        if (command) {
+            switch (command->command_type) {
+            case core::datas::CommandType::SUBSCRIBE:{
+                core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command);
+                uint64_t size = obj->size();
+                for (uint64_t index = 0; index < size; index++) {
+                    std::cout << obj->symbols[index].symbol << std::endl;
+                }
+                break;
+            }
+            case core::datas::CommandType::UNSUBSCRIBE: {
+                break;
+            }
+            case core::datas::CommandType::ORDER: {
+                break;
+            }
+            case core::datas::CommandType::CANCEL: {
+                break;
+            }
+            default:
+                // spdlog::error("{} unknow command type: {}", LOGHEAD, static_cast<int64_t>(command->command_type));
+                break;
+            }
+        }
     }
 }
 
