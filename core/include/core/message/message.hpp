@@ -55,14 +55,24 @@ public:
             throw std::runtime_error(LOGHEAD + " unable to load buffer!");
         }
 
+        header = reinterpret_cast<Header *>(address);
         if (is_writting) {
-            header = reinterpret_cast<Header *>(address);
-            header->data_front_address = address + HeaderSize;
-            header->data_tail_address = address + size;
-            header->data_earliest_addresss = header->data_front_address;
-            header->data_lastest_address = header->data_front_address;
-            header->data_cursor_address = header->data_front_address;
-            header->data_next_address = header->data_front_address;
+            if (header->data_front_address == 0) {
+                header->data_front_address = address + HeaderSize;
+                header->data_tail_address = address + size;
+                header->data_earliest_addresss = header->data_front_address;
+                header->data_lastest_address = header->data_front_address;
+                header->data_cursor_address = header->data_front_address;
+                header->data_next_address = header->data_front_address;
+            } else {
+                uint64_t displacement = header->data_front_address - (address + HeaderSize);
+                header->data_front_address = address + HeaderSize;
+                header->data_tail_address = header->data_tail_address - displacement;
+                header->data_earliest_addresss = header->data_earliest_addresss - displacement;
+                header->data_lastest_address = header->data_lastest_address - displacement;
+                header->data_cursor_address = header->data_cursor_address - displacement;
+                header->data_next_address = header->data_next_address - displacement;
+            }
         }
     }
 
