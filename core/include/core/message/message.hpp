@@ -80,6 +80,10 @@ public:
         release(address, size);
     }
 
+    virtual uintptr_t earliest() {
+        return header ? header->data_earliest_addresss : 0;
+    }
+
 protected:
     const std::string& path;
     size_t size;
