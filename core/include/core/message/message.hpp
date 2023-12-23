@@ -97,7 +97,7 @@ protected:
 
 namespace core::message::message {
 
-class MarketChannel: protected Channel {
+class MarketChannel: public Channel {
 public:
     MarketChannel(const std::string& filename, size_t size, bool is_writting=false) : Channel("/tmp/" + filename + "_market", size, is_writting) {
 
@@ -184,7 +184,7 @@ private:
 };
 
 
-class CommandChannel: protected Channel {
+class CommandChannel: public Channel {
 public:
     CommandChannel(const std::string& filename, size_t size) : Channel("/tmp/" + filename + "_command", size, true) {
     }
