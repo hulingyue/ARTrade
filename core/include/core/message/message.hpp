@@ -220,13 +220,11 @@ public:
         if (target_displacement >= header->data_lastest_displacement) { return nullptr; }
         auto result = read(target_address(target_displacement));
         if (result) {
-            spdlog::info("{} target: {} last: {}", LOGHEAD, target_displacement, header->data_lastest_displacement);
             target_displacement = target_displacement + CommandDataHeaderSize;
             return result;
         }
 
         target_displacement = header->data_lastest_displacement;
-        spdlog::info("{} target: {} last: {}", LOGHEAD, target_displacement, header->data_lastest_displacement);
         return read(target_address(target_displacement));
     }
 
