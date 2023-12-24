@@ -17,18 +17,18 @@ namespace {
 using namespace core::message::sharememory;
 
 struct alignas(64) Header {
-    // front address of data
-    uintptr_t data_front_address = 0;
-    // tail address of data
-    uintptr_t data_tail_address = 0;
-    // the earliest data's address
-    uintptr_t data_earliest_addresss = 0;
-    // the lastest data's address
-    uintptr_t data_lastest_address = 0;
+    // front displacement of data
+    uint64_t data_front_displacement = 0;
+    // tail displacement of data
+    uint64_t data_tail_displacement = 0;
+    // the earliest data's displacement
+    uint64_t data_earliest_displacement = 0;
+    // the lastest data's displacement
+    uint64_t data_lastest_displacement = 0;
     // for trade; check if the data can be remove
-    uintptr_t data_cursor_address = 0;
+    uint64_t data_cursor_displacement = 0;
     // the end of the lastest data
-    uintptr_t data_next_address = 0;
+    uint64_t data_next_displacement = 0;
 };
 
 struct alignas(64) MarketDataHeader {
@@ -56,23 +56,13 @@ public:
         }
 
         header = reinterpret_cast<Header *>(address);
-        if (is_writting) {
-            if (header->data_front_address == 0) {
-                header->data_front_address = address + HeaderSize;
-                header->data_tail_address = address + size;
-                header->data_earliest_addresss = header->data_front_address;
-                header->data_lastest_address = header->data_front_address;
-                header->data_cursor_address = header->data_front_address;
-                header->data_next_address = header->data_front_address;
-            } else {
-                uint64_t displacement = header->data_front_address - (address + HeaderSize);
-                header->data_front_address = address + HeaderSize;
-                header->data_tail_address = header->data_tail_address - displacement;
-                header->data_earliest_addresss = header->data_earliest_addresss - displacement;
-                header->data_lastest_address = header->data_lastest_address - displacement;
-                header->data_cursor_address = header->data_cursor_address - displacement;
-                header->data_next_address = header->data_next_address - displacement;
-            }
+        if (is_writting && header->data_front_displacement == 0) {
+            header->data_front_displacement = HeaderSize;
+            header->data_tail_displacement = size;
+            header->data_earliest_displacement = HeaderSize;
+            header->data_lastest_displacement = HeaderSize;
+            header->data_cursor_displacement = HeaderSize;
+            header->data_next_displacement = HeaderSize;
         }
     }
 
@@ -80,9 +70,17 @@ public:
         release(address, size);
     }
 
-    virtual uintptr_t earliest() {
-        return header ? header->data_earliest_addresss : 0;
+    virtual uint64_t earliest_displacement() {
+        return header ? header->data_earliest_displacement : 0;
     }
+
+    virtual inline uintptr_t front_address() const { return address + header->data_front_displacement; }
+    virtual inline uintptr_t tail_address() const { return address + header->data_tail_displacement; }
+    virtual inline uintptr_t earliest_address() const { return address + header->data_earliest_displacement; }
+    virtual inline uintptr_t lastest_address() const { return address + header->data_lastest_displacement; }
+    virtual inline uintptr_t cursor_address() const { return address + header->data_cursor_displacement; }
+    virtual inline uintptr_t next_address() const { return address + header->data_next_displacement; }
+    virtual inline uintptr_t target_address(uint64_t target_displacement) const { return address + target_displacement; }
 
 protected:
     const std::string& path;
@@ -125,11 +123,16 @@ public:
         return nullptr;
     }
 
-    core::datas::Market_base* read_next(uintptr_t target_address) {
-        auto result = read(target_address);
-        if (result) { return result; }
+    core::datas::Market_base* read_next(uint64_t target_displacement) {
+        if (target_displacement >= header->data_lastest_displacement) { return nullptr; }
+        auto result = read(target_address(target_displacement));
+        if (result) {
+            target_displacement = target_displacement + CommandDataHeaderSize;
+            return result;
+        }
 
-        return read(header->data_lastest_address);
+        target_displacement = header->data_lastest_displacement;
+        return read(target_address(target_displacement));
     }
 
 private:
@@ -156,29 +159,29 @@ private:
         int length = _market_size + MarketDataHeaderSize;
         if (!apply(length)) {
             // cover
-            // header->data_next_address = address + HeaderSize;
-            header->data_next_address = header->data_front_address;
+            // header->data_next_displacement = address + HeaderSize;
+            header->data_next_displacement = header->data_front_displacement;
 
             if (!apply(length)) { return false; }
         }
 
         // data_header
-        header->data_lastest_address = header->data_next_address;
-        MarketDataHeader* _header = reinterpret_cast<MarketDataHeader*>(header->data_lastest_address);
+        header->data_lastest_displacement = header->data_next_displacement;
+        MarketDataHeader* _header = reinterpret_cast<MarketDataHeader*>(lastest_address());
         _header->data_size = _market_size;
         _header->type = _type;
 
         // date_body
-        T* data = reinterpret_cast<T*>(header->data_lastest_address + MarketDataHeaderSize);
+        T* data = reinterpret_cast<T*>(lastest_address() + MarketDataHeaderSize);
         std::memcpy(data, &value, _market_size);
 
-        header->data_next_address = header->data_next_address + MarketDataHeaderSize + _market_size;
+        header->data_next_displacement = header->data_lastest_displacement + MarketDataHeaderSize + _market_size;
         return true;
     }
 
     bool apply(int length) {
-        // return (((header->data_next_address + length) - address) <= size);
-        return ((header->data_next_address + length) <= header->data_tail_address);
+        // return (((next_address() + length) - address) <= size);
+        return ((header->data_next_displacement + length) <= header->data_tail_displacement);
     }
 
 };
@@ -196,7 +199,7 @@ public:
         return insert(value);
     }
 
-    core::datas::Command_base* read(uintptr_t &target_address) {
+    core::datas::Command_base* read(uintptr_t target_address) {
         CommandDataHeader *_header = reinterpret_cast<CommandDataHeader*>(target_address);
         if (_header == nullptr) { return nullptr; }
 
@@ -213,16 +216,18 @@ public:
         return nullptr;
     }
 
-    core::datas::Command_base* read_next(uintptr_t &target_address) {
-        if (target_address == header->data_lastest_address) { return nullptr; }
-        auto result = read(target_address);
+    core::datas::Command_base* read_next(uint64_t &target_displacement) {
+        if (target_displacement >= header->data_lastest_displacement) { return nullptr; }
+        auto result = read(target_address(target_displacement));
         if (result) {
-            target_address = target_address + CommandDataHeaderSize;
+            spdlog::info("{} target: {} last: {}", LOGHEAD, target_displacement, header->data_lastest_displacement);
+            target_displacement = target_displacement + CommandDataHeaderSize;
             return result;
         }
 
-        target_address = header->data_lastest_address;
-        return read(header->data_lastest_address);
+        target_displacement = header->data_lastest_displacement;
+        spdlog::info("{} target: {} last: {}", LOGHEAD, target_displacement, header->data_lastest_displacement);
+        return read(target_address(target_displacement));
     }
 
 private:
@@ -248,31 +253,31 @@ private:
 
         int length = _command_size + CommandDataHeaderSize;
         if (!apply(length)) {
-            header->data_next_address = header->data_front_address;
+            header->data_next_displacement = header->data_front_displacement;
 
             if (!apply(length)) { return false; }
         }
 
         // data_header
-        header->data_lastest_address = header->data_next_address;
-        CommandDataHeader* _header = reinterpret_cast<CommandDataHeader*>(header->data_lastest_address);
+        header->data_lastest_displacement = header->data_next_displacement;
+        CommandDataHeader* _header = reinterpret_cast<CommandDataHeader*>(lastest_address());
         _header->data_size = _command_size;
         _header->type = _type;
         _header->status = core::datas::CommandStatus::EFFECTIVE;
 
         // date_body
-        T* data = reinterpret_cast<T*>(header->data_lastest_address + CommandDataHeaderSize);
+        T* data = reinterpret_cast<T*>(lastest_address() + CommandDataHeaderSize);
         std::memcpy(data, &value, _command_size);
 
-        header->data_next_address = header->data_next_address + CommandDataHeaderSize + _command_size;
+        header->data_next_displacement = header->data_lastest_displacement + CommandDataHeaderSize + _command_size;
         return true;
     }
 
     bool apply(int length) {
-        if (header->data_earliest_addresss <= header->data_next_address) {
-            return static_cast<int>(header->data_tail_address - header->data_next_address) >= length;
+        if (earliest_address() <= next_address()) {
+            return static_cast<int>(tail_address() - next_address()) >= length;
         } else {
-            return static_cast<int>(header->data_earliest_addresss - header->data_next_address) >= length;
+            return static_cast<int>(earliest_address() - next_address()) >= length;
         }
     }
 };

@@ -154,7 +154,7 @@ void Modules::run() {
 
     auto ts = std::chrono::system_clock::now();
 
-    uintptr_t c_address = 0x0;
+    uint64_t address_displacement = self.command_channel->earliest_displacement();
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         
@@ -165,7 +165,7 @@ void Modules::run() {
         }
 
         // read commands & deal with commands
-        auto command = self.command_channel->read_next(c_address);
+        auto command = self.command_channel->read_next(address_displacement);
         if (command) {
             switch (command->command_type) {
             case core::datas::CommandType::SUBSCRIBE:{
