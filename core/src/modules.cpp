@@ -186,6 +186,16 @@ void Modules::run() {
             case core::datas::CommandType::UNSUBSCRIBE: {
                 // very important!!!
                 address_displacement = address_displacement + sizeof(core::datas::SymbolObj);
+
+                core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command);
+                uint64_t size = obj->size();
+
+                std::vector<std::string> symbols;
+                for (uint64_t index = 0; index < size; index++) {
+                    symbols.emplace_back(std::move(std::string(obj->symbols[index])));
+                }
+
+                self.market->unsubscribe(std::vector<std::string>(std::move(symbols)));
                 break;
             }
             case core::datas::CommandType::ORDER: {
