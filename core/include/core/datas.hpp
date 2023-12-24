@@ -138,15 +138,11 @@ struct Command_base {
 
 // subscribe & unsubscribe
 struct alignas(64) SymbolObj : public Command_base {
-    struct alignas(64) SymbolBaseObj {
-        char symbol[SYMBOL_MAX_LENGTH];
-    };
-
-    SymbolBaseObj symbols[SYMBOL_MAX_CAPACITY];
+    char symbols[SYMBOL_MAX_LENGTH][SYMBOL_MAX_CAPACITY];
 
     bool push_back(const char* symbol) {
         if (_size >= SYMBOL_MAX_CAPACITY) { return false; }
-        std::strncpy(symbols[size()].symbol, symbol, SYMBOL_MAX_LENGTH - 1);
+        std::strncpy(symbols[size()], symbol, SYMBOL_MAX_LENGTH - 1);
         _size++;
         return true;
     }

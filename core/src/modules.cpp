@@ -175,7 +175,7 @@ void Modules::run() {
                 core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command);
                 uint64_t size = obj->size();
                 for (uint64_t index = 0; index < size; index++) {
-                    std::cout << obj->symbols[index].symbol << std::endl;
+                    std::cout << obj->symbols[index] << std::endl;
                 }
                 break;
             }
