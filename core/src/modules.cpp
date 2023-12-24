@@ -209,7 +209,7 @@ void Modules::run() {
                 break;
             }
             default:
-                // spdlog::error("{} unknow command type: {}", LOGHEAD, static_cast<int64_t>(command->command_type));
+                spdlog::error("{} unknow command type: {}", LOGHEAD, static_cast<int64_t>(command->command_type));
                 break;
             }
         }
