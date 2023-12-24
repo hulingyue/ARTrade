@@ -108,7 +108,7 @@ public:
         return insert(value);
     }
 
-    core::datas::Market_base* read(uintptr_t target_address) {
+    core::datas::Market_base* read(const uintptr_t target_address) const {
         MarketDataHeader *_header = reinterpret_cast<MarketDataHeader*>(target_address);
         if (_header == nullptr) { return nullptr; }
 
@@ -123,7 +123,7 @@ public:
         return nullptr;
     }
 
-    core::datas::Market_base* read_next(uint64_t target_displacement) {
+    core::datas::Market_base* read_next(uint64_t &target_displacement) const {
         if (target_displacement >= header->data_lastest_displacement) { return nullptr; }
         auto result = read(target_address(target_displacement));
         if (result) {
@@ -199,7 +199,7 @@ public:
         return insert(value);
     }
 
-    core::datas::Command_base* read(uintptr_t target_address) {
+    core::datas::Command_base* read(const uintptr_t target_address) const {
         CommandDataHeader *_header = reinterpret_cast<CommandDataHeader*>(target_address);
         if (_header == nullptr) { return nullptr; }
 
@@ -216,7 +216,7 @@ public:
         return nullptr;
     }
 
-    core::datas::Command_base* read_next(uint64_t &target_displacement) {
+    core::datas::Command_base* read_next(uint64_t &target_displacement) const {
         if (target_displacement >= header->data_lastest_displacement) { return nullptr; }
         auto result = read(target_address(target_displacement));
         if (result) {
