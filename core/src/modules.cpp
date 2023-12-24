@@ -169,6 +169,9 @@ void Modules::run() {
         if (command) {
             switch (command->command_type) {
             case core::datas::CommandType::SUBSCRIBE:{
+                // very important!!!
+                address_displacement = address_displacement + sizeof(core::datas::SymbolObj);
+
                 core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command);
                 uint64_t size = obj->size();
                 for (uint64_t index = 0; index < size; index++) {
@@ -177,12 +180,18 @@ void Modules::run() {
                 break;
             }
             case core::datas::CommandType::UNSUBSCRIBE: {
+                // very important!!!
+                address_displacement = address_displacement + sizeof(core::datas::SymbolObj);
                 break;
             }
             case core::datas::CommandType::ORDER: {
+                // very important!!!
+                address_displacement = address_displacement + sizeof(core::datas::OrderObj);
                 break;
             }
             case core::datas::CommandType::CANCEL: {
+                // very important!!!
+                address_displacement = address_displacement + sizeof(core::datas::CancelObj);
                 break;
             }
             default:
