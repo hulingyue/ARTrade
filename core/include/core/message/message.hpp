@@ -124,7 +124,7 @@ public:
     }
 
     core::datas::Market_base* read_next(uint64_t &target_displacement) const {
-        if (target_displacement >= header->data_lastest_displacement) { return nullptr; }
+        if (target_displacement > header->data_lastest_displacement) { return nullptr; }
         auto result = read(target_address(target_displacement));
         if (result) {
             target_displacement = target_displacement + CommandDataHeaderSize;
@@ -217,7 +217,7 @@ public:
     }
 
     core::datas::Command_base* read_next(uint64_t &target_displacement) const {
-        if (target_displacement >= header->data_lastest_displacement) { return nullptr; }
+        if (target_displacement > header->data_lastest_displacement) { return nullptr; }
         auto result = read(target_address(target_displacement));
         if (result) {
             target_displacement = target_displacement + CommandDataHeaderSize;
