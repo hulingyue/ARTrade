@@ -214,6 +214,14 @@ void Modules::run() {
             case core::datas::CommandType::CANCEL: {
                 // very important!!!
                 address_displacement = address_displacement + sizeof(core::datas::CancelObj);
+
+                core::datas::CancelObj *obj = reinterpret_cast<core::datas::CancelObj*>(command);
+                if (obj) {
+                    self.trade->cancel(*obj);
+                } else {
+                    spdlog::error("{} CANCEL cannot reinterpret memory!", LOGHEAD);
+                    break;
+                }
                 break;
             }
             default:
