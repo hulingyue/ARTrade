@@ -201,6 +201,14 @@ void Modules::run() {
             case core::datas::CommandType::ORDER: {
                 // very important!!!
                 address_displacement = address_displacement + sizeof(core::datas::OrderObj);
+
+                core::datas::OrderObj *obj = reinterpret_cast<core::datas::OrderObj*>(command);
+                if (obj) {
+                    self.trade->order(*obj);
+                } else {
+                    spdlog::error("{} ORDER cannot reinterpret memory!", LOGHEAD);
+                    break;
+                }
                 break;
             }
             case core::datas::CommandType::CANCEL: {
