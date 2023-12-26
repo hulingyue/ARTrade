@@ -26,8 +26,8 @@ public:
     virtual void on_order() = 0;
 
 public:
-    virtual bool subscribe(core::datas::SymbolObj symbols) final;
-    virtual bool unsubscribe(core::datas::SymbolObj symbols) final;
+    virtual bool subscribe(core::datas::SymbolObj symbols) final __attribute__((aligned(64)));
+    virtual bool unsubscribe(core::datas::SymbolObj symbols) final __attribute__((aligned(64)));
     virtual bool order() final;
     virtual bool cancel() final;
 
