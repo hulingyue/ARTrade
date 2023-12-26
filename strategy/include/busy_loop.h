@@ -5,8 +5,6 @@
 #include <core/pimpl.h>
 #include <core/datas.hpp>
 
-#include "datas.hpp"
-
 
 class Strategy {
 public:
@@ -19,9 +17,9 @@ public:
 
     virtual void task() = 0;
 
-    virtual void on_market_bbo(strategy::datas::MarketResponseBbo* bbo);
-    virtual void on_market_depth(strategy::datas::MarketResponseDepth* depth);
-    virtual void on_market_kline(strategy::datas::MarketResponseKline* kline);
+    virtual void on_market_bbo(core::datas::Market_bbo* bbo);
+    virtual void on_market_depth(core::datas::Market_depth* depth);
+    virtual void on_market_kline(core::datas::Market_kline* kline);
     
     virtual void on_market() = 0;
     virtual void on_traded() = 0;

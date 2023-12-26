@@ -9,9 +9,6 @@ struct Self {
     core::message::message::CommandChannel *command_channel = nullptr;
     core::message::message::MarketChannel *market_channel = nullptr;
 };
-
-using namespace core::datas;
-using namespace strategy::datas;
 } // namespace 
 
 
@@ -99,7 +96,7 @@ void Strategy::run() {
 
 void Strategy::custom_init() {
     std::string proj = project_name();
-    MessageType type = message_type();
+    core::datas::MessageType type = message_type();
     self.command_channel = new core::message::message::CommandChannel(proj, 40 * MB);
     self.market_channel = new core::message::message::MarketChannel(proj, 40 * KB);
 
@@ -107,16 +104,10 @@ void Strategy::custom_init() {
     assert(self.market_channel != nullptr);
 }
 
-void Strategy::on_market_bbo(strategy::datas::MarketResponseBbo* bbo) {
+void Strategy::on_market_bbo(core::datas::Market_bbo* bbo) {}
 
-}
+void Strategy::on_market_depth(core::datas::Market_depth* depth) {}
 
-void Strategy::on_market_depth(strategy::datas::MarketResponseDepth* depth) {
-
-}
-
-void Strategy::on_market_kline(strategy::datas::MarketResponseKline* kline) {
-
-}
+void Strategy::on_market_kline(core::datas::Market_kline* kline) {}
 
 #undef LOGHEAD
