@@ -28,12 +28,16 @@
     ```shell
     sudo apt-get install libboost-all-dev
     ```
-5. 编译程序
+5. 如果需要进行单元测试
+    ```
+    sudo apt-get install libgtest-dev
+    ```
+6. 编译程序
     ``` shell
     compile bybit
     > sh compile.sh -p bybit
     ```
-6. 执行 (以 **bybit** 为例)
+7. 执行 (以 **bybit** 为例)
     ```shell
     > cd bybit
     > ./bybit -r ./
