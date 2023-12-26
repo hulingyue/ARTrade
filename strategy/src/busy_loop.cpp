@@ -20,7 +20,6 @@ Strategy::~Strategy() {
 }
 
 bool Strategy::subscribe(core::datas::SymbolObj symbols) {
-    std::cout << "subscribe" << std::endl;
     core::datas::SymbolObj obj = std::move(symbols);
     obj.command_type = core::datas::CommandType::SUBSCRIBE;
     return self.command_channel->write(obj);
