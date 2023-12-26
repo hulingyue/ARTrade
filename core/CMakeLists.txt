@@ -42,3 +42,15 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include/${PROJECT_NAME})
+
+# GTest
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+
+file(GLOB UNITFILES "./unit/*.cpp")
+set(TEST_PROJECT_NAME "unittest")
+add_executable(${TEST_PROJECT_NAME} ${UNITFILES})
+
+target_link_libraries(${TEST_PROJECT_NAME} ${GTEST_BOTH_LIBRARIES} ${PROJECT_NAME})
+
+add_test(NAME CoreTest COMMAND ${TEST_PROJECT_NAME})
