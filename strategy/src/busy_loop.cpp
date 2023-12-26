@@ -46,6 +46,7 @@ void Strategy::run() {
     std::thread task_thread(std::bind(&Strategy::task, this));
     task_thread.detach();
 
+    uint64_t market_displacement = self.market_channel->earliest_displacement();
     while (true) {
         // read commands
 
@@ -54,41 +55,37 @@ void Strategy::run() {
         //     continue;
         // }
 
-        // // read market
-        // core::datas::MarketObj* market_obj = self.message->read_market();
-        // if (market_obj) {
-        //     if (market_obj->market_type == MarketType::Bbo) {
-        //         MarketResponseBbo bbo;
-        //         std::memcpy(bbo.exchange, market_obj->exchange, strategy::datas::SYMBOL_MAX_LENGTH);
-        //         std::memcpy(bbo.symbol, market_obj->symbol, strategy::datas::SYMBOL_MAX_LENGTH);
-        //         bbo.time = market_obj->time;
+        /*****************/
+        /** read market **/
+        /*****************/
+        core::datas::Market_base* market_obj = self.market_channel->read_next(market_displacement);
+        if (market_obj) {
+            switch (market_obj->market_type) {
+            case core::datas::MarketType::Bbo: {
+                core::datas::Market_bbo* obj = reinterpret_cast<core::datas::Market_bbo*>(market_obj);
+                if (obj) {
+                    on_market_bbo(std::move(obj));
+                }
+                break;
+            }
+            case core::datas::MarketType::Depth: {
+                core::datas::Market_depth* obj = reinterpret_cast<core::datas::Market_depth*>(market_obj);
+                if (obj) {
 
-        //         bbo.price = market_obj->newest.price;
-        //         bbo.quantity = market_obj->newest.quantity;
-        //         on_market_bbo(&bbo);
-        //     } else if (market_obj->market_type == MarketType::Depth) {
-        //         MarketResponseDepth depth;
-        //         std::memcpy(depth.exchange, market_obj->exchange, strategy::datas::SYMBOL_MAX_LENGTH);
-        //         std::memcpy(depth.symbol, market_obj->symbol, strategy::datas::SYMBOL_MAX_LENGTH);
-        //         depth.time = market_obj->time;
+                }
+                break;
+            }
+            case core::datas::MarketType::Kline: {
+                core::datas::Market_kline* obj = reinterpret_cast<core::datas::Market_kline*>(market_obj);
+                if (obj) {
 
-        //         std::memcpy(depth.asks, market_obj->asks, sizeof(strategy::datas::TradePair) * strategy::datas::MARKET_MAX_DEPTH);
-        //         std::memcpy(depth.bids, market_obj->bids, sizeof(strategy::datas::TradePair) * strategy::datas::MARKET_MAX_DEPTH);
-        //         on_market_depth(&depth);
-        //     } else if (market_obj->market_type == MarketType::Kline) {
-        //         MarketResponseKline kline;
-        //         std::memcpy(kline.exchange, market_obj->exchange, strategy::datas::SYMBOL_MAX_LENGTH);
-        //         std::memcpy(kline.symbol, market_obj->symbol, strategy::datas::SYMBOL_MAX_LENGTH);
-        //         kline.time = market_obj->time;
-
-        //         kline.high = market_obj->high;
-        //         kline.low = market_obj->low;
-        //         kline.open = market_obj->open;
-        //         kline.close = market_obj->close;
-        //         on_market_kline(&kline);
-        //     }
-        //     continue;
-        // }
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
 
         // 
     }
