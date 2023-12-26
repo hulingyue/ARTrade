@@ -123,16 +123,31 @@ public:
         return nullptr;
     }
 
-    core::datas::Market_base* read_next(uint64_t &target_displacement) const {
-        if (target_displacement > header->data_lastest_displacement) { return nullptr; }
-        auto result = read(target_address(target_displacement));
-        if (result) {
-            target_displacement = target_displacement + CommandDataHeaderSize;
-            return result;
+    // update displacement
+    core::datas::Market_base* read(const uintptr_t target_address, uint64_t &target_displacement) const {
+        MarketDataHeader *_header = reinterpret_cast<MarketDataHeader*>(target_address);
+        if (_header == nullptr) { return nullptr; }
+
+        target_displacement = target_displacement + CommandDataHeaderSize + _header->data_size;
+        if (_header->type == core::datas::MarketType::Bbo && _header->data_size == sizeof(core::datas::Market_bbo)) {
+            return reinterpret_cast<core::datas::Market_bbo*>(target_address + MarketDataHeaderSize);
+        } else if (_header->type == core::datas::MarketType::Depth && _header->data_size == sizeof(core::datas::Market_depth)) {
+            return reinterpret_cast<core::datas::Market_depth*>(target_address + MarketDataHeaderSize);
+        } else if (_header->type == core::datas::MarketType::Kline && _header->data_size == sizeof(core::datas::Market_kline)) {
+            return reinterpret_cast<core::datas::Market_kline*>(target_address + MarketDataHeaderSize);
         }
 
+        target_displacement = target_displacement - CommandDataHeaderSize - _header->data_size;
+        return nullptr;
+    }
+
+    core::datas::Market_base* read_next(uint64_t &target_displacement) const {
+        if (target_displacement > header->data_lastest_displacement) { return nullptr; }
+        auto result = read(target_address(target_displacement), target_displacement);
+        if (result) { return result; }
+
         target_displacement = header->data_lastest_displacement;
-        return read(target_address(target_displacement));
+        return read(target_address(target_displacement), target_displacement);
     }
 
 private:
