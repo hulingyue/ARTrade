@@ -38,6 +38,9 @@ if [ -d "$PROJECT_NAME" ]; then
     make -j16
 
     cp ./"$PROJECT_NAME" ./../../"$PROJECT_NAME"
+
+    # core GTest
+    ./core/unittest
 else
     error "UNKNOW PROJECT!"
 fi
