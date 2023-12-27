@@ -33,7 +33,7 @@ TEST_F(MarketChannelTest, WriteTest) {
     
     uint64_t displacement = 0;
     while (true) {
-        // spdlog::info("displacement: {} last: {}", displacement, channel->lastest_displacement());
+        spdlog::info("displacement: {} last: {}", displacement, channel->lastest_displacement());
         if (displacement > channel->lastest_displacement()) { break; }
         displacement = channel->lastest_displacement();
         bool result = channel->write(bbo);
@@ -84,7 +84,7 @@ TEST_F(MarketChannelTest, ReadTest) {
         }
         spdlog::info("displacement: {} last: {}", displacement, channel->lastest_displacement());
         result = channel->read_next(displacement);
-        // ASSERT_NE(result, nullptr);
+        ASSERT_NE(result, nullptr);
     }
 }
 
