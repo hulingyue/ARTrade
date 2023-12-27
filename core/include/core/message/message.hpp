@@ -74,6 +74,10 @@ public:
         return header ? header->data_earliest_displacement : 0;
     }
 
+    virtual uint64_t lastest_displacement() {
+        return header ? header->data_lastest_displacement : 0;
+    }
+
     virtual inline uintptr_t front_address() const { return address + header->data_front_displacement; }
     virtual inline uintptr_t tail_address() const { return address + header->data_tail_displacement; }
     virtual inline uintptr_t earliest_address() const { return address + header->data_earliest_displacement; }
