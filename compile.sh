@@ -27,6 +27,9 @@ PROJECT_NAME="$project"
 # download third-party libraries
 git submodule update --init
 
+# GTest
+UNITTEST='./core/unittest'
+
 # compile
 if [ -d "$PROJECT_NAME" ]; then
     cd "$PROJECT_NAME"
@@ -34,12 +37,21 @@ if [ -d "$PROJECT_NAME" ]; then
         mkdir build
     fi
     cd build
+
+    # clear unittest
+    if [ -x "$UNITTEST" ]; then
+        rm "$UNITTEST"
+    fi
+
     cmake ..
     make -j16
 
     cp ./"$PROJECT_NAME" ./../../"$PROJECT_NAME"
 
     # core GTest
+    if [ -x "$UNITTEST" ]; then
+        $UNITTEST
+    fi
     ./core/unittest
 else
     error "UNKNOW PROJECT!"
