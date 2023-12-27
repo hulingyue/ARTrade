@@ -52,7 +52,6 @@ if [ -d "$PROJECT_NAME" ]; then
     if [ -x "$UNITTEST" ]; then
         $UNITTEST
     fi
-    ./core/unittest
 else
     error "UNKNOW PROJECT!"
 fi
