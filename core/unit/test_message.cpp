@@ -55,22 +55,24 @@ TEST_F(MarketChannelTest, ReadTest) {
 
     int count = 10000;
 
-    for (int index = 0; index < count; index++) {
-        bbo.time = core::time::Time::now_nanosecond();
-        channel->write(bbo);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        spdlog::info("insert displacement: {}", channel->lastest_displacement());
-    }
-
     uint64_t displacement = channel->earliest_displacement();
     core::datas::Market_base* result = nullptr;
     for(int index = 0; index < count; index++) {
-        
+        bbo.time = core::time::Time::now_nanosecond();
+        if (index % 2 == 0) {
+            memcpy(bbo.symbol, "BTCUSDT", 16);
+        } else {
+            memcpy(bbo.symbol, "ETHUSDT", 16);
+        }
+        channel->write(bbo);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        spdlog::info("insert displacement: {}", channel->lastest_displacement());
+
         result = channel->read_next(displacement);
 
         // debug
         if (result == nullptr) {
-            spdlog::error("displacement: {} last: {}", displacement, channel->lastest_displacement());
+            spdlog::error("index: {} displacement: {} last: {}", index, displacement, channel->lastest_displacement());
         } else {
             switch (result->market_type) {
             case core::datas::MarketType::Bbo: {
@@ -82,8 +84,6 @@ TEST_F(MarketChannelTest, ReadTest) {
                 break;
             }
         }
-        spdlog::info("displacement: {} last: {}", displacement, channel->lastest_displacement());
-        result = channel->read_next(displacement);
         ASSERT_NE(result, nullptr);
     }
 }
