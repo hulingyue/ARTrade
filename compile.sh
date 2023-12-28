@@ -38,6 +38,15 @@ if [ -d "$PROJECT_NAME" ]; then
     fi
     cd build
 
+    # clean executation
+    if [ -x "$PROJECT_NAME" ]; then
+        rm "$PROJECT_NAME"
+    fi
+
+    if [ -x "./../$PROJECT_NAME" ]; then
+        rm "./../$PROJECT_NAME"
+    fi
+
     # clear unittest
     if [ -x "$UNITTEST" ]; then
         rm "$UNITTEST"
