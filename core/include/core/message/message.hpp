@@ -17,6 +17,7 @@ namespace {
 using namespace core::message::sharememory;
 
 struct alignas(64) Header {
+    bool is_cover = false;
     // front displacement of data
     uint64_t data_front_displacement = 0;
     // tail displacement of data
@@ -146,7 +147,7 @@ public:
     }
 
     core::datas::Market_base* read_next(uint64_t &target_displacement) const {
-        if (target_displacement > header->data_lastest_displacement) { return nullptr; }
+        if (target_displacement == header->data_next_displacement) { return nullptr; }
         auto result = read(target_address(target_displacement), target_displacement);
         if (result) { return result; }
 
@@ -178,10 +179,18 @@ private:
         int length = _market_size + MarketDataHeaderSize;
         if (!apply(length)) {
             // cover
-            // header->data_next_displacement = address + HeaderSize;
+            header->is_cover = true;
             header->data_next_displacement = header->data_front_displacement;
 
             if (!apply(length)) { return false; }
+        }
+
+        if (header->is_cover) {
+            MarketDataHeader* earliest_header = reinterpret_cast<MarketDataHeader*>(earliest_address());
+            header->data_earliest_displacement = header->data_earliest_displacement + earliest_header->data_size + MarketDataHeaderSize;
+            if (header->data_earliest_displacement >= header->data_tail_displacement) {
+                header->data_earliest_displacement = header->data_front_displacement;
+            }
         }
 
         // data_header
