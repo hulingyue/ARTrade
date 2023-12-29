@@ -65,10 +65,24 @@ public:
             header->data_cursor_displacement = HeaderSize;
             header->data_next_displacement = HeaderSize;
         }
+
+        assert(memory_check(this) == true && "Memory overlap");
     }
 
     virtual ~Channel() {
         release(address, size);
+    }
+
+    static bool memory_check(const Channel* const channel) {
+        static uint64_t ranges[2] = {0};
+        if (std::max(ranges[0], channel->front_address()) <= std::min(ranges[1], channel->tail_address())) {
+            spdlog::error("{} R1({}, {}) R2({}, {})", LOGHEAD, ranges[0], ranges[1], channel->front_address(), channel->tail_address());
+            return false;
+        }
+
+        ranges[0] = channel->front_address();
+        ranges[1] = channel->tail_address();
+        return true;
     }
 
     virtual uint64_t earliest_displacement() {
