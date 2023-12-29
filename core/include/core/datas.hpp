@@ -84,9 +84,9 @@ enum class OrderStatus : int64_t {
 /******************************************/
 enum class MarketType: int64_t {
       Unknow = -1
-    , Depth = 1
-    , Kline = 2
-    , Bbo = 3
+    , Depth = 11
+    , Kline = 12
+    , Bbo = 13
 };
 
 struct Market_base {
@@ -126,10 +126,10 @@ struct alignas(64) Market_kline : public Market_base {
 /******************************************/
 enum class CommandType : int64_t {
       UNKNOW = -1
-    , SUBSCRIBE = 1
-    , UNSUBSCRIBE = 2
-    , ORDER = 3
-    , CANCEL = 4
+    , SUBSCRIBE = 21
+    , UNSUBSCRIBE = 22
+    , ORDER = 23
+    , CANCEL = 24
 };
 
 struct Command_base {
