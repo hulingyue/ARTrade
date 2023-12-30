@@ -71,25 +71,25 @@ void Strategy::run() {
         /*****************/
         /** read market **/
         /*****************/
-        core::datas::Market_base* market_obj = self.market_channel->read_next(market_displacement);
-        if (market_obj) {
-            switch (market_obj->market_type) {
+        std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> market_pair = self.market_channel->read_next(market_displacement);
+        if (market_pair.first) {
+            switch (market_pair.first->market_type) {
             case core::datas::MarketType::Bbo: {
-                core::datas::Market_bbo* obj = reinterpret_cast<core::datas::Market_bbo*>(market_obj);
+                core::datas::Market_bbo* obj = reinterpret_cast<core::datas::Market_bbo*>(market_pair.first);
                 if (obj) {
                     on_market_bbo(std::move(obj));
                 }
                 break;
             }
             case core::datas::MarketType::Depth: {
-                core::datas::Market_depth* obj = reinterpret_cast<core::datas::Market_depth*>(market_obj);
+                core::datas::Market_depth* obj = reinterpret_cast<core::datas::Market_depth*>(market_pair.first);
                 if (obj) {
                     on_market_depth(std::move(obj));
                 }
                 break;
             }
             case core::datas::MarketType::Kline: {
-                core::datas::Market_kline* obj = reinterpret_cast<core::datas::Market_kline*>(market_obj);
+                core::datas::Market_kline* obj = reinterpret_cast<core::datas::Market_kline*>(market_pair.first);
                 if (obj) {
                     on_market_kline(std::move(obj));
                 }

@@ -116,43 +116,34 @@ public:
         return insert(value);
     }
 
-    core::datas::Market_base* read(const uintptr_t target_address) const {
+    std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> read(const uintptr_t target_address) const {
         core::datas::MarketDataHeader* _header = reinterpret_cast<core::datas::MarketDataHeader*>(target_address);
-        if (_header == nullptr) { return nullptr; }
+        if (_header == nullptr) { return std::make_pair(nullptr, nullptr); }
 
         if (_header->type == core::datas::MarketType::Bbo && _header->data_size == sizeof(core::datas::Market_bbo)) {
-            return reinterpret_cast<core::datas::Market_bbo*>(target_address + MarketDataHeaderSize);
+            return std::make_pair(reinterpret_cast<core::datas::Market_bbo*>(target_address + MarketDataHeaderSize), _header);
         } else if (_header->type == core::datas::MarketType::Depth && _header->data_size == sizeof(core::datas::Market_depth)) {
-            return reinterpret_cast<core::datas::Market_depth*>(target_address + MarketDataHeaderSize);
+            return std::make_pair(reinterpret_cast<core::datas::Market_depth*>(target_address + MarketDataHeaderSize), _header);
         } else if (_header->type == core::datas::MarketType::Kline && _header->data_size == sizeof(core::datas::Market_kline)) {
-            return reinterpret_cast<core::datas::Market_kline*>(target_address + MarketDataHeaderSize);
+            return std::make_pair(reinterpret_cast<core::datas::Market_kline*>(target_address + MarketDataHeaderSize), _header);
         }
 
-        return nullptr;
+        return std::make_pair(nullptr, _header);
     }
 
     // update displacement
-    core::datas::Market_base* read(const uintptr_t target_address, uint64_t &target_displacement) const {
-        core::datas::MarketDataHeader* _header = reinterpret_cast<core::datas::MarketDataHeader*>(target_address);
-        if (_header == nullptr) { return nullptr; }
-
-        target_displacement = target_displacement + CommandDataHeaderSize + _header->data_size;
-        if (_header->type == core::datas::MarketType::Bbo && _header->data_size == sizeof(core::datas::Market_bbo)) {
-            return reinterpret_cast<core::datas::Market_bbo*>(target_address + MarketDataHeaderSize);
-        } else if (_header->type == core::datas::MarketType::Depth && _header->data_size == sizeof(core::datas::Market_depth)) {
-            return reinterpret_cast<core::datas::Market_depth*>(target_address + MarketDataHeaderSize);
-        } else if (_header->type == core::datas::MarketType::Kline && _header->data_size == sizeof(core::datas::Market_kline)) {
-            return reinterpret_cast<core::datas::Market_kline*>(target_address + MarketDataHeaderSize);
+    std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> read(const uintptr_t target_address, uint64_t &target_displacement) const {
+        std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> market_pair = read(target_address);
+        if (market_pair.first != nullptr) {
+            target_displacement = target_displacement + CommandDataHeaderSize + market_pair.second->data_size;
         }
-
-        target_displacement = target_displacement - CommandDataHeaderSize - _header->data_size;
-        return nullptr;
+        return market_pair;
     }
 
-    core::datas::Market_base* read_next(uint64_t &target_displacement) const {
-        if (target_displacement == header->data_next_displacement) { return nullptr; }
+    std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> read_next(uint64_t &target_displacement) const {
+        if (target_displacement == header->data_next_displacement) { return std::make_pair(nullptr, nullptr); }
         auto result = read(target_address(target_displacement), target_displacement);
-        if (result) { return result; }
+        if (result.first) { return result; }
 
         target_displacement = header->data_lastest_displacement;
         return read(target_address(target_displacement), target_displacement);

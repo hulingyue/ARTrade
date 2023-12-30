@@ -56,7 +56,7 @@ TEST_F(MarketChannelTest, ReadTest) {
     int count = 10000;
 
     uint64_t displacement = channel->earliest_displacement();
-    core::datas::Market_base* result = nullptr;
+    std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> market_pair = std::make_pair(nullptr, nullptr);
     for(int index = 0; index < count; index++) {
         bbo.time = core::time::Time::now_nanosecond();
         if (index % 2 == 0) {
@@ -68,15 +68,15 @@ TEST_F(MarketChannelTest, ReadTest) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         spdlog::info("insert displacement: {}", channel->lastest_displacement());
 
-        result = channel->read_next(displacement);
+        market_pair = channel->read_next(displacement);
 
         // debug
-        if (result == nullptr) {
+        if (market_pair.first == nullptr) {
             spdlog::error("index: {} displacement: {} last: {}", index, displacement, channel->lastest_displacement());
         } else {
-            switch (result->market_type) {
+            switch (market_pair.first->market_type) {
             case core::datas::MarketType::Bbo: {
-                core::datas::Market_bbo* bbo = reinterpret_cast<core::datas::Market_bbo*>(result);
+                core::datas::Market_bbo* bbo = reinterpret_cast<core::datas::Market_bbo*>(market_pair.first);
                 spdlog::info("exchange: {} symbol: {} time: {} displacement: {}", bbo->exchange, bbo->symbol, bbo->time, displacement);
                 break;
             }
@@ -84,7 +84,7 @@ TEST_F(MarketChannelTest, ReadTest) {
                 break;
             }
         }
-        ASSERT_NE(result, nullptr);
+        ASSERT_NE(market_pair.first, nullptr);
     }
 }
 
