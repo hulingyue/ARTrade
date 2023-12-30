@@ -166,7 +166,7 @@ void Modules::run() {
 
         // read commands & deal with commands
         std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = self.command_channel->read_next(address_displacement);
-        if (command_pair.first) {
+        if (command_pair.first && command_pair.second && command_pair.second->status == core::datas::CommandStatus::EFFECTIVE) {
             switch (command_pair.first->command_type) {
             case core::datas::CommandType::SUBSCRIBE:{
                 core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command_pair.first);
