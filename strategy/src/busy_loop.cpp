@@ -48,7 +48,9 @@ void Strategy::run() {
     uint64_t command_displacement = self.command_channel->earliest_displacement();
     uint64_t market_displacement = self.market_channel->earliest_displacement();
     while (true) {
-        // read commands
+        /*****************/
+        /* read commands */
+        /*****************/
         core::datas::Command_base* command_obj = self.command_channel->read_next(command_displacement);
         if (command_obj) {
             switch (command_obj->command_type) {
@@ -99,7 +101,6 @@ void Strategy::run() {
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        // 
     }
 }
 
