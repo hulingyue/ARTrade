@@ -45,14 +45,26 @@ void Strategy::run() {
     std::thread task_thread(std::bind(&Strategy::task, this));
     task_thread.detach();
 
+    uint64_t command_displacement = self.command_channel->earliest_displacement();
     uint64_t market_displacement = self.market_channel->earliest_displacement();
     while (true) {
         // read commands
-
-        // core::datas::CommandObj* command_obj = self.message->read_command();
-        // if (command_obj) {
-        //     continue;
-        // }
+        core::datas::Command_base* command_obj = self.command_channel->read_next(command_displacement);
+        if (command_obj) {
+            switch (command_obj->command_type) {
+            case core::datas::CommandType::SUBSCRIBE:
+                break;
+            case core::datas::CommandType::UNSUBSCRIBE:
+                break;
+            case core::datas::CommandType::ORDER:
+                break;
+            case core::datas::CommandType::CANCEL:
+                break;
+            default:
+                break;
+            }
+            continue;
+        }
 
         /*****************/
         /** read market **/
