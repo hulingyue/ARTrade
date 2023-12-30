@@ -230,27 +230,27 @@ public:
         return insert(value);
     }
 
-    core::datas::Command_base* read(const uintptr_t target_address) const {
+    std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> read(const uintptr_t target_address) const {
         core::datas::CommandDataHeader* _header = reinterpret_cast<core::datas::CommandDataHeader*>(target_address);
-        if (_header == nullptr) { return nullptr; }
+        if (_header == nullptr) { return std::make_pair(nullptr, nullptr); }
 
         if (_header->type == core::datas::CommandType::SUBSCRIBE) {
-            return reinterpret_cast<core::datas::SymbolObj*>(target_address + CommandDataHeaderSize);
+            return std::make_pair(reinterpret_cast<core::datas::SymbolObj*>(target_address + CommandDataHeaderSize), _header);
         } else if (_header->type == core::datas::CommandType::UNSUBSCRIBE) {
-            return reinterpret_cast<core::datas::SymbolObj*>(target_address + CommandDataHeaderSize);
+            return std::make_pair(reinterpret_cast<core::datas::SymbolObj*>(target_address + CommandDataHeaderSize), _header);
         } else if (_header->type == core::datas::CommandType::ORDER && _header->data_size == sizeof(core::datas::OrderObj)) {
-            return reinterpret_cast<core::datas::OrderObj*>(target_address + CommandDataHeaderSize);
+            return std::make_pair(reinterpret_cast<core::datas::OrderObj*>(target_address + CommandDataHeaderSize), _header);
         } else if (_header->type == core::datas::CommandType::CANCEL && _header->data_size == sizeof(core::datas::CancelObj)) {
-            return reinterpret_cast<core::datas::CancelObj*>(target_address + CommandDataHeaderSize);
+            return std::make_pair(reinterpret_cast<core::datas::CancelObj*>(target_address + CommandDataHeaderSize), _header);
         }
 
-        return nullptr;
+        return std::make_pair(nullptr, _header);
     }
 
-    core::datas::Command_base* read_next(uint64_t &target_displacement) const {
-        if (target_displacement > header->data_lastest_displacement) { return nullptr; }
+    std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> read_next(uint64_t &target_displacement) const {
+        if (target_displacement > header->data_lastest_displacement) { return std::make_pair(nullptr, nullptr); }
         auto result = read(target_address(target_displacement));
-        if (result) {
+        if (result.first) {
             target_displacement = target_displacement + CommandDataHeaderSize;
             return result;
         }

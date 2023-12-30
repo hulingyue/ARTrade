@@ -51,9 +51,9 @@ void Strategy::run() {
         /*****************/
         /* read commands */
         /*****************/
-        core::datas::Command_base* command_obj = self.command_channel->read_next(command_displacement);
-        if (command_obj) {
-            switch (command_obj->command_type) {
+        std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = self.command_channel->read_next(command_displacement);
+        if (command_pair.first) {
+            switch (command_pair.first->command_type) {
             case core::datas::CommandType::SUBSCRIBE:
                 break;
             case core::datas::CommandType::UNSUBSCRIBE:

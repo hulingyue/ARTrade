@@ -165,14 +165,14 @@ void Modules::run() {
         }
 
         // read commands & deal with commands
-        auto command = self.command_channel->read_next(address_displacement);
-        if (command) {
-            switch (command->command_type) {
+        std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = self.command_channel->read_next(address_displacement);
+        if (command_pair.first) {
+            switch (command_pair.first->command_type) {
             case core::datas::CommandType::SUBSCRIBE:{
                 // very important!!!
                 address_displacement = address_displacement + sizeof(core::datas::SymbolObj);
 
-                core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command);
+                core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command_pair.first);
                 uint64_t size = obj->size();
 
                 std::vector<std::string> symbols;
@@ -181,13 +181,15 @@ void Modules::run() {
                 }
 
                 self.market->subscribe(std::vector<std::string>(std::move(symbols)));
+
+                // obj->command_type = core::datas::CommandStatus::INVALID;
                 break;
             }
             case core::datas::CommandType::UNSUBSCRIBE: {
                 // very important!!!
                 address_displacement = address_displacement + sizeof(core::datas::SymbolObj);
 
-                core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command);
+                core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command_pair.first);
                 uint64_t size = obj->size();
 
                 std::vector<std::string> symbols;
@@ -202,7 +204,7 @@ void Modules::run() {
                 // very important!!!
                 address_displacement = address_displacement + sizeof(core::datas::OrderObj);
 
-                core::datas::OrderObj *obj = reinterpret_cast<core::datas::OrderObj*>(command);
+                core::datas::OrderObj *obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
                 if (obj) {
                     self.trade->order(*obj);
                 } else {
@@ -215,7 +217,7 @@ void Modules::run() {
                 // very important!!!
                 address_displacement = address_displacement + sizeof(core::datas::CancelObj);
 
-                core::datas::CancelObj *obj = reinterpret_cast<core::datas::CancelObj*>(command);
+                core::datas::CancelObj *obj = reinterpret_cast<core::datas::CancelObj*>(command_pair.first);
                 if (obj) {
                     self.trade->cancel(*obj);
                 } else {
@@ -225,7 +227,7 @@ void Modules::run() {
                 break;
             }
             default:
-                spdlog::error("{} unknow command type: {}", LOGHEAD, static_cast<int64_t>(command->command_type));
+                spdlog::error("{} unknow command type: {}", LOGHEAD, static_cast<int64_t>(command_pair.first->command_type));
                 break;
             }
         }
