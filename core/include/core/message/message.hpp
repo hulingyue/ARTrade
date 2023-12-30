@@ -32,20 +32,9 @@ struct alignas(64) Header {
     uint64_t data_next_displacement = 0;
 };
 
-struct alignas(64) MarketDataHeader {
-    core::datas::MarketType type;
-    size_t data_size = 0;
-};
-
-struct alignas(64) CommandDataHeader {
-    core::datas::CommandType type;
-    size_t data_size = 0;
-    core::datas::CommandStatus status = core::datas::CommandStatus::INVALID;
-};
-
 constexpr size_t HeaderSize = static_cast<size_t>(sizeof(Header));
-constexpr size_t MarketDataHeaderSize = static_cast<size_t>(sizeof(MarketDataHeader));
-constexpr size_t CommandDataHeaderSize = static_cast<size_t>(sizeof(CommandDataHeader));
+constexpr size_t MarketDataHeaderSize = static_cast<size_t>(sizeof(core::datas::MarketDataHeader));
+constexpr size_t CommandDataHeaderSize = static_cast<size_t>(sizeof(core::datas::CommandDataHeader));
 
 class Channel {
 public:
@@ -128,7 +117,7 @@ public:
     }
 
     core::datas::Market_base* read(const uintptr_t target_address) const {
-        MarketDataHeader *_header = reinterpret_cast<MarketDataHeader*>(target_address);
+        core::datas::MarketDataHeader* _header = reinterpret_cast<core::datas::MarketDataHeader*>(target_address);
         if (_header == nullptr) { return nullptr; }
 
         if (_header->type == core::datas::MarketType::Bbo && _header->data_size == sizeof(core::datas::Market_bbo)) {
@@ -144,7 +133,7 @@ public:
 
     // update displacement
     core::datas::Market_base* read(const uintptr_t target_address, uint64_t &target_displacement) const {
-        MarketDataHeader *_header = reinterpret_cast<MarketDataHeader*>(target_address);
+        core::datas::MarketDataHeader* _header = reinterpret_cast<core::datas::MarketDataHeader*>(target_address);
         if (_header == nullptr) { return nullptr; }
 
         target_displacement = target_displacement + CommandDataHeaderSize + _header->data_size;
@@ -200,7 +189,7 @@ private:
         }
 
         if (header->is_cover) {
-            MarketDataHeader* earliest_header = reinterpret_cast<MarketDataHeader*>(earliest_address());
+            core::datas::MarketDataHeader* earliest_header = reinterpret_cast<core::datas::MarketDataHeader*>(earliest_address());
             header->data_earliest_displacement = header->data_earliest_displacement + earliest_header->data_size + MarketDataHeaderSize;
             if (header->data_earliest_displacement >= header->data_tail_displacement) {
                 header->data_earliest_displacement = header->data_front_displacement;
@@ -209,7 +198,7 @@ private:
 
         // data_header
         header->data_lastest_displacement = header->data_next_displacement;
-        MarketDataHeader* _header = reinterpret_cast<MarketDataHeader*>(lastest_address());
+        core::datas::MarketDataHeader* _header = reinterpret_cast<core::datas::MarketDataHeader*>(lastest_address());
         _header->data_size = _market_size;
         _header->type = _type;
 
@@ -242,7 +231,7 @@ public:
     }
 
     core::datas::Command_base* read(const uintptr_t target_address) const {
-        CommandDataHeader *_header = reinterpret_cast<CommandDataHeader*>(target_address);
+        core::datas::CommandDataHeader* _header = reinterpret_cast<core::datas::CommandDataHeader*>(target_address);
         if (_header == nullptr) { return nullptr; }
 
         if (_header->type == core::datas::CommandType::SUBSCRIBE) {
@@ -300,7 +289,7 @@ private:
 
         // data_header
         header->data_lastest_displacement = header->data_next_displacement;
-        CommandDataHeader* _header = reinterpret_cast<CommandDataHeader*>(lastest_address());
+        core::datas::CommandDataHeader* _header = reinterpret_cast<core::datas::CommandDataHeader*>(lastest_address());
         _header->data_size = _command_size;
         _header->type = _type;
         _header->status = core::datas::CommandStatus::EFFECTIVE;

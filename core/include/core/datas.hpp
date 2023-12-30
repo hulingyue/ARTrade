@@ -188,4 +188,23 @@ struct alignas(64) CancelObj : public Command_base {
 /***    Command - end                   ***/
 /******************************************/
 
+
+/******************************************/
+/****   ShareMemory Data Header - begin ***/
+/******************************************/
+struct alignas(64) MarketDataHeader {
+    MarketType type;
+    size_t data_size = 0;
+};
+
+struct alignas(64) CommandDataHeader {
+    CommandType type;
+    size_t data_size = 0;
+    CommandStatus status = CommandStatus::INVALID;
+};
+/******************************************/
+/****   ShareMemory Data Header - end   ***/
+/******************************************/
+
+
 } // namespace core::datas
