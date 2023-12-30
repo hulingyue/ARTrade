@@ -177,9 +177,10 @@ void Modules::run() {
                     symbols.emplace_back(std::move(std::string(obj->symbols[index])));
                 }
 
-                self.market->subscribe(std::vector<std::string>(std::move(symbols)));
-
-                command_pair.second->status = core::datas::CommandStatus::INVALID;
+                core::datas::MarketOperateResult result = self.market->subscribe(std::vector<std::string>(std::move(symbols)));
+                if (result.code == 0) {
+                    command_pair.second->status = core::datas::CommandStatus::INVALID;
+                }
                 break;
             }
             case core::datas::CommandType::UNSUBSCRIBE: {
