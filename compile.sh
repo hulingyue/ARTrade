@@ -1,11 +1,15 @@
 #!/bin/bash
 
-while getopts ":p:" opt; do
+unittest=false
+while getopts ":p:t" opt; do
     case $opt in
         p)
             project="$OPTARG"
             project=${project%/}
             ;;
+        t)
+            unittest=true
+        ;;
         \?)
             echo "无效的选项: -$OPTARG" >&2
             ;;
@@ -58,8 +62,10 @@ if [ -d "$PROJECT_NAME" ]; then
     cp ./"$PROJECT_NAME" ./../../"$PROJECT_NAME"
 
     # core GTest
-    if [ -x "$UNITTEST" ]; then
-        $UNITTEST
+    if [ $unittest = true ]; then
+        if [ -x "$UNITTEST" ]; then
+            $UNITTEST
+        fi
     fi
 else
     error "UNKNOW PROJECT!"
