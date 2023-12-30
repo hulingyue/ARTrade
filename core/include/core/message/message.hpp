@@ -238,13 +238,18 @@ public:
         return std::make_pair(nullptr, _header);
     }
 
+    std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> read(const uintptr_t target_address, uint64_t &target_displacement) const {
+        std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = read(target_address);
+        if (command_pair.first != nullptr) {
+            target_displacement = target_displacement + CommandDataHeaderSize + command_pair.second->data_size;
+        }
+        return command_pair;
+    }
+
     std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> read_next(uint64_t &target_displacement) const {
         if (target_displacement > header->data_lastest_displacement) { return std::make_pair(nullptr, nullptr); }
-        auto result = read(target_address(target_displacement));
-        if (result.first) {
-            target_displacement = target_displacement + CommandDataHeaderSize;
-            return result;
-        }
+        std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> result = read(target_address(target_displacement), target_displacement);
+        if (result.first) { return result; }
 
         target_displacement = header->data_lastest_displacement;
         return read(target_address(target_displacement));

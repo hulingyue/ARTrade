@@ -169,9 +169,6 @@ void Modules::run() {
         if (command_pair.first) {
             switch (command_pair.first->command_type) {
             case core::datas::CommandType::SUBSCRIBE:{
-                // very important!!!
-                address_displacement = address_displacement + sizeof(core::datas::SymbolObj);
-
                 core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command_pair.first);
                 uint64_t size = obj->size();
 
@@ -182,13 +179,10 @@ void Modules::run() {
 
                 self.market->subscribe(std::vector<std::string>(std::move(symbols)));
 
-                // obj->command_type = core::datas::CommandStatus::INVALID;
+                command_pair.second->status = core::datas::CommandStatus::INVALID;
                 break;
             }
             case core::datas::CommandType::UNSUBSCRIBE: {
-                // very important!!!
-                address_displacement = address_displacement + sizeof(core::datas::SymbolObj);
-
                 core::datas::SymbolObj *obj = reinterpret_cast<core::datas::SymbolObj*>(command_pair.first);
                 uint64_t size = obj->size();
 
@@ -201,9 +195,6 @@ void Modules::run() {
                 break;
             }
             case core::datas::CommandType::ORDER: {
-                // very important!!!
-                address_displacement = address_displacement + sizeof(core::datas::OrderObj);
-
                 core::datas::OrderObj *obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
                 if (obj) {
                     self.trade->order(*obj);
@@ -214,9 +205,6 @@ void Modules::run() {
                 break;
             }
             case core::datas::CommandType::CANCEL: {
-                // very important!!!
-                address_displacement = address_displacement + sizeof(core::datas::CancelObj);
-
                 core::datas::CancelObj *obj = reinterpret_cast<core::datas::CancelObj*>(command_pair.first);
                 if (obj) {
                     self.trade->cancel(*obj);
