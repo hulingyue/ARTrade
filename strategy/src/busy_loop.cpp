@@ -70,14 +70,14 @@ void Strategy::run() {
             case core::datas::MarketType::Depth: {
                 core::datas::Market_depth* obj = reinterpret_cast<core::datas::Market_depth*>(market_obj);
                 if (obj) {
-
+                    on_market_depth(std::move(obj));
                 }
                 break;
             }
             case core::datas::MarketType::Kline: {
                 core::datas::Market_kline* obj = reinterpret_cast<core::datas::Market_kline*>(market_obj);
                 if (obj) {
-
+                    on_market_kline(std::move(obj));
                 }
                 break;
             }
