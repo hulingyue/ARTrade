@@ -192,7 +192,10 @@ void Modules::run() {
                     symbols.emplace_back(std::move(std::string(obj->symbols[index])));
                 }
 
-                self.market->unsubscribe(std::vector<std::string>(std::move(symbols)));
+                core::datas::MarketOperateResult result = self.market->unsubscribe(std::vector<std::string>(std::move(symbols)));
+                if (result.code == 0) {
+                    command_pair.second->status = core::datas::CommandStatus::INVALID;
+                }
                 break;
             }
             case core::datas::CommandType::ORDER: {
