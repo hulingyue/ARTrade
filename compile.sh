@@ -59,7 +59,12 @@ if [ -d "$PROJECT_NAME" ]; then
     cmake ..
     make -j16
 
-    cp ./"$PROJECT_NAME" ./../../"$PROJECT_NAME"
+    if [ -x "$PROJECT_NAME" ]; then
+        cp ./"$PROJECT_NAME" ./../../"$PROJECT_NAME"
+    else
+        error "compile failure!"
+        return
+    fi
 
     # core GTest
     if [ $unittest = true ]; then
