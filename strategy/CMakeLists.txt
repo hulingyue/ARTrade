@@ -25,3 +25,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE core)
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+#---------------------------------------------------------------
+# pybind11
+
+file(GLOB PYSOURCES "pystrategy/*.cpp")
+pybind11_add_module("pystrategy" MODULE ${PYSOURCES})
+target_link_libraries("pystrategy" PRIVATE core)
