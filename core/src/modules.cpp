@@ -5,6 +5,7 @@
 #include "core/modules.h"
 #include "core/config.h"
 #include "core/util.h"
+#include "core/order.hpp"
 
 
 #define LOGHEAD "[Modules::" + std::string(__func__) + "]"
@@ -201,7 +202,16 @@ void Modules::run() {
             case core::datas::CommandType::ORDER: {
                 core::datas::OrderObj *obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
                 if (obj) {
-                    self.trade->order(*obj);
+                    core::datas::TradeOperateResult result = self.trade->order(*obj);
+                    obj->status = core::datas::OrderStatus::ACCEPTED;
+                    if (result.code != 0) {
+                        obj->status = core::datas::OrderStatus::REJECTED;
+                        memset(obj->msg, 0, core::datas::ORDER_MSG_MAX_SIZE);
+                        memcpy(obj->msg, result.msg.c_str(), core::datas::ORDER_MSG_MAX_SIZE);
+                        // obj->msg[core::datas::ORDER_MSG_MAX_SIZE - 1] = '\0';
+                        break;
+                    }
+                    core::order::Order::get_instance()->insert(obj->client_id, command_pair);
                 } else {
                     spdlog::error("{} ORDER cannot reinterpret memory!", LOGHEAD);
                     break;
@@ -211,7 +221,15 @@ void Modules::run() {
             case core::datas::CommandType::CANCEL: {
                 core::datas::CancelObj *obj = reinterpret_cast<core::datas::CancelObj*>(command_pair.first);
                 if (obj) {
-                    self.trade->cancel(*obj);
+                    core::datas::TradeOperateResult result = self.trade->cancel(*obj);
+                    obj->status = core::datas::OrderStatus::ACCEPTED;
+                    if (result.code != 0) {
+                        obj->status = core::datas::OrderStatus::REJECTED;
+                        memset(obj->msg, 0, core::datas::ORDER_MSG_MAX_SIZE);
+                        memcpy(obj->msg, result.msg.c_str(), core::datas::ORDER_MSG_MAX_SIZE);
+                        // obj->msg[core::datas::ORDER_MSG_MAX_SIZE - 1] = '\0';
+                        break;
+                    }
                 } else {
                     spdlog::error("{} CANCEL cannot reinterpret memory!", LOGHEAD);
                     break;
