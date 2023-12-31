@@ -7,6 +7,7 @@ static const int SUBSCRIBE_MAX_SIZE = 10;
 static const int SYMBOL_MAX_LENGTH = 16;
 static const uint64_t SYMBOL_MAX_CAPACITY = 100;
 static const int MARKET_MAX_DEPTH = 10;
+static const int ORDER_MSG_MAX_SIZE = 256;
 
 struct MarketOperateResult {
     int code;
@@ -162,6 +163,7 @@ private:
 struct alignas(64) OrderObj : public Command_base {
     char symbol[SYMBOL_MAX_LENGTH];
     char exchange[SYMBOL_MAX_LENGTH];
+    char msg[ORDER_MSG_MAX_SIZE];
 
     OrderSide side;
     OrderOffset offset;
@@ -173,15 +175,20 @@ struct alignas(64) OrderObj : public Command_base {
     int order_id;
 
     double price;
-    double quantity;
+    double quantity; // order origin count
+    double traded; // turnover 
+    double revoked; // success cancel turnover
 };
 
 struct alignas(64) CancelObj : public Command_base {
     char symbol[SYMBOL_MAX_LENGTH];
     char exchange[SYMBOL_MAX_LENGTH];
+    char msg[ORDER_MSG_MAX_SIZE];
 
     int client_id;
     int order_id;
+
+    OrderStatus status;
 };
 
 /******************************************/
