@@ -156,7 +156,7 @@ void Modules::run() {
 
     uint64_t address_displacement = self.command_channel->earliest_displacement();
     while (true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         
         auto now = std::chrono::system_clock::now();
         if (std::chrono::duration_cast<std::chrono::seconds>(now - ts) >= std::chrono::seconds(1)) {
