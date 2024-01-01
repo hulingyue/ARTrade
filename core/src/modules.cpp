@@ -211,7 +211,9 @@ void Modules::run() {
                         // obj->msg[core::datas::ORDER_MSG_MAX_SIZE - 1] = '\0';
                         break;
                     }
-                    core::order::Order::get_instance()->insert(obj->client_id, command_pair);
+                    core::order::Order* order_obj = core::order::Order::get_instance();
+                    order_obj->insert(obj->client_id, command_pair);
+                    obj->client_id = order_obj->next_client_id();
                 } else {
                     spdlog::error("{} ORDER cannot reinterpret memory!", LOGHEAD);
                     break;
