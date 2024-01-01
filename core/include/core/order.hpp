@@ -64,6 +64,14 @@ public:
         return map_orders.empty();
     }
 
+    inline command_pair_type find(const uint64_t client_id) {
+        auto iterator = map_orders.find(client_id);
+        if (iterator == map_orders.end()) {
+            return std::make_pair(nullptr, nullptr);
+        }
+        return iterator->second;
+    }
+
     inline uint64_t next_client_id() { return (client_id_index.load() + 1) % UINT64_MAX; }
 
 private:
