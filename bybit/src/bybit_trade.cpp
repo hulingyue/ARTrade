@@ -153,6 +153,16 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
             nlohmann::json j_msg = nlohmann::json::parse(res->body);
             result.code = j_msg.value("retCode", 0);
             result.msg = j_msg.value("retMsg", "");
+            std::string order_id = j_msg.value("result", nlohmann::json::object()).value("orderId", "");
+            std::string order_link_id = j_msg.value("result", nlohmann::json::object()).value("orderLinkId", "");
+            std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = core::order::Order::get_instance()->find(std::stoi(order_link_id));
+            if (command_pair.first) {
+                core::datas::OrderObj* order_obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
+                if (std::to_string(order_obj->client_id) == order_id) {
+                    memcpy(order_obj->order_id, order_link_id.c_str(), core::datas::ORDERID_MAX_SIZE);
+                    order_obj->order_id[core::datas::ORDERID_MAX_SIZE - 1] = '\0';
+                }
+            }
         }
 
         if (result.code == 0) {
