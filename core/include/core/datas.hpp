@@ -8,6 +8,7 @@ static const int SYMBOL_MAX_LENGTH = 16;
 static const uint64_t SYMBOL_MAX_CAPACITY = 100;
 static const int MARKET_MAX_DEPTH = 10;
 static const int ORDER_MSG_MAX_SIZE = 256;
+static const int ORDERID_MAX_SIZE = 128;
 
 struct MarketOperateResult {
     int code;
@@ -171,8 +172,8 @@ struct alignas(64) OrderObj : public Command_base {
     OrderStatus status;
     OrderTIF tif;
 
-    int client_id;
-    int order_id;
+    uint64_t client_id;
+    char order_id[ORDERID_MAX_SIZE];
 
     double price;
     double quantity; // order origin count
