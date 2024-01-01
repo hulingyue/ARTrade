@@ -6,6 +6,7 @@
 #include <core/util.h>
 #include <core/time.hpp>
 #include <nlohmann/json.hpp>
+#include <core/order.hpp>
 
 #include "format.hpp"
 #include "signature.hpp"
@@ -125,6 +126,7 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
     std::string path = "/v5/order/create";
 
     nlohmann::json parameters = {
+        {"orderLinkId", std::to_string(order.client_id)},
         {"category", self.category},
         {"symbol", std::string(order.symbol)},
         {"side", side_to_bybit(order.side)},
