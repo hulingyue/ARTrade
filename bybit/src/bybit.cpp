@@ -60,6 +60,7 @@ void Bybit::init_config() {
 
 void Bybit::interval_1s() {
     self.market.interval_1s();
+    self.trade.interval_1s();
 }
 
 BybitMarket& Bybit::market() {
