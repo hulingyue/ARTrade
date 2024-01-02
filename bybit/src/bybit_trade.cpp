@@ -236,18 +236,22 @@ void BybitTrade::on_message(std::string const &msg) {
     nlohmann::json message = nlohmann::json::parse(msg);
 
     std::string op = message.value("op", "");
-    if (op == "auth") {
+    if (op.length() > 0) {
         bool status = message.value("success", false);
-        self.is_ready.store(status);
+        if (op == "auth" && status) {
+            // subscribe private message
+            subscribe_private_channel();
+        } else if (op == "subscribe") {
+            self.is_ready.store(status);
+        }
 
         if (status) {
             spdlog::info("{} op: {} status: {} msg: {}", LOGHEAD, op, status, message.value("ret_msg", ""));
-            // subscribe private message
-            subscribe_private_channel();
         } else {
             spdlog::error("{} op: {} status: {} msg: {}", LOGHEAD, op, status, message.value("ret_msg", ""));
         }
     }
+
 }
 
 void BybitTrade::ping() {
