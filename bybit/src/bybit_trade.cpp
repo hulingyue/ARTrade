@@ -19,6 +19,7 @@ struct Self {
     std::atomic<bool> is_ready;
     core::websocket::client::WebSocketClient *websocket_client = nullptr;
     core::http::client::HttpClient http_client;
+    int interval = 0;
 
     std::string api_key;
     std::string api_secret;
@@ -201,7 +202,10 @@ TradeOperateResult BybitTrade::cancel(core::datas::CancelObj const &order) {
 }
 
 void BybitTrade::interval_1s() {
-
+    self.interval += 1;
+    if (self.interval % 30 == 0) {
+        ping();
+    }
 }
 
 void BybitTrade::on_open() {
