@@ -26,6 +26,7 @@ private:
     void on_message(std::string const &msg);
 
     void ping();
+    void subscribe_private_channel();
 
 private:
     Self &self;

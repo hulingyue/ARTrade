@@ -238,6 +238,8 @@ void BybitTrade::on_message(std::string const &msg) {
 
         if (status) {
             spdlog::info("{} op: {} status: {} msg: {}", LOGHEAD, op, status, message.value("ret_msg", ""));
+            // subscribe private message
+            subscribe_private_channel();
         } else {
             spdlog::error("{} op: {} status: {} msg: {}", LOGHEAD, op, status, message.value("ret_msg", ""));
         }
@@ -246,6 +248,20 @@ void BybitTrade::on_message(std::string const &msg) {
 
 void BybitTrade::ping() {
     std::string json_obj = R"({"req_id": "0", "op": "ping"})";
+    self.websocket_client->send(json_obj);
+}
+
+void BybitTrade::subscribe_private_channel() {
+    std::string json_obj = R"({
+        "op": "subscribe",
+        "args": [
+            "position",
+            "execution",
+            "order",
+            "wallet",
+            "greeks"
+        ]
+    })";
     self.websocket_client->send(json_obj);
 }
 
