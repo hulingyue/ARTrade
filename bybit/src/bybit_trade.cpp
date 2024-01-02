@@ -243,7 +243,7 @@ void BybitTrade::on_message(std::string const &msg) {
             subscribe_private_channel();
         } else if (op == "subscribe") {
             self.is_ready.store(status);
-        }
+        } else if (op == "pong") { return; }
 
         if (status) {
             spdlog::info("{} op: {} status: {} msg: {}", LOGHEAD, op, status, message.value("ret_msg", ""));
