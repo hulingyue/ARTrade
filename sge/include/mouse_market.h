@@ -4,10 +4,13 @@
 #include <core/datas.hpp>
 #include <core/pimpl.h>
 
+#include <SgitFtdcMdApi.h>
+
 using MarketOperateResult = core::datas::MarketOperateResult;
+using namespace fstech;
 
 
-class MouseMarket final : public core::api::market::Market {
+class MouseMarket final : public core::api::market::Market, public CThostFtdcMdSpi {
 public:
     MouseMarket();
     ~MouseMarket();

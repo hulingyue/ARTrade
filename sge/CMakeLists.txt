@@ -14,13 +14,26 @@ add_subdirectory(${CORE} core)
 message(STATUS "Build with core source code 🆗")
 
 #---------------------------------------------------------------
+# SDK
+include_directories(
+    sdk/include
+)
+
+set(SDK
+  ${CMAKE_CURRENT_SOURCE_DIR}/sdk/libcrypto.so.10
+  ${CMAKE_CURRENT_SOURCE_DIR}/sdk/libsgitquotapi.so
+  ${CMAKE_CURRENT_SOURCE_DIR}/sdk/libsgittradeapi.so
+  ${CMAKE_CURRENT_SOURCE_DIR}/sdk/libssl.so.10
+)
+
+#---------------------------------------------------------------
 # app
 file(GLOB SOURCES "src/*.cpp" "main.cpp")
 add_executable(${PROJECT_NAME}
   ${SOURCES}
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE core)
+target_link_libraries(${PROJECT_NAME} PRIVATE core ${SDK})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
