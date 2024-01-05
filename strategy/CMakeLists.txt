@@ -29,6 +29,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 #---------------------------------------------------------------
 # pybind11
 
-file(GLOB PYSOURCES "pystrategy/*.cpp")
-pybind11_add_module("pystrategy" MODULE ${PYSOURCES})
+file(GLOB PYSTRATEGY_SOURCES "PythonApi/pystrategy/*.cpp")
+pybind11_add_module("pystrategy" MODULE ${PYSTRATEGY_SOURCES})
 target_link_libraries("pystrategy" PRIVATE core)
+file(GLOB PYCORE_SOURCES "PythonApi/pycore/*.cpp")
+pybind11_add_module("pycore" MODULE ${PYCORE_SOURCES})
+target_link_libraries("pycore" PRIVATE core)
