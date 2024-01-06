@@ -1,11 +1,32 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <core/datas.hpp>
 
 namespace py = pybind11;
 using namespace core::datas;
 
-py::str convertCharArrayToPythonString(const char* charArray) {
-    return py::str(charArray);
+py::str convert_char_array_to_python_string(const char* char_array) {
+    return py::str(char_array);
+}
+
+template <typename T>
+py::array_t<T> convert_to_numpy_array(const T *data, size_t size) {
+    py::array_t<T> result({size});
+    auto result_buffer = result.request();
+    T *result_ptr = static_cast<T *>(result_buffer.ptr);
+    std::memcpy(result_ptr, data, size * sizeof(T));
+    return result;
+}
+
+template <typename T, size_t N>
+std::array<T, N> convert_from_numpy_array(py::array_t<T> array) {
+    auto buffer = array.request();
+    if (buffer.size != N) {
+        throw std::runtime_error("Array size does not match");
+    }
+    std::array<T, N> result;
+    std::memcpy(result.data(), buffer.ptr, N * sizeof(T));
+    return result;
 }
 
 PYBIND11_MODULE(pycore, m) {
@@ -95,7 +116,7 @@ PYBIND11_MODULE(pycore, m) {
         .def_readwrite("time", &Market_base::time)
         .def_property("symbol",
             [](const Market_base &mb) {
-                return convertCharArrayToPythonString(mb.symbol);
+                return convert_char_array_to_python_string(mb.symbol);
             },
             [](Market_base &mb, const py::str &s) {
                 // Add logic to handle the conversion from Python string to C++ char array here
@@ -104,7 +125,7 @@ PYBIND11_MODULE(pycore, m) {
         )
         .def_property("exchange",
             [](const Market_base &mb) {
-                return convertCharArrayToPythonString(mb.exchange);
+                return convert_char_array_to_python_string(mb.exchange);
             },
             [](Market_base &mb, const py::str &s) {
                 // Add logic to handle the conversion from Python string to C++ char array here
@@ -117,28 +138,24 @@ PYBIND11_MODULE(pycore, m) {
         .def_readwrite("price", &Market_bbo::price)
         .def_readwrite("quantity", &Market_bbo::quantity);
     
-    py::class_<Market_depth, Market_base>(m, "Market_bbo")
+    py::class_<Market_depth, Market_base>(m, "Market_depth")
         .def(py::init<>())
         .def_readwrite("price", &Market_depth::price)
         .def_readwrite("quantity", &Market_depth::quantity)
         .def_property("asks",
-            [](const Market_base &mb) {
-                return py::list(mb.asks);
-            },
-            [](Market_base &mb, const py::str &s) {
-                // Add logic to handle the conversion from Python string to C++ char array here
-                strncpy(mb.asks, s.cast<std::string>().c_str(), sizeof(mb.asks));
-            }
-        );
-        // .def_property("bids",
-        //     [](const Market_base &mb) {
-        //         return py::array<double>(mb.bids);
-        //     },
-        //     [](Market_base &mb, const py::str &s) {
-        //         // Add logic to handle the conversion from Python string to C++ char array here
-        //         strncpy(mb.bids, s.cast<std::string>().c_str(), sizeof(mb.bids));
-        //     }
-        // );
+                      [](const Market_depth &md) {
+                          return convert_to_numpy_array<TradePair>(md.asks, core::datas::MARKET_MAX_DEPTH);
+                      },
+                      [](Market_depth &md, const py::array_t<TradePair> &value) {
+                          return convert_from_numpy_array<TradePair, core::datas::MARKET_MAX_DEPTH>(value);
+                      })
+        .def_property("bids",
+                      [](const Market_depth &md) {
+                          return convert_to_numpy_array<TradePair>(md.asks, core::datas::MARKET_MAX_DEPTH);
+                      },
+                      [](Market_depth &md, const py::array_t<TradePair> &value) {
+                          return convert_from_numpy_array<TradePair, core::datas::MARKET_MAX_DEPTH>(value);
+                      });
 
     py::class_<Market_kline, Market_base>(m, "Market_kline")
         .def(py::init<>())
