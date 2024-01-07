@@ -15,7 +15,8 @@ message(STATUS "Build with core source code 🆗")
 
 #---------------------------------------------------------------
 # app
-file(GLOB SOURCES "src/*.cpp" "main.cpp")
+file(GLOB SOURCES "CppApi/src/*.cpp" "main.cpp")
+include_directories("CppApi/include")
 add_executable(${PROJECT_NAME}
   ${SOURCES}
 )
