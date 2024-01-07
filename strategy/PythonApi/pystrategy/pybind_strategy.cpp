@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <core/datas.hpp>
-#include "../../include/busy_loop.h"
+#include "busy_loop.h"
 
 
 namespace py = pybind11;
