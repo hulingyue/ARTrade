@@ -1,5 +1,5 @@
 #include <iostream>
-#include "busy_loop.h"
+#include "strategy.h"
 
 
 class Strategy_Demo : public Strategy {
