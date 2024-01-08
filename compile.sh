@@ -25,6 +25,12 @@ error() {
     echo -- "\e[31mERROR: $1\e[0m"
 }
 
+del() {
+    if [ -x $1 ]; then
+        rm $1
+    fi
+}
+
 FILE_NAME="$0"
 PROJECT_NAME="$project"
 
@@ -34,31 +40,36 @@ git submodule update --init
 # GTest
 UNITTEST='./core/unittest'
 
+path_exists=true
 # compile
 if [ -d "$PROJECT_NAME" ]; then
     cd "$PROJECT_NAME"
+elif [ -d "exchange/crypto/$PROJECT_NAME" ]; then
+    cd "exchange/crypto/$PROJECT_NAME"
+elif [ -d "exchange/finance/$PROJECT_NAME" ]; then
+    cd "exchange/finance/$PROJECT_NAME"
+else
+    error "UNKNOW PROJECT!"
+    path_exists=true
+fi
+
+if [ path_exists ]; then
     if [ ! -d build ]; then
         mkdir build
     fi
     cd build
 
     # clean executation
-    if [ -x "$PROJECT_NAME" ]; then
-        rm "$PROJECT_NAME"
-    fi
-
-    if [ -x "./../$PROJECT_NAME" ]; then
-        rm "./../$PROJECT_NAME"
-    fi
+    del $PROJECT_NAME
+    del "./../$PROJECT_NAME"
 
     # clear unittest
-    if [ -x "$UNITTEST" ]; then
-        rm "$UNITTEST"
-    fi
+    del $UNITTEST
 
     cmake ..
     make -j16
 
+    info $PROJECT_NAME
     if [ -x "$PROJECT_NAME" ]; then
         cp ./"$PROJECT_NAME" ./../../"$PROJECT_NAME"
     else
@@ -72,6 +83,4 @@ if [ -d "$PROJECT_NAME" ]; then
             $UNITTEST
         fi
     fi
-else
-    error "UNKNOW PROJECT!"
 fi
