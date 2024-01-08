@@ -8,7 +8,14 @@ add_compile_options(-Wno-subobject-linkage)
 #---------------------------------------------------------------
 # core
 
-set(CORE ${CMAKE_CURRENT_SOURCE_DIR}/../core)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../core)
+  set(CORE ${CMAKE_CURRENT_SOURCE_DIR}/../core)
+elseif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../core)
+  set(CORE ${CMAKE_CURRENT_SOURCE_DIR}/../../core)
+elseif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../../core)
+  set(CORE ${CMAKE_CURRENT_SOURCE_DIR}/../../../core)
+endif()
+
 message(STATUS "core: ${CORE}")
 add_subdirectory(${CORE} core)
 message(STATUS "Build with core source code 🆗")
