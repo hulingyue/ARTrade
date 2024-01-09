@@ -29,10 +29,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 #---------------------------------------------------------------
 # pybind11
-
-file(GLOB PYSTRATEGY_SOURCES "PythonApi/pystrategy/*.cpp")
-pybind11_add_module("pystrategy" MODULE ${PYSTRATEGY_SOURCES})
-target_link_libraries("pystrategy" PRIVATE core)
-file(GLOB PYCORE_SOURCES "PythonApi/pycore/*.cpp")
-pybind11_add_module("pycore" MODULE ${PYCORE_SOURCES})
-target_link_libraries("pycore" PRIVATE core)
+set(PYModuleName "pystrategy")
+pybind11_add_module(${PYModuleName} MODULE "PythonApi/pystrategy.cpp")
+target_link_libraries(${PYModuleName} PRIVATE core)
+set_target_properties(${PYModuleName} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../PythonApi/")
