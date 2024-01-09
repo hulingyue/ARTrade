@@ -1,5 +1,5 @@
 #include <iostream>
-#include "strategy.h"
+#include "strategy.hpp"
 
 
 class Strategy_Demo : public Strategy {

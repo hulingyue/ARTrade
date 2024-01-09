@@ -1,9 +1,12 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <core/datas.hpp>
+#include "strategy.hpp"
+
 
 namespace py = pybind11;
 using namespace core::datas;
+
 
 py::str convert_char_array_to_python_string(const char* char_array) {
     return py::str(char_array);
@@ -29,7 +32,36 @@ std::array<T, N> convert_from_numpy_array(py::array_t<T> array) {
     return result;
 }
 
-PYBIND11_MODULE(pycore, m) {
+class PyStrategy : public Strategy {
+public:
+    using Strategy::Strategy;
+
+    std::string project_name() override {
+        PYBIND11_OVERLOAD_PURE(std::string, Strategy, project_name,);
+    }
+
+    core::datas::MessageType message_type() override {
+        PYBIND11_OVERLOAD_PURE(core::datas::MessageType, Strategy, message_type);
+    }
+
+    void task() override {
+        PYBIND11_OVERLOAD_PURE(void, Strategy, task,);
+    }
+
+    void on_market() override {
+        PYBIND11_OVERLOAD_PURE(void, Strategy, on_market);
+    }
+
+    void on_traded() override {
+        PYBIND11_OVERLOAD_PURE(void, Strategy, on_traded);
+    }
+
+    void on_order() override {
+        PYBIND11_OVERLOAD_PURE(void, Strategy, on_order);
+    }
+};
+
+PYBIND11_MODULE(pystrategy, m) {
     py::class_<MarketOperateResult>(m, "MarketOperateResult")
         .def(py::init<>())
         .def_readwrite("code", &MarketOperateResult::code)
@@ -164,4 +196,17 @@ PYBIND11_MODULE(pycore, m) {
         .def_readwrite("open", &Market_kline::open)
         .def_readwrite("close", &Market_kline::close);
 
+    py::class_<Strategy, PyStrategy>(m, "Strategy")
+        .def(py::init<>())
+        .def("project_name", &Strategy::project_name)
+        .def("task", &Strategy::task)
+        .def("on_market_bbo", &Strategy::on_market_bbo)
+        .def("on_market_depth", &Strategy::on_market_depth)
+        .def("on_market_kline", &Strategy::on_market_kline)
+        .def("on_market", &Strategy::on_market)
+        .def("on_traded", &Strategy::on_traded)
+        .def("on_order", &Strategy::on_order)
+        .def("order", &Strategy::order)
+        .def("cancel", &Strategy::cancel)
+        .def("run", &Strategy::run);
 }
