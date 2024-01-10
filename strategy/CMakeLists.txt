@@ -32,4 +32,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 set(PYModuleName "pystrategy")
 pybind11_add_module(${PYModuleName} MODULE "PythonApi/pystrategy.cpp")
 target_link_libraries(${PYModuleName} PRIVATE core)
-set_target_properties(${PYModuleName} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../PythonApi/")
+set_target_properties(${PYModuleName} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../PythonApi/pystrategy")
