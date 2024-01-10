@@ -196,6 +196,21 @@ PYBIND11_MODULE(pystrategy, m) {
         .def_readwrite("open", &Market_kline::open)
         .def_readwrite("close", &Market_kline::close);
 
+    /******************************************/
+    /***    Command - begin                 ***/
+    /******************************************/
+    py::enum_<CommandType>(m, "CommandType")
+        .value("UNKNOW", CommandType::UNKNOW)
+        .value("SUBSCRIBE", CommandType::SUBSCRIBE)
+        .value("UNSUBSCRIBE", CommandType::UNSUBSCRIBE)
+        .value("ORDER", CommandType::ORDER)
+        .value("CANCEL", CommandType::CANCEL)
+        .export_values();
+
+    py::class_<Command_base>(m, "Command_base")
+        .def(py::init<>())
+        .def_readwrite("command_type", &Command_base::command_type);
+
     py::class_<Strategy, PyStrategy>(m, "Strategy")
         .def(py::init<>())
         .def("project_name", &Strategy::project_name)
