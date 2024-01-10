@@ -33,3 +33,17 @@ set(PYModuleName "pystrategy")
 pybind11_add_module(${PYModuleName} MODULE "PythonApi/pystrategy.cpp")
 target_link_libraries(${PYModuleName} PRIVATE core)
 set_target_properties(${PYModuleName} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../PythonApi/pystrategy")
+
+#---------------------------------------------------------------
+#
+add_custom_command(
+    TARGET ${PYModuleName}
+    POST_BUILD
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/../PythonApi
+    COMMAND python3 setup.py sdist --dist-dir pystrategy
+    COMMENT "Running setuptools sdist command"
+)
+
+add_custom_target(run_setuptools ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/../PythonApi/setup.py
+)
