@@ -93,8 +93,8 @@ enum class MarketType: int64_t {
 
 struct Market_base {
     MarketType market_type;
-    char symbol[SYMBOL_MAX_LENGTH];
-    char exchange[SYMBOL_MAX_LENGTH];
+    char symbol[SYMBOL_MAX_LENGTH] = {0};
+    char exchange[SYMBOL_MAX_LENGTH] = {0};
     unsigned long time;
 };
 
@@ -140,7 +140,7 @@ struct Command_base {
 
 // subscribe & unsubscribe
 struct alignas(64) SymbolObj : public Command_base {
-    char symbols[SYMBOL_MAX_LENGTH][SYMBOL_MAX_CAPACITY];
+    char symbols[SYMBOL_MAX_CAPACITY][SYMBOL_MAX_LENGTH] = {0};
 
     bool push_back(const char* symbol) {
         if (_size >= SYMBOL_MAX_CAPACITY) { return false; }
@@ -162,9 +162,9 @@ private:
 };
 
 struct alignas(64) OrderObj : public Command_base {
-    char symbol[SYMBOL_MAX_LENGTH];
-    char exchange[SYMBOL_MAX_LENGTH];
-    char msg[ORDER_MSG_MAX_SIZE];
+    char symbol[SYMBOL_MAX_LENGTH] = {0};
+    char exchange[SYMBOL_MAX_LENGTH] = {0};
+    char msg[ORDER_MSG_MAX_SIZE] = {0};
 
     OrderSide side;
     OrderOffset offset;
@@ -182,9 +182,9 @@ struct alignas(64) OrderObj : public Command_base {
 };
 
 struct alignas(64) CancelObj : public Command_base {
-    char symbol[SYMBOL_MAX_LENGTH];
-    char exchange[SYMBOL_MAX_LENGTH];
-    char msg[ORDER_MSG_MAX_SIZE];
+    char symbol[SYMBOL_MAX_LENGTH] = {0};
+    char exchange[SYMBOL_MAX_LENGTH] = {0};
+    char msg[ORDER_MSG_MAX_SIZE] = {0};
 
     int client_id;
     int order_id;
