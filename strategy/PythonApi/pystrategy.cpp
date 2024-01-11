@@ -201,6 +201,34 @@ PYBIND11_MODULE(pystrategy, m) {
         .def(py::init<>())
         .def_readwrite("command_type", &Command_base::command_type);
 
+     py::class_<SymbolObj, Command_base>(m, "SymbolObj")
+        .def(py::init<>())
+        .def("push_back", &SymbolObj::push_back)
+        .def("size", &SymbolObj::size)
+        .def("capacity", &SymbolObj::capacity)
+        .def_property("symbols",
+            [](const SymbolObj &obj) {
+                py::array_t<char, py::array::c_style> array({core::datas::SYMBOL_MAX_CAPACITY * core::datas::SYMBOL_MAX_LENGTH});
+                auto mutable_arr = array.mutable_unchecked();
+                for (int i = 0; i < core::datas::SYMBOL_MAX_CAPACITY; i++) {
+                    const char* str = obj.symbols[i];
+                    std::copy(str, str + core::datas::SYMBOL_MAX_LENGTH, mutable_arr.mutable_data(i * core::datas::SYMBOL_MAX_LENGTH));
+                }
+                return array;
+            },
+            [](SymbolObj &obj, py::array_t<char, py::array::c_style> array) {
+                if (array.size() != core::datas::SYMBOL_MAX_CAPACITY * core::datas::SYMBOL_MAX_LENGTH) {
+                    throw std::runtime_error("Invalid array size");
+                }
+                auto arr = array.unchecked();
+                for (int i = 0; i < core::datas::SYMBOL_MAX_CAPACITY; i++) {
+                    const char* str = arr.data(i * core::datas::SYMBOL_MAX_LENGTH);
+                    std::string symbol = std::string(str, core::datas::SYMBOL_MAX_LENGTH);  // 截断字符串
+                    std::strcpy(obj.symbols[i], symbol.c_str());
+                }
+            }
+        );
+
     py::class_<Strategy, PyStrategy>(m, "Strategy")
         .def(py::init<>())
         .def("project_name", &Strategy::project_name)
