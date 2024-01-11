@@ -8,10 +8,6 @@ namespace py = pybind11;
 using namespace core::datas;
 
 
-py::str convert_char_array_to_python_string(const char* char_array) {
-    return py::str(char_array);
-}
-
 template <typename T>
 py::array_t<T> convert_to_numpy_array(const T *data, size_t size) {
     py::array_t<T> result({size});
@@ -147,20 +143,14 @@ PYBIND11_MODULE(pystrategy, m) {
         .def_readwrite("market_type", &Market_base::market_type)
         .def_readwrite("time", &Market_base::time)
         .def_property("symbol",
-            [](const Market_base &mb) {
-                return convert_char_array_to_python_string(mb.symbol);
-            },
+            [](const Market_base &mb) { return py::str(mb.symbol); },
             [](Market_base &mb, const py::str &s) {
-                // Add logic to handle the conversion from Python string to C++ char array here
                 strncpy(mb.symbol, s.cast<std::string>().c_str(), sizeof(mb.symbol));
             }
         )
         .def_property("exchange",
-            [](const Market_base &mb) {
-                return convert_char_array_to_python_string(mb.exchange);
-            },
+            [](const Market_base &mb) { return py::str(mb.exchange); },
             [](Market_base &mb, const py::str &s) {
-                // Add logic to handle the conversion from Python string to C++ char array here
                 strncpy(mb.exchange, s.cast<std::string>().c_str(), sizeof(mb.exchange));
             }
         );
