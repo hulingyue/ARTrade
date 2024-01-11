@@ -38,13 +38,13 @@ public:
     virtual void on_order() = 0;
 
 public:
-    virtual bool subscribe(core::datas::SymbolObj symbols) final __attribute__((aligned(64))) {
+    virtual bool subscribe(core::datas::SymbolObj symbols) final {
         core::datas::SymbolObj obj = std::move(symbols);
         obj.command_type = core::datas::CommandType::SUBSCRIBE;
         return self.command_channel->write(obj);
     }
 
-    virtual bool unsubscribe(core::datas::SymbolObj symbols) final __attribute__((aligned(64))) {
+    virtual bool unsubscribe(core::datas::SymbolObj symbols) final {
         core::datas::SymbolObj obj = std::move(symbols);
         obj.command_type = core::datas::CommandType::UNSUBSCRIBE;
         return self.command_channel->write(obj);
