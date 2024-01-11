@@ -127,11 +127,20 @@ private:
     void custom_init() {
         std::string proj = project_name();
         core::datas::MessageType type = message_type();
-        self.command_channel = new core::message::message::CommandChannel(proj, 40 * MB);
-        self.market_channel = new core::message::message::MarketChannel(proj, 40 * MB);
 
-        assert(self.command_channel != nullptr);
-        assert(self.market_channel != nullptr);
+        switch (type) {
+        case core::datas::MessageType::ShareMemory: {
+            self.command_channel = new core::message::message::CommandChannel(proj, 40 * MB);
+            self.market_channel = new core::message::message::MarketChannel(proj, 40 * MB);
+
+            assert(self.command_channel != nullptr);
+            assert(self.market_channel != nullptr);
+            break;
+        }
+        default:
+            assert(false && "unsupport message type!");
+            break;
+        }
     }
 
 private:
