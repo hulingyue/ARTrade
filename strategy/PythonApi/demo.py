@@ -12,13 +12,14 @@ class MyStrategy(Strategy):
         return MessageType.ShareMemory
     
     def task(self):
-        print("task1")
-        while True:
-            print("task")
-            pass
+        obj = SymbolObj()
+        obj.command_type = CommandType.UNKNOW
+        obj.push_back("tickers.BTCUSDT")
+        obj.push_back("tickers.ETHUSDT")
 
+        self.subscribe(obj)
+        while True:
+            pass
 
 t = MyStrategy()
 t.run()
-
-    
