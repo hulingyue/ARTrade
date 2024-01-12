@@ -229,7 +229,7 @@ PYBIND11_MODULE(pystrategy, m) {
             }
         );
 
-    py::class_<Strategy, PyStrategy>(m, "Strategy")
+    py::class_<Strategy, PyStrategy, std::shared_ptr<Strategy>>(m, "Strategy")
         .def(py::init<>())
         .def("project_name", &Strategy::project_name)
         .def("task", &Strategy::task)
