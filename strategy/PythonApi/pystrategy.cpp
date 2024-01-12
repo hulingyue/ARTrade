@@ -239,6 +239,8 @@ PYBIND11_MODULE(pystrategy, m) {
         .def("on_market", &Strategy::on_market)
         .def("on_traded", &Strategy::on_traded)
         .def("on_order", &Strategy::on_order)
+        .def("subscribe", &Strategy::subscribe)
+        .def("unsubscribe", &Strategy::unsubscribe)
         .def("order", &Strategy::order)
         .def("cancel", &Strategy::cancel)
         .def("run", &Strategy::run);
