@@ -4,15 +4,16 @@
 
 class Strategy_Demo : public Strategy {
 public:
-    virtual std::string project_name() override {
-        return "Bybit";
+
+    Strategy_Demo() {
+        project_name("Bybit");
+        message_type(core::datas::MessageType::ShareMemory);
+
+        set_task(std::bind(&Strategy_Demo::task, this));
+        set_on_market_bbo(std::bind(&Strategy_Demo::on_market_bbo, this, std::placeholders::_1));
     }
 
-    virtual core::datas::MessageType message_type() override {
-        return core::datas::MessageType::ShareMemory;
-    }
-
-    virtual void task() override {
+    void task() {
         core::datas::SymbolObj symbol_obj;
         symbol_obj.command_type = core::datas::CommandType::UNKNOW;
         symbol_obj.push_back("tickers.BTCUSDT");
@@ -22,22 +23,9 @@ public:
         while (true) {
 
         }
-        
-    }
-    
-    virtual void on_market() override {
-    
-    }
-    
-    virtual void on_traded() override {
-    
-    }
-    
-    virtual void on_order() override {
-    
     }
 
-    virtual void on_market_bbo(core::datas::Market_bbo* bbo) {
+    void on_market_bbo(core::datas::Market_bbo* bbo) {
         if (bbo) {
             std::cout << bbo->exchange << " " << bbo->symbol << " " << bbo->time << " " << bbo->price << " " << bbo->quantity << std::endl;
         } else {

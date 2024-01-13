@@ -8,46 +8,40 @@
 
 #define LOGHEAD "[Strategy::" + std::string(__func__) + "]"
 
-namespace {
-struct Self {
-    core::message::message::CommandChannel *command_channel = nullptr;
-    core::message::message::MarketChannel *market_channel = nullptr;
-};
-} // namespace 
-
 
 class Strategy {
 public:
-    Strategy() : self( *new ::Self{} ) {}
-    virtual ~Strategy() {
-        delete &self;
-    }
+    Strategy() {}
+    virtual ~Strategy() {}
 
 public:
-    virtual std::string project_name() = 0;
-    virtual core::datas::MessageType message_type() = 0;
+    std::string project_name() { return _project_name; }
+    void project_name(std::string name) { _project_name = name; }
 
-    virtual void task() = 0;
+    core::datas::MessageType message_type() { return _message_type; }
+    void message_type(core::datas::MessageType type) { _message_type = type; }
 
-    virtual void on_market_bbo(core::datas::Market_bbo* bbo) {}
-    virtual void on_market_depth(core::datas::Market_depth* depth) {}
-    virtual void on_market_kline(core::datas::Market_kline* kline) {}
+    void set_task(std::function<void()> func) { task = func; }
+
+    void set_on_market_bbo(std::function<void(core::datas::Market_bbo*)> func) { on_market_bbo = func; }
+    void set_on_market_depth(std::function<void(core::datas::Market_depth*)> func) { on_market_depth = func; }
+    void set_on_market_kline(std::function<void(core::datas::Market_kline*)> func) { on_market_kline = func; }
     
-    virtual void on_market() = 0;
-    virtual void on_traded() = 0;
-    virtual void on_order() = 0;
+    void set_on_market(std::function<void()> func) { on_market = func; }
+    void set_on_traded(std::function<void()> func) { on_traded = func; }
+    void set_on_order(std::function<void()> func) { on_order = func; }
 
 public:
     virtual bool subscribe(core::datas::SymbolObj symbols) final {
         core::datas::SymbolObj obj = std::move(symbols);
         obj.command_type = core::datas::CommandType::SUBSCRIBE;
-        return self.command_channel->write(obj);
+        return command_channel->write(obj);
     }
 
     virtual bool unsubscribe(core::datas::SymbolObj symbols) final {
         core::datas::SymbolObj obj = std::move(symbols);
         obj.command_type = core::datas::CommandType::UNSUBSCRIBE;
-        return self.command_channel->write(obj);
+        return command_channel->write(obj);
     }
 
     virtual bool order() final {
@@ -61,16 +55,17 @@ public:
     virtual void run() final {
         custom_init();
 
-        std::thread task_thread(std::bind(&Strategy::task, this));
+        assert(task && "Please set the task!");
+        std::thread task_thread(task);
         task_thread.detach();
 
-        uint64_t command_displacement = self.command_channel->earliest_displacement();
-        uint64_t market_displacement = self.market_channel->earliest_displacement();
+        uint64_t command_displacement = command_channel->earliest_displacement();
+        uint64_t market_displacement = market_channel->earliest_displacement();
         while (true) {
             /*****************/
             /* read commands */
             /*****************/
-            std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = self.command_channel->read_next(command_displacement);
+            std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = command_channel->read_next(command_displacement);
             if (command_pair.first) {
                 switch (command_pair.first->command_type) {
                 case core::datas::CommandType::SUBSCRIBE:
@@ -90,26 +85,26 @@ public:
             /*****************/
             /** read market **/
             /*****************/
-            std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> market_pair = self.market_channel->read_next(market_displacement);
+            std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> market_pair = market_channel->read_next(market_displacement);
             if (market_pair.first) {
                 switch (market_pair.first->market_type) {
                 case core::datas::MarketType::Bbo: {
                     core::datas::Market_bbo* obj = reinterpret_cast<core::datas::Market_bbo*>(market_pair.first);
-                    if (obj) {
+                    if (obj && on_market_bbo) {
                         on_market_bbo(std::move(obj));
                     }
                     break;
                 }
                 case core::datas::MarketType::Depth: {
                     core::datas::Market_depth* obj = reinterpret_cast<core::datas::Market_depth*>(market_pair.first);
-                    if (obj) {
+                    if (obj && on_market_depth) {
                         on_market_depth(std::move(obj));
                     }
                     break;
                 }
                 case core::datas::MarketType::Kline: {
                     core::datas::Market_kline* obj = reinterpret_cast<core::datas::Market_kline*>(market_pair.first);
-                    if (obj) {
+                    if (obj && on_market_kline) {
                         on_market_kline(std::move(obj));
                     }
                     break;
@@ -130,11 +125,11 @@ private:
 
         switch (type) {
         case core::datas::MessageType::ShareMemory: {
-            self.command_channel = new core::message::message::CommandChannel(proj, 40 * MB);
-            self.market_channel = new core::message::message::MarketChannel(proj, 40 * MB);
+            command_channel = new core::message::message::CommandChannel(proj, 40 * MB);
+            market_channel = new core::message::message::MarketChannel(proj, 40 * MB);
 
-            assert(self.command_channel != nullptr);
-            assert(self.market_channel != nullptr);
+            assert(command_channel != nullptr);
+            assert(market_channel != nullptr);
             break;
         }
         default:
@@ -144,7 +139,23 @@ private:
     }
 
 private:
-    Self &self;
+    core::message::message::CommandChannel *command_channel = nullptr;
+    core::message::message::MarketChannel *market_channel = nullptr;
+
+private:
+    std::string _project_name;
+    core::datas::MessageType _message_type;
+
+private:
+    std::function<void()> task;
+
+    std::function<void(core::datas::Market_bbo*)> on_market_bbo;
+    std::function<void(core::datas::Market_depth*)> on_market_depth;
+    std::function<void(core::datas::Market_kline*)> on_market_kline;
+
+    std::function<void()> on_market;
+    std::function<void()> on_traded;
+    std::function<void()> on_order;
 };
 
 #undef LOGHEAD
