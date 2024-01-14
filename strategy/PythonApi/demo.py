@@ -5,11 +5,11 @@ class MyStrategy(Strategy):
     def __init__(self):
         Strategy.__init__(self)
 
-    def project_name(self):
-        return "Bybit"
-    
-    def message_type(self):
-        return MessageType.ShareMemory
+        super().project_name("Bybit")
+        super().message_type(MessageType.ShareMemory)
+
+        super().set_task(lambda: self.task())
+        super().set_on_market_bbo(lambda bbo: self.on_market_bbo(bbo))
     
     def task(self):
         obj = SymbolObj()
@@ -21,5 +21,10 @@ class MyStrategy(Strategy):
         while True:
             pass
 
-t = MyStrategy()
-t.run()
+    def on_market_bbo(self, bbo):
+        print(bbo.exchange, bbo.symbol, bbo.time, bbo.price)
+
+
+if __name__ == "__main__":
+    t = MyStrategy()
+    t.run()
