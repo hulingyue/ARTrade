@@ -52,13 +52,7 @@ public:
         return false;
     }
 
-    virtual void run() final {
-        custom_init();
-
-        assert(task && "Please set the task!");
-        std::thread task_thread(task);
-        task_thread.detach();
-
+    virtual void monitor() final {
         uint64_t command_displacement = command_channel->earliest_displacement();
         uint64_t market_displacement = market_channel->earliest_displacement();
         while (true) {
@@ -115,6 +109,17 @@ public:
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
+    virtual void run() final {
+        custom_init();
+
+        std::thread task_thread(std::bind(&Strategy::monitor, this));
+        task_thread.detach();
+
+        if (task) {
+            task();
         }
     }
 
