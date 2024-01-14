@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/functional.h>
 #include <pybind11/numpy.h>
 #include <core/datas.hpp>
 #include "strategy.hpp"
@@ -28,34 +29,6 @@ std::array<T, N> convert_from_numpy_array(py::array_t<T> array) {
     return result;
 }
 
-class PyStrategy : public Strategy {
-public:
-    using Strategy::Strategy;
-
-    std::string project_name() override {
-        PYBIND11_OVERLOAD_PURE(std::string, Strategy, project_name,);
-    }
-
-    core::datas::MessageType message_type() override {
-        PYBIND11_OVERLOAD_PURE(core::datas::MessageType, Strategy, message_type);
-    }
-
-    void task() override {
-        PYBIND11_OVERLOAD_PURE(void, Strategy, task,);
-    }
-
-    void on_market() override {
-        PYBIND11_OVERLOAD_PURE(void, Strategy, on_market);
-    }
-
-    void on_traded() override {
-        PYBIND11_OVERLOAD_PURE(void, Strategy, on_traded);
-    }
-
-    void on_order() override {
-        PYBIND11_OVERLOAD_PURE(void, Strategy, on_order);
-    }
-};
 
 PYBIND11_MODULE(pystrategy, m) {
     py::class_<MarketOperateResult>(m, "MarketOperateResult")
@@ -229,16 +202,19 @@ PYBIND11_MODULE(pystrategy, m) {
             }
         );
 
-    py::class_<Strategy, PyStrategy, std::shared_ptr<Strategy>>(m, "Strategy")
+    py::class_<Strategy, std::shared_ptr<Strategy>>(m, "Strategy")
         .def(py::init<>())
-        .def("project_name", &Strategy::project_name)
-        .def("task", &Strategy::task)
-        .def("on_market_bbo", &Strategy::on_market_bbo)
-        .def("on_market_depth", &Strategy::on_market_depth)
-        .def("on_market_kline", &Strategy::on_market_kline)
-        .def("on_market", &Strategy::on_market)
-        .def("on_traded", &Strategy::on_traded)
-        .def("on_order", &Strategy::on_order)
+        .def("project_name", (std::string (Strategy::*)()) &Strategy::project_name)
+        .def("project_name", (void (Strategy::*)(std::string)) &Strategy::project_name)
+        .def("message_type", (core::datas::MessageType (Strategy::*)()) &Strategy::message_type)
+        .def("message_type", (void (Strategy::*)(core::datas::MessageType)) &Strategy::message_type)
+        .def("set_task", &Strategy::set_task)
+        .def("set_on_market_bbo", &Strategy::set_on_market_bbo)
+        .def("set_on_market_depth", &Strategy::set_on_market_depth)
+        .def("set_on_market_kline", &Strategy::set_on_market_kline)
+        .def("set_on_market", &Strategy::set_on_market)
+        .def("set_on_traded", &Strategy::set_on_traded)
+        .def("set_on_order", &Strategy::set_on_order)
         .def("subscribe", &Strategy::subscribe)
         .def("unsubscribe", &Strategy::unsubscribe)
         .def("order", &Strategy::order)
