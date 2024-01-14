@@ -115,8 +115,8 @@ public:
     virtual void run() final {
         custom_init();
 
-        std::thread task_thread(std::bind(&Strategy::monitor, this));
-        task_thread.detach();
+        std::thread monitor_thread(std::bind(&Strategy::monitor, this));
+        monitor_thread.detach();
 
         if (task) {
             task();
