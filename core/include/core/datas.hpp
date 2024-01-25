@@ -214,5 +214,28 @@ struct alignas(64) CommandDataHeader {
 /****   ShareMemory Data Header - end   ***/
 /******************************************/
 
+enum class InstrumentType {
+      SPOT    // 现货
+    , Future  // 期货 | 合约
+    , Option  // 期权
+    , Bond    // 债券
+};
+
+struct Instruments {
+    InstrumentType type;
+    std::string symbol;
+    int log_size;
+    double price_scale;
+
+    double min_leverage;
+    double max_leverage;
+    double leverage_scale;
+
+    double min_quantity;
+    double max_quantity;
+    double quantity_scale;
+
+    std::string expire;
+};
 
 } // namespace core::datas
