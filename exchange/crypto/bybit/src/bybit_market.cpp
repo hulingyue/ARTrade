@@ -15,7 +15,7 @@ struct Self {
     int interval = 0;
 
     // market
-    std::unordered_map<char*, double> MarketBBOPrices;
+    std::unordered_map<std::string_view, double> MarketBBOPrices;
 
     ~Self() {
         if (client) delete client;
@@ -152,10 +152,10 @@ void BybitMarket::on_message(const std::string &msg) {
         obj.time = message["ts"].get<uint64_t>();
         if (message["data"].is_null() || message["data"]["lastPrice"].is_null()) {
             // Bybit 首条数据一定是snapshot，所以理论上不必判断key是否存在
-            obj.price = self.MarketBBOPrices[obj.symbol];
+            obj.price = self.MarketBBOPrices[symbols];
         } else {
             obj.price = std::stod(message["data"]["lastPrice"].get<std::string>());
-            self.MarketBBOPrices[obj.symbol] = obj.price;
+            self.MarketBBOPrices[symbols] = obj.price;
         }
         obj.quantity = 0;
 
