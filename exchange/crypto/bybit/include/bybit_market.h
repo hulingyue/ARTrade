@@ -22,6 +22,8 @@ public:
     void interval_1s();
 
 private:
+    void instruments();
+
     void on_open();
     void on_close();
     void on_message(std::string const &msg);

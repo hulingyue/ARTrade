@@ -1,5 +1,7 @@
 #include "bybit_market.h"
 #include <core/util.h>
+#include <core/http/util.hpp>
+#include <core/http/client.h>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <regex>
@@ -10,6 +12,7 @@ using namespace core::websocket::client;
 
 namespace {
 struct Self {
+    core::http::client::HttpClient http_client;
     std::atomic<bool> is_ready;
     WebSocketClient *client = nullptr;
     int interval = 0;
@@ -105,6 +108,45 @@ void BybitMarket::interval_1s() {
     if (self.interval % 30 == 0) {
         ping();
     }
+}
+
+void BybitMarket::instruments() {
+    auto config = core::config::Config::get();
+    bool is_test = config.value("is_test", true);
+    std::string base_url = is_test ? config.value("trade_test_restful_url", "") : config.value("trade_restful_url", "");
+    std::string category = config.value("is_spot", true) ? "spot" : "linear";
+    self.http_client.set_uri(base_url);
+    
+    std::string url = "/v5/market/instruments-info?category=" + category;// + "&limit=1000";
+
+    httplib::Headers headers = {{"Content-Type", "application/json"}};
+    self.http_client.set_header(headers);
+
+    httplib::Result res = self.http_client.get(url);
+
+    if (!res) {
+        spdlog::error("{} url: {}", LOGHEAD, url);
+        return;
+    }
+
+    if (res->status != 200) {
+        spdlog::error("{} url: {} state: {}", LOGHEAD, url, res->status);
+        return;
+    }
+
+    nlohmann::json message = nlohmann::json::parse(res->body);
+    if (message["retCode"] != 0 || message["retMsg"] != "OK") {
+        spdlog::error("{} url: {} state: {} retCode: {} retMsg: {}", LOGHEAD, url, res->status, message["retCode"], message["retMsg"]);
+        return;
+    }
+
+    message = message["result"]["list"];
+
+    for (nlohmann::json item: message) {
+        std::cout << item["symbol"] << std::endl;
+    }
+
+    return;
 }
 
 /***********************/
