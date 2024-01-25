@@ -149,7 +149,7 @@ void BybitMarket::on_message(const std::string &msg) {
         obj.market_type = core::datas::MarketType::Bbo;
         std::strcpy(obj.symbol, symbols.c_str());
         std::strcpy(obj.exchange, "Bybit");
-        obj.time = message.value("ts", 0);
+        obj.time = message["ts"].get<uint64_t>();
         if (message["data"].is_null() || message["data"]["lastPrice"].is_null()) {
             // Bybit 首条数据一定是snapshot，所以理论上不必判断key是否存在
             obj.price = self.MarketBBOPrices[obj.symbol];
