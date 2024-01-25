@@ -214,11 +214,11 @@ struct alignas(64) CommandDataHeader {
 /****   ShareMemory Data Header - end   ***/
 /******************************************/
 
-enum class InstrumentType {
-      SPOT    // 现货
-    , Future  // 期货 | 合约
-    , Option  // 期权
-    , Bond    // 债券
+enum class InstrumentType: char {
+      SPOT    = 'S'  // 现货
+    , Future  = 'F'  // 期货 | 合约
+    , Option  = 'O'  // 期权
+    , Bond    = 'B'  // 债券
 };
 
 struct Instruments {
