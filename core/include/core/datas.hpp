@@ -224,7 +224,7 @@ struct InstrumentType {
         , Bond      // 债券
     };
 
-    static std::string to_string(core::datas::InstrumentType::Type type) {
+    static std::string to_string(Type type) {
         switch (type) {
         case Type::SPOT: { return "SPOT"; }
         case Type::Future: { return "Future"; }
@@ -234,7 +234,7 @@ struct InstrumentType {
         }
     }
 
-    static core::datas::InstrumentType::Type from_string(std::string type) {
+    static Type from_string(std::string type) {
         if ("SPOT" == type) { return Type::SPOT; }
         else if ("Future" == type) { return Type::Future; }
         else if ("Option" == type) { return Type::Option; }
