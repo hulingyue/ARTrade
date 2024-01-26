@@ -259,20 +259,18 @@ struct Instruments {
 
     std::string expire;
 
-    void to_json(nlohmann::json &j) const {
-        j = nlohmann::json{
-            {"type", InstrumentType::to_string(type)},
-            {"symbol", symbol},
-            {"log_size", log_size},
-            {"price_scale", price_scale},
-            {"min_leverage", min_leverage},
-            {"max_leverage", max_leverage},
-            {"leverage_scale", leverage_scale},
-            {"min_quantity", min_quantity},
-            {"max_quantity", max_quantity},
-            {"quantity_scale", quantity_scale},
-            {"expire", expire}
-        };
+    void to_json(nlohmann::ordered_json &j) const {
+        j["type"] = InstrumentType::to_string(type);
+        j["symbol"] = symbol;
+        j["log_size"] = log_size;
+        j["price_scale"] = price_scale;
+        j["min_leverage"] = min_leverage;
+        j["max_leverage"] = max_leverage;
+        j["leverage_scale"] = leverage_scale;
+        j["min_quantity"] = min_quantity;
+        j["max_quantity"] = max_quantity;
+        j["quantity_scale"] = quantity_scale;
+        j["expire"] = expire;
     }
 
     void from_json(const nlohmann::json& j) {
