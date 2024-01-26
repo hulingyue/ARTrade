@@ -272,15 +272,15 @@ bool Modules::save_instruments() {
     std::string instruments_path = (core::util::config_path() / std::filesystem::path("instruments.json")).string();
     std::ofstream file(instruments_path);
 
-    std::vector<core::datas::Instruments> vector_instruments(self.map_instruments.size());
-    nlohmann::ordered_json  j = nlohmann::ordered_json::array();
-    for (const auto& pair: self.map_instruments) {
-        nlohmann::ordered_json instrumentJson;
-        pair.second->to_json(instrumentJson);
-        j.push_back(instrumentJson);
-    }
-
     if (file.is_open()) {
+        std::vector<core::datas::Instruments> vector_instruments(self.map_instruments.size());
+        nlohmann::ordered_json  j = nlohmann::ordered_json::array();
+        for (const auto& pair: self.map_instruments) {
+            nlohmann::ordered_json instrumentJson;
+            pair.second->to_json(instrumentJson);
+            j.push_back(instrumentJson);
+        }
+
         file << j.dump(4);
         file.close();
         spdlog::info("{} save instruments success!", LOGHEAD);
