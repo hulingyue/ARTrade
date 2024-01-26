@@ -34,6 +34,10 @@ public:
     virtual void interval_1s();
 
 public:
+    void add_instrument(core::datas::Instruments *instrument);
+    core::datas::Instruments* find_instrument(std::string symbol);
+
+public:
     virtual std::string project_name() = 0;
     virtual core::datas::MessageType message_type() = 0;
 

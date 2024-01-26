@@ -18,6 +18,8 @@ struct Self {
     core::message::message::MarketChannel *market_channel = nullptr;
     core::message::message::CommandChannel *command_channel = nullptr;
 
+    std::unordered_map<std::string, core::datas::Instruments*> map_instruments;
+
     ~Self() {
         if (market) { delete market; }
         if (trade) { delete trade; }
@@ -248,6 +250,19 @@ void Modules::run() {
 
 void Modules::interval_1s() {
     spdlog::info("{}", LOGHEAD);
+}
+
+void Modules::add_instrument(core::datas::Instruments *instrument) {
+    // if (!instrument) { return; }
+    self.map_instruments[instrument->symbol] = instrument;
+    std::cout << self.map_instruments.size() << std::endl;
+}
+
+core::datas::Instruments* Modules::find_instrument(std::string symbol) {
+    if (self.map_instruments.find(symbol) != self.map_instruments.end()) {
+        return self.map_instruments[symbol];
+    }
+    return nullptr;
 }
 
 } // namespace core::modules
