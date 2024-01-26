@@ -120,6 +120,7 @@ void BybitTrade::init() {
 }
 
 bool BybitTrade::is_ready() {
+    return true;
     return self.is_ready.load();
 }
 

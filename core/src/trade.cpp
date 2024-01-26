@@ -3,7 +3,8 @@
 
 namespace {
 struct Self {
-    core::message::Message* message;
+    core::message::Message* message = nullptr;
+    core::modules::Modules* modules = nullptr;
 };
 }
 
@@ -21,6 +22,9 @@ Trade::~Trade() {
 void Trade::set_message(core::message::Message* message) {
     self.message = message;
 }
+
+void Trade::set_modules(core::modules::Modules* modules) { self.modules = modules; }
+core::modules::Modules* Trade::modules() { return self.modules; }
 
 /*****************************/
 /** event                   **/

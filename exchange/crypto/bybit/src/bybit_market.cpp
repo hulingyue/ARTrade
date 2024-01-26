@@ -142,10 +142,9 @@ void BybitMarket::instruments() {
 
     message = message["result"]["list"];
 
-    std::vector<core::datas::Instruments> instruments;
     for (nlohmann::json item: message) {
         if (item["status"] != "Trading") { continue; }
-        instruments.emplace_back(core::datas::Instruments{
+        core::datas::Instruments* instrument = new core::datas::Instruments {
             .type = core::datas::InstrumentType::Future,
             .symbol = item["symbol"],
             .log_size = 1,
@@ -156,10 +155,9 @@ void BybitMarket::instruments() {
             .min_quantity = std::stod(std::string(item["lotSizeFilter"]["minOrderQty"])),
             .max_quantity = std::stod(std::string(item["lotSizeFilter"]["maxOrderQty"])),
             .quantity_scale = std::stod(std::string(item["lotSizeFilter"]["qtyStep"]))
-        });
+        };
+        modules()->add_instrument(instrument);
     }
-
-    spdlog::info("{} instrument's size: {}", LOGHEAD, instruments.size());
 
     return;
 }

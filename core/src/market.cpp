@@ -4,6 +4,7 @@
 namespace {
 struct Self {
     core::message::message::MarketChannel *channel = nullptr;
+    core::modules::Modules* modules = nullptr;
 };
 }
 
@@ -28,6 +29,9 @@ void Market::set_channel(core::message::message::MarketChannel *channel) {
     }
     self.channel = channel;
 }
+
+void Market::set_modules(core::modules::Modules* modules) { self.modules = modules; }
+core::modules::Modules* Market::modules() { return self.modules; }
 
 /*****************************/
 /** event                   **/

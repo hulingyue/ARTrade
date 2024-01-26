@@ -135,11 +135,14 @@ void Modules::custom_init() {
     if (self.market) {
         self.market->set_channel(self.market_channel);
         self.market->init();
+        self.market->set_modules(this);
+        self.market->instruments();
     }
     self.command_channel = new core::message::message::CommandChannel(proj, 40 * MB);
     if (self.trade) {
         // self.trade->set_message(self.command_channel);
         self.trade->init();
+        self.trade->set_modules(this);
     }
 }
 
@@ -255,7 +258,6 @@ void Modules::interval_1s() {
 void Modules::add_instrument(core::datas::Instruments *instrument) {
     // if (!instrument) { return; }
     self.map_instruments[instrument->symbol] = instrument;
-    std::cout << self.map_instruments.size() << std::endl;
 }
 
 core::datas::Instruments* Modules::find_instrument(std::string symbol) {

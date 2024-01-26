@@ -9,6 +9,10 @@
 #include "datas.hpp"
 
 
+// forward declaration
+namespace core::api::market { class Market; }
+namespace core::api::trade { class Trade; }
+
 namespace core::modules {
 
 class Modules {
@@ -36,6 +40,7 @@ public:
 public:
     void add_instrument(core::datas::Instruments *instrument);
     core::datas::Instruments* find_instrument(std::string symbol);
+    bool save_instruments();
 
 public:
     virtual std::string project_name() = 0;

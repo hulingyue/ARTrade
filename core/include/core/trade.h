@@ -1,12 +1,12 @@
 #pragma once 
 #include "datas.hpp"
 #include "pimpl.h"
+#include "modules.h"
 
 
 // forward declaration
-namespace core::message {
-    class Message;
-}
+namespace core::message { class Message; }
+namespace core::modules { class Modules; }
 
 
 namespace core::api::trade {
@@ -25,6 +25,8 @@ class Trade {
         virtual TradeOperateResult cancel(core::datas::CancelObj const &order) = 0;
 
         virtual void set_message(core::message::Message* messsage) final;
+        virtual void set_modules(core::modules::Modules* modules) final;
+        virtual core::modules::Modules* modules() final;
     
         // event
     private:
