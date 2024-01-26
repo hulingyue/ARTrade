@@ -145,7 +145,7 @@ void BybitMarket::instruments() {
     for (nlohmann::json item: message) {
         if (item["status"] != "Trading") { continue; }
         core::datas::Instruments* instrument = new core::datas::Instruments {
-            .type = core::datas::InstrumentType::Future,
+            .type = core::datas::InstrumentType::Type::Future,
             .symbol = item["symbol"],
             .log_size = 1,
             .price_scale = pow(10, -1 * std::stoi(std::string(item["priceScale"]))),

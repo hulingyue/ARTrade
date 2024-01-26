@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <cstring>
+#include <nlohmann/json.hpp>
 
 namespace core::datas {
 static const int SUBSCRIBE_MAX_SIZE = 10;
@@ -214,15 +215,36 @@ struct alignas(64) CommandDataHeader {
 /****   ShareMemory Data Header - end   ***/
 /******************************************/
 
-enum class InstrumentType: char {
-      SPOT    = 'S'  // 现货
-    , Future  = 'F'  // 期货 | 合约
-    , Option  = 'O'  // 期权
-    , Bond    = 'B'  // 债券
+struct InstrumentType {
+    enum class Type {
+          UNKNOW    // 未知
+        , SPOT      // 现货
+        , Future    // 期货 | 合约
+        , Option    // 期权
+        , Bond      // 债券
+    };
+
+    static std::string to_string(core::datas::InstrumentType::Type type) {
+        switch (type) {
+        case Type::SPOT: { return "SPOT"; }
+        case Type::Future: { return "Future"; }
+        case Type::Option: { return "Option"; }
+        case Type::Bond: { return "Bond"; }
+        default: { return "UNKNOW"; }
+        }
+    }
+
+    static core::datas::InstrumentType::Type from_string(std::string type) {
+        if ("SPOT" == type) { return Type::SPOT; }
+        else if ("Future" == type) { return Type::Future; }
+        else if ("Option" == type) { return Type::Option; }
+        else if ("Bond" == type) { return Type::Bond; }
+        else { return Type::UNKNOW; }
+    }
 };
 
 struct Instruments {
-    InstrumentType type;
+    InstrumentType::Type type;
     std::string symbol;
     int log_size;
     double price_scale;
@@ -236,6 +258,36 @@ struct Instruments {
     double quantity_scale;
 
     std::string expire;
+
+    void to_json(nlohmann::json &j) const {
+        j = nlohmann::json{
+            {"type", InstrumentType::to_string(type)},
+            {"symbol", symbol},
+            {"log_size", log_size},
+            {"price_scale", price_scale},
+            {"min_leverage", min_leverage},
+            {"max_leverage", max_leverage},
+            {"leverage_scale", leverage_scale},
+            {"min_quantity", min_quantity},
+            {"max_quantity", max_quantity},
+            {"quantity_scale", quantity_scale},
+            {"expire", expire}
+        };
+    }
+
+    void from_json(const nlohmann::json& j) {
+        InstrumentType::from_string(j.at("type").get<std::string>());
+        j.at("symbol").get_to(symbol);
+        j.at("log_size").get_to(log_size);
+        j.at("price_scale").get_to(price_scale);
+        j.at("min_leverage").get_to(min_leverage);
+        j.at("max_leverage").get_to(max_leverage);
+        j.at("leverage_scale").get_to(leverage_scale);
+        j.at("min_quantity").get_to(min_quantity);
+        j.at("max_quantity").get_to(max_quantity);
+        j.at("quantity_scale").get_to(quantity_scale);
+        j.at("expire").get_to(expire);
+    }
 };
 
 } // namespace core::datas

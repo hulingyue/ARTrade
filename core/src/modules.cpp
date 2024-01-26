@@ -137,6 +137,7 @@ void Modules::custom_init() {
         self.market->init();
         self.market->set_modules(this);
         self.market->instruments();
+        save_instruments();
     }
     self.command_channel = new core::message::message::CommandChannel(proj, 40 * MB);
     if (self.trade) {
@@ -265,6 +266,30 @@ core::datas::Instruments* Modules::find_instrument(std::string symbol) {
         return self.map_instruments[symbol];
     }
     return nullptr;
+}
+
+bool Modules::save_instruments() {
+    std::string instruments_path = (core::util::config_path() / std::filesystem::path("instruments.json")).string();
+    std::ofstream file(instruments_path);
+
+    std::vector<core::datas::Instruments> vector_instruments(self.map_instruments.size());
+    nlohmann::json j = nlohmann::json::array();
+    for (const auto& pair: self.map_instruments) {
+        nlohmann::json instrumentJson;
+        pair.second->to_json(instrumentJson);
+        j.push_back(instrumentJson);
+    }
+
+    if (file.is_open()) {
+        file << j.dump(4);
+        file.close();
+        spdlog::info("{} save instruments success!", LOGHEAD);
+        return true;
+    }
+
+    spdlog::error("{} cannot open {}", LOGHEAD, instruments_path);
+    return false;
+
 }
 
 } // namespace core::modules
