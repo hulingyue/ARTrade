@@ -34,7 +34,7 @@ struct Self {
 };
 
 void update_headers(Self *self, const nlohmann::json& parameters, const std::string method) {
-    std::string timestamp = std::to_string(core::time::Time::now_millisecond());
+    std::string timestamp = std::to_string(core::time::Time().to_nanoseconds());
 
     std::string sign;
     static const std::string recv_window = "5000";
@@ -215,7 +215,7 @@ void BybitTrade::on_open() {
     json_obj["req_id"] = self.reqid;
     json_obj["op"] = "auth";
 
-    auto exipres = core::time::Time::now_millisecond() + 1000;
+    auto exipres = core::time::Time().to_nanoseconds() + 1000;
     json_obj["args"] = {
         self.api_key,
         exipres,

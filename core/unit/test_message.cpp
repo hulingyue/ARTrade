@@ -24,7 +24,7 @@ TEST_F(MarketChannelTest, WriteTest) {
     bbo.market_type = core::datas::MarketType::Bbo;
     std::strcpy(bbo.symbol, "BTCUSDT");
     std::strcpy(bbo.exchange, "Bybit");
-    bbo.time = core::time::Time::now_nanosecond();
+    bbo.time = core::time::Time().to_nanoseconds();
     bbo.price = 40000.2;
     bbo.quantity = 23432.1;
     
@@ -43,7 +43,7 @@ TEST_F(MarketChannelTest, ReadTest) {
     bbo.market_type = core::datas::MarketType::Bbo;
     std::strcpy(bbo.symbol, "BTCUSDT");
     std::strcpy(bbo.exchange, "Bybit");
-    bbo.time = core::time::Time::now_nanosecond();
+    bbo.time = core::time::Time().to_nanoseconds();
     bbo.price = 40000.2;
     bbo.quantity = 23432.1;
 
@@ -52,7 +52,7 @@ TEST_F(MarketChannelTest, ReadTest) {
     uint64_t displacement = channel->earliest_displacement();
     std::pair<core::datas::Market_base*, core::datas::MarketDataHeader*> market_pair = std::make_pair(nullptr, nullptr);
     for(int index = 0; index < count; index++) {
-        bbo.time = core::time::Time::now_nanosecond();
+        bbo.time = core::time::Time().to_nanoseconds();
         if (index % 2 == 0) {
             memcpy(bbo.symbol, "BTCUSDT", 16);
         } else {
