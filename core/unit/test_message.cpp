@@ -20,16 +20,13 @@ protected:
 };
 
 TEST_F(MarketChannelTest, WriteTest) {
-    core::datas::Market_bbo bbo{
-        {
-            .market_type = core::datas::MarketType::Bbo,
-            .symbol = "BTCUSDT",
-            .exchange = "Bybit",
-            .time = core::time::Time::now_nanosecond()
-        },
-        .price = 40000.2,
-        .quantity = 23432.1
-    };
+    core::datas::Market_bbo bbo;
+    bbo.market_type = core::datas::MarketType::Bbo;
+    std::strcpy(bbo.symbol, "BTCUSDT");
+    std::strcpy(bbo.exchange, "Bybit");
+    bbo.time = core::time::Time::now_nanosecond();
+    bbo.price = 40000.2;
+    bbo.quantity = 23432.1;
     
     uint64_t displacement = 0;
     while (true) {
@@ -42,16 +39,13 @@ TEST_F(MarketChannelTest, WriteTest) {
 }
 
 TEST_F(MarketChannelTest, ReadTest) {
-    core::datas::Market_bbo bbo{
-        {
-            .market_type = core::datas::MarketType::Bbo,
-            .symbol = "BTCUSDT",
-            .exchange = "Bybit",
-            .time = core::time::Time::now_nanosecond()
-        },
-        .price = 40000.2,
-        .quantity = 23432.1
-    };
+    core::datas::Market_bbo bbo;
+    bbo.market_type = core::datas::MarketType::Bbo;
+    std::strcpy(bbo.symbol, "BTCUSDT");
+    std::strcpy(bbo.exchange, "Bybit");
+    bbo.time = core::time::Time::now_nanosecond();
+    bbo.price = 40000.2;
+    bbo.quantity = 23432.1;
 
     int count = 10000;
 
