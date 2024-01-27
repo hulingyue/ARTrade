@@ -9,7 +9,7 @@
 	url = https://github.com/nlohmann/json.git
 [submodule "core/3rd/websocketpp"]
 	path = core/3rd/websocketpp
-	url = https://github.com/zaphoyd/websocketpp
+	url = https://github.com/hulingyue/websocketpp
 [submodule "core/3rd/CLI11"]
 	path = core/3rd/CLI11
 	url = https://github.com/CLIUtils/CLI11.git
