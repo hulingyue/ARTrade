@@ -1,3 +1,6 @@
+mod strategy;
+
+
 fn main() {
-    println!("Hello, world!");
+    let _ = strategy::ffi::MessageType::ShareMemory;
 }
