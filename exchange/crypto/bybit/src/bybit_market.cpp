@@ -106,7 +106,7 @@ MarketOperateResult BybitMarket::unsubscribe(const std::vector<std::string> symb
 
 void BybitMarket::interval_1s() {
     self.interval += 1;
-    if (self.interval % 30 == 0) {
+    if (self.interval % 20 == 0) {
         ping();
     }
 }
