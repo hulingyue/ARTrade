@@ -13,13 +13,12 @@ class Time {
 public:
     Time() {
         _time_point = std::chrono::system_clock::now();
-        _time = _time_point.time_since_epoch();
-        std::time_t tt = std::chrono::system_clock::to_time_t(_time_point);
-        _time_member = std::localtime(&tt);
+        init();
     }
 
     Time(int year, int month, int day, int hour, int minute, int second) {
-        // todo
+        _time_point = std::chrono::time_point<std::chrono::system_clock>(std::chrono::hours(hour) + std::chrono::minutes(minute) + std::chrono::seconds(second) + std::chrono::duration_cast<std::chrono::seconds>(std::chrono::hours(24)*(day-1)) + std::chrono::duration_cast<std::chrono::seconds>(std::chrono::hours(24)*30)*(month-1) + std::chrono::duration_cast<std::chrono::seconds>(std::chrono::hours(24)*365)*(year-1970));
+        init();
     }
 
 public:
@@ -64,6 +63,13 @@ public:
             time_format[24] = '\0';
         }
         return std::string(time_format);
+    }
+
+private:
+    void init() {
+        _time = _time_point.time_since_epoch();
+        std::time_t tt = std::chrono::system_clock::to_time_t(_time_point);
+        _time_member = std::localtime(&tt);
     }
 
 private:
