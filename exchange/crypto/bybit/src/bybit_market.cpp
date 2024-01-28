@@ -97,10 +97,12 @@ static MarketOperateResult market_evene(Self &self, std::string op, const std::v
 }
 
 MarketOperateResult BybitMarket::subscribe(const std::vector<std::string> symbols) {
+    // tudo: symbol转换
     return market_evene(self, "subscribe", std::move(symbols));
 }
 
 MarketOperateResult BybitMarket::unsubscribe(const std::vector<std::string> symbols) {
+    // tudo: symbol转换
     return market_evene(self, "unsubscribe", std::move(symbols));
 }
 
