@@ -2,6 +2,7 @@
 #include <core/util.h>
 #include <core/http/util.hpp>
 #include <core/http/client.h>
+#include <core/time.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <regex>
@@ -154,7 +155,8 @@ void BybitMarket::instruments() {
             .leverage_scale = std::stod(std::string(item["leverageFilter"]["leverageStep"])),
             .min_quantity = std::stod(std::string(item["lotSizeFilter"]["minOrderQty"])),
             .max_quantity = std::stod(std::string(item["lotSizeFilter"]["maxOrderQty"])),
-            .quantity_scale = std::stod(std::string(item["lotSizeFilter"]["qtyStep"]))
+            .quantity_scale = std::stod(std::string(item["lotSizeFilter"]["qtyStep"])),
+            .expire = core::time::Time(2099, 12, 31, 23, 59, 59).to_string()
         };
         modules()->add_instrument(instrument);
     }
