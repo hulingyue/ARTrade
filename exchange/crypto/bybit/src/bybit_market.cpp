@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <regex>
+#include <core/orderbook.hpp>
 
 
 #define LOGHEAD "[BybitMarket::" + std::string(__func__) + "]"
@@ -20,7 +21,7 @@ struct Self {
 
     // market
     std::unordered_map<std::string_view, double> MapMarketBbo;
-    std::unordered_map<std::string_view, core::datas::Market_depth> MapMarketOrderBooks;
+    std::unordered_map<std::string_view, core::orderbook::OrderBook> MapOrderBooks;
 
     ~Self() {
         if (client) delete client;
@@ -226,7 +227,12 @@ void BybitMarket::on_message(const std::string &msg) {
 
             save_pairs(message["data"]["a"], symbols, "asks");
             save_pairs(message["data"]["b"], symbols, "bids");
-            self.MapMarketOrderBooks[symbols] = obj;
+
+            auto it = self.MapOrderBooks.find(symbols);
+            if (it == self.MapOrderBooks.end()) {
+                // self.MapOrderBooks[symbols] = core::orderbook::OrderBook(core::datas::MARKET_MAX_DEPTH);
+            }
+
         } else {
             return;
         }
