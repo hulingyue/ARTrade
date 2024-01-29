@@ -46,4 +46,9 @@ void Market::on_market(core::datas::Market_kline &obj) {
     self.channel->write(obj);
 }
 
+void Market::on_market(core::datas::Market_depth &obj) {
+    if (self.channel == nullptr) { return; }
+    self.channel->write(obj);
+}
+
 } // core::api::market
