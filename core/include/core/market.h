@@ -36,6 +36,7 @@ class Market {
 
         // event
         void on_market(core::datas::Market_bbo &obj);
+        void on_market(core::datas::Market_kline &obj);
     private:
         Self &self;
 };         

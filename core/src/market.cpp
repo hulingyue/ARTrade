@@ -37,10 +37,12 @@ core::modules::Modules* Market::modules() { return self.modules; }
 /** event                   **/
 /*****************************/
 void Market::on_market(core::datas::Market_bbo &obj) {
-    if (self.channel == nullptr) {
-        return;
-    }
+    if (self.channel == nullptr) { return; }
+    self.channel->write(obj);
+}
 
+void Market::on_market(core::datas::Market_kline &obj) {
+    if (self.channel == nullptr) { return; }
     self.channel->write(obj);
 }
 
