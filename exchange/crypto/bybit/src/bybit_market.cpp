@@ -222,7 +222,39 @@ void BybitMarket::on_message(const std::string &msg) {
         return;
 
     } else if (mode == "kline") {  //  kline.{interval}.{symbol} e.g., kline.30.BTCUSDT
+        // spdlog::info("{} tickers: {}", LOGHEAD, msg);
 
+        core::datas::Market_kline obj;
+        obj.market_type = core::datas::MarketType::Kline;
+        std::strcpy(obj.symbol, symbols.c_str());
+        std::strcpy(obj.exchange, "Bybit");
+        obj.time = message["ts"].get<uint64_t>();
+
+        // only one from a practical perspective
+        auto data = message["data"][0];
+        obj.confirm = data["confirm"];
+
+        std::string interval = data["interval"];
+        if (std::isdigit(interval[0])) {
+            int i_interval = std::stod(interval);
+            if (i_interval < 60) {
+                interval = interval + "min";
+            } else {
+                i_interval = i_interval / 60;
+                interval = std::to_string(i_interval) + "h";
+            }
+        }
+        std::strcpy(obj.interval, interval.c_str());
+
+        obj.high = std::stod(data["high"].get<std::string>());
+        obj.low = std::stod(data["low"].get<std::string>());
+        obj.open = std::stod(data["open"].get<std::string>());
+        obj.close = std::stod(data["close"].get<std::string>());
+        obj.start = data["start"];
+        obj.end = data["end"];
+
+        on_market(obj);
+        return;
     } else if (mode == "liquidation") {  //  liquidation.{symbol} e.g., liquidation.BTCUSDT
 
     } else if (mode == "kline_lt") {  //  kline_lt.{interval}.{symbol} e.g., kline_lt.30.BTC3SUSDT
