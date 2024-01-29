@@ -113,6 +113,11 @@ struct alignas(64) Market_depth : public Market_base {
 };
 
 struct alignas(64) Market_kline : public Market_base {
+    bool confirm;
+    char interval[8];
+    uint64_t start;
+    uint64_t end;
+
     double high;
     double low;
     double open;

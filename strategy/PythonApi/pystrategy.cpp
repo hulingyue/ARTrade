@@ -154,6 +154,15 @@ PYBIND11_MODULE(pystrategy, m) {
 
     py::class_<Market_kline, Market_base>(m, "Market_kline")
         .def(py::init<>())
+        .def_readwrite("confirm", &Market_kline::confirm)
+        .def_property("interval",
+            [](const Market_kline &mb) { return py::str(mb.interval); },
+            [](Market_kline &mb, const py::str &s) {
+                strncpy(mb.interval, s.cast<std::string>().c_str(), sizeof(mb.interval));
+            }
+        )
+        .def_readwrite("start", &Market_kline::start)
+        .def_readwrite("end", &Market_kline::end)
         .def_readwrite("high", &Market_kline::high)
         .def_readwrite("low", &Market_kline::low)
         .def_readwrite("open", &Market_kline::open)
