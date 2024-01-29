@@ -264,7 +264,8 @@ void BybitMarket::on_message(const std::string &msg) {
     } else if (mode == "lt") {  //  lt.{symbol} e.g.,lt.BTC3SUSDT
 
     } else {
-        spdlog::info("{} msg: {}", LOGHEAD, msg);
+        spdlog::error("{} msg: {}", LOGHEAD, msg);
+        return;
     }
 
 }
