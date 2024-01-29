@@ -20,6 +20,7 @@ struct Self {
 
     // market
     std::unordered_map<std::string_view, double> MapMarketBbo;
+    std::unordered_map<std::string_view, core::datas::Market_depth> MapMarketOrderBooks;
 
     ~Self() {
         if (client) delete client;
@@ -199,7 +200,39 @@ void BybitMarket::on_message(const std::string &msg) {
     std::string symbols = match[4];
 
     if (mode == "orderbook") {  //  orderbook.{depth}.{symbol} e.g., orderbook.1.BTCUSDT
+        // spdlog::info("{} tickers: {}", LOGHEAD, msg);
 
+        core::datas::Market_depth obj;
+        obj.market_type = core::datas::MarketType::Depth;
+        std::strcpy(obj.symbol, symbols.c_str());
+        std::strcpy(obj.exchange, "Bybit");
+        obj.time = message["ts"].get<uint64_t>();
+
+        obj.price = 0.0;
+        obj.quantity = 0.0;
+
+        if ("snapshot" == message["type"]) {
+            auto save_pairs = [&](std::vector<nlohmann::json::array_t> data, std::string_view symbols, std::string_view side) {
+                int depth = std::min(core::datas::MARKET_MAX_DEPTH, static_cast<int>(data.size()));
+                for (int index = 0; index < depth; index++) {
+                    core::datas::TradePair pair {.price = std::stod(data[index][0].get<std::string>()), .quantity = std::stod(data[index][1].get<std::string>())};
+                    if ("asks" == side) {
+                        obj.asks[index] = pair;
+                    } else if ("bids" == side) {
+                        obj.bids[index] = pair;
+                    }
+                }
+            };
+
+            save_pairs(message["data"]["a"], symbols, "asks");
+            save_pairs(message["data"]["b"], symbols, "bids");
+            self.MapMarketOrderBooks[symbols] = obj;
+        } else {
+            return;
+        }
+
+        on_market(obj);
+        return;
     } else if (mode == "publicTrade") {  //  publicTrade.{symbol} 注意: 期權使用baseCoin, e.g., publicTrade.BTC
 
     } else if (mode == "tickers") {  //  tickers.{symbol}
