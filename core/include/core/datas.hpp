@@ -7,7 +7,7 @@ namespace core::datas {
 static const int SUBSCRIBE_MAX_SIZE = 10;
 static const int SYMBOL_MAX_LENGTH = 16;
 static const uint64_t SYMBOL_MAX_CAPACITY = 100;
-static const int MARKET_MAX_DEPTH = 10;
+static const int MARKET_MAX_DEPTH = 50;
 static const int ORDER_MSG_MAX_SIZE = 256;
 static const int ORDERID_MAX_SIZE = 128;
 
