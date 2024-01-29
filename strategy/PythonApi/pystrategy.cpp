@@ -18,6 +18,15 @@ py::array_t<T> convert_to_numpy_array(const T *data, size_t size) {
     return result;
 }
 
+template <typename T>
+py::list convert_to_list(const T *data, size_t size) {
+    py::list result;
+    for (size_t i = 0; i < size; ++i) {
+        result.append(data[i]);
+    }
+    return result;
+}
+
 template <typename T, size_t N>
 std::array<T, N> convert_from_numpy_array(py::array_t<T> array) {
     auto buffer = array.request();
@@ -29,6 +38,17 @@ std::array<T, N> convert_from_numpy_array(py::array_t<T> array) {
     return result;
 }
 
+template <typename T, size_t N>
+std::array<T, N> convert_from_list(const py::list &list) {
+    if (py::len(list) != N) {
+        throw std::runtime_error("List size does not match");
+    }
+    std::array<T, N> result;
+    for (size_t i = 0; i < N; ++i) {
+        result[i] = list[i].cast<T>();
+    }
+    return result;
+}
 
 PYBIND11_MODULE(pystrategy, m) {
     py::class_<MarketOperateResult>(m, "MarketOperateResult")
@@ -139,17 +159,17 @@ PYBIND11_MODULE(pystrategy, m) {
         .def_readwrite("quantity", &Market_depth::quantity)
         .def_property("asks",
                       [](const Market_depth &md) {
-                          return convert_to_numpy_array<TradePair>(md.asks, core::datas::MARKET_MAX_DEPTH);
+                          return convert_to_list<TradePair>(md.asks, core::datas::MARKET_MAX_DEPTH);
                       },
                       [](Market_depth &md, const py::array_t<TradePair> &value) {
-                          return convert_from_numpy_array<TradePair, core::datas::MARKET_MAX_DEPTH>(value);
+                          return convert_from_list<TradePair, core::datas::MARKET_MAX_DEPTH>(value);
                       })
         .def_property("bids",
                       [](const Market_depth &md) {
-                          return convert_to_numpy_array<TradePair>(md.asks, core::datas::MARKET_MAX_DEPTH);
+                          return convert_to_list<TradePair>(md.bids, core::datas::MARKET_MAX_DEPTH);
                       },
                       [](Market_depth &md, const py::array_t<TradePair> &value) {
-                          return convert_from_numpy_array<TradePair, core::datas::MARKET_MAX_DEPTH>(value);
+                          return convert_from_list<TradePair, core::datas::MARKET_MAX_DEPTH>(value);
                       });
 
     py::class_<Market_kline, Market_base>(m, "Market_kline")
