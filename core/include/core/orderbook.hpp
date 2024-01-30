@@ -5,7 +5,7 @@
 
 namespace core::datas { struct TradePair; }
 
-namespace core::orderbook {
+namespace {
 enum class PriceOrder {
     ESC,  // ask
     DESC  // bid
@@ -81,12 +81,19 @@ private:
     std::unordered_map<double, int> map_index;
     core::datas::TradePair *data;
 };
+} // namespace
 
+namespace core::orderbook {
 class OrderBook {
 public:
     OrderBook(int depth, double accuracy=0.00001) {
         asks = new SingleOrderBook(depth, accuracy, PriceOrder::ESC);
         bids = new SingleOrderBook(depth, accuracy, PriceOrder::DESC);
+    }
+
+    ~OrderBook() {
+        delete asks;
+        delete bids;
     }
 
     void init_asks(core::datas::TradePair pair[], int size) { asks->init(pair, size); }
@@ -101,13 +108,8 @@ public:
         return std::make_pair(asks->get(), bids->get());
     }
 
-    ~OrderBook() {
-        delete asks;
-        delete bids;
-    }
-
 private:
     SingleOrderBook *asks;
     SingleOrderBook *bids;
 };
-}
+} // namespace core::orderbook
