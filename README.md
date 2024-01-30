@@ -28,13 +28,17 @@
     ```shell
     sudo apt-get install libboost-all-dev
     ```
-5. compile project
+5. download GTest
+    ```shell
+    sudo apt-get install libgtest-dev
+    ```
+6. compile project
     ``` shell
     compile bybit
     > sh compile.sh -p bybit
     ```
-6. run (Take the **bybit** as an example)
+7. run (Take the **bybit** as an example)
     ```shell
-    > cd bybit
+    > cd exchange/crypto/bybit
     > ./bybit -r ./
     ```
