@@ -231,6 +231,43 @@ PYBIND11_MODULE(pystrategy, m) {
             }
         );
 
+    py::class_<OrderObj, Command_base>(m, "OrderObj")
+        .def(py::init<>())
+        .def_property("symbol",
+            [](const OrderObj &mb) { return py::str(mb.symbol); },
+            [](OrderObj &mb, const py::str &s) {
+                strncpy(mb.symbol, s.cast<std::string>().c_str(), sizeof(mb.symbol));
+            }
+        )
+        .def_property("exchange",
+            [](const OrderObj &mb) { return py::str(mb.exchange); },
+            [](OrderObj &mb, const py::str &s) {
+                strncpy(mb.exchange, s.cast<std::string>().c_str(), sizeof(mb.exchange));
+            }
+        )
+        .def_property("msg",
+            [](const OrderObj &mb) { return py::str(mb.msg); },
+            [](OrderObj &mb, const py::str &s) {
+                strncpy(mb.msg, s.cast<std::string>().c_str(), sizeof(mb.msg));
+            }
+        )
+        .def_readwrite("side", &OrderObj::side)
+        .def_readwrite("offset", &OrderObj::offset)
+        .def_readwrite("type", &OrderObj::type)
+        .def_readwrite("status", &OrderObj::status)
+        .def_readwrite("tif", &OrderObj::tif)
+        .def_readwrite("client_id", &OrderObj::client_id)
+        .def_property("order_id",
+            [](const OrderObj &mb) { return py::str(mb.order_id); },
+            [](OrderObj &mb, const py::str &s) {
+                strncpy(mb.order_id, s.cast<std::string>().c_str(), sizeof(mb.order_id));
+            }
+        )
+        .def_readwrite("price", &OrderObj::price)
+        .def_readwrite("quantity", &OrderObj::quantity)
+        .def_readwrite("traded", &OrderObj::traded)
+        .def_readwrite("revoked", &OrderObj::revoked);
+
     py::class_<Strategy, std::shared_ptr<Strategy>>(m, "Strategy")
         .def(py::init<>())
         .def("project_name", (std::string (Strategy::*)()) &Strategy::project_name)
