@@ -21,7 +21,7 @@ struct Self {
 
     // market
     std::unordered_map<std::string_view, double> MapMarketBbo;
-    std::unordered_map<std::string_view, core::orderbook::OrderBook> MapOrderBooks;
+    core::orderbook::OrderbookManager orderbook;
 
     ~Self() {
         if (client) delete client;
@@ -212,6 +212,14 @@ void BybitMarket::on_message(const std::string &msg) {
         obj.price = 0.0;
         obj.quantity = 0.0;
 
+        /**
+         * because bybit's depth only support:
+         *  future: 1 50
+         *  spot  : 1 50 200
+         * and we only support less than or equal 50
+        */
+        static int orderbook_depth = 50;
+
         if ("snapshot" == message["type"]) {
             auto save_pairs = [&](std::vector<nlohmann::json::array_t> data, std::string_view symbols, std::string_view side) {
                 int depth = std::min(core::datas::MARKET_MAX_DEPTH, static_cast<int>(data.size()));
@@ -225,16 +233,29 @@ void BybitMarket::on_message(const std::string &msg) {
                 }
             };
 
+            self.orderbook.key_exist_or_create(symbols, orderbook_depth);
             save_pairs(message["data"]["a"], symbols, "asks");
-            save_pairs(message["data"]["b"], symbols, "bids");
+            self.orderbook.init_asks(symbols, obj.asks, orderbook_depth);
 
-            auto it = self.MapOrderBooks.find(symbols);
-            if (it == self.MapOrderBooks.end()) {
-                // self.MapOrderBooks[symbols] = core::orderbook::OrderBook(core::datas::MARKET_MAX_DEPTH);
+            save_pairs(message["data"]["b"], symbols, "bids");
+            self.orderbook.init_bids(symbols, obj.asks, orderbook_depth);
+        } else {
+            nlohmann::json ask_data = message["data"]["a"];
+            nlohmann::json bid_data = message["data"]["b"];
+
+            for (nlohmann::json::iterator it = ask_data.begin(); it != ask_data.end(); it++) {
+                self.orderbook.update_asks(symbols, orderbook_depth, std::stod(it->at(0).get<std::string>()), std::stod(it->at(1).get<std::string>()));
             }
 
-        } else {
-            return;
+            for (nlohmann::json::iterator it = bid_data.begin(); it != bid_data.end(); it++) {
+                self.orderbook.update_bids(symbols, orderbook_depth, std::stod(it->at(0).get<std::string>()), std::stod(it->at(1).get<std::string>()));
+            }
+
+            auto ask_point = self.orderbook.get_asks(symbols, orderbook_depth);
+            if (ask_point) { std::memcpy(obj.asks, self.orderbook.get_asks(symbols, orderbook_depth), sizeof(core::datas::TradePair) * orderbook_depth); }
+
+            auto bid_point = self.orderbook.get_bids(symbols, orderbook_depth);
+            if (bid_point) { std::memcpy(obj.bids, self.orderbook.get_bids(symbols, orderbook_depth), sizeof(core::datas::TradePair) * orderbook_depth); }
         }
 
         on_market(obj);
