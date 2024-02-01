@@ -112,4 +112,69 @@ private:
     SingleOrderBook *asks;
     SingleOrderBook *bids;
 };
+
+class OrderbookManager {
+public:
+    OrderbookManager() = default;
+    ~OrderbookManager() = default;
+
+    void init_asks(std::string symbol, core::datas::TradePair pair[], int size, double accuracy=0.00001) {
+        // key_exist_or_create(symbol, size, accuracy);
+        auto orderbook = _map[symbol][size];
+        orderbook->init_asks(pair, size);
+    }
+
+    void init_bids(std::string symbol, core::datas::TradePair pair[], int size, double accuracy=0.00001) {
+        // key_exist_or_create(symbol, size, accuracy);
+        auto orderbook = _map[symbol][size];
+        orderbook->init_bids(pair, size);
+    }
+
+    void update_asks(std::string symbol, int depth, double price, double quantity, double accuracy=0.00001) {
+        // key_exist_or_create(symbol, depth, accuracy);
+        auto orderbook = _map[symbol][depth];
+        orderbook->update_asks(price, quantity);
+    }
+
+    void update_bids(std::string symbol, int depth, double price, double quantity, double accuracy=0.00001) {
+        // key_exist_or_create(symbol, depth, accuracy);
+        auto orderbook = _map[symbol][depth];
+        orderbook->update_bids(price, quantity);
+    }
+
+    core::datas::TradePair* get_asks(std::string symbol, int depth, double accuracy=0.00001) {
+        // key_exist_or_create(symbol, depth, accuracy);
+        auto orderbook = _map[symbol][depth];
+        return orderbook->get_asks();
+    }
+
+    core::datas::TradePair* get_bids(std::string symbol, int depth, double accuracy=0.00001) {
+        // key_exist_or_create(symbol, depth, accuracy);
+        auto orderbook = _map[symbol][depth];
+        return orderbook->get_bids();
+    }
+
+    std::pair<core::datas::TradePair*, core::datas::TradePair*> get(std::string symbol, int depth, double accuracy=0.00001) {
+        // key_exist_or_create(symbol, depth, accuracy);
+        auto orderbook = _map[symbol][depth];
+        return std::make_pair(get_asks(symbol, depth, accuracy), get_bids(symbol, depth, accuracy));
+    }
+
+// private:
+    void key_exist_or_create(std::string symbol, int depth, double accuracy) {
+        auto it = _map.find(symbol);
+        if (it == _map.end()) {
+            _map[symbol] = std::unordered_map<int, OrderBook*>();
+        }
+
+        auto inner_it = _map[symbol].find(depth);
+        if (inner_it == _map[symbol].end()) {
+            _map[symbol][depth] = new OrderBook(depth, accuracy);
+        }
+    }
+
+private:
+    // symbol<depth, info>
+    std::unordered_map<std::string, std::unordered_map<int, OrderBook*>> _map;
+};
 } // namespace core::orderbook
