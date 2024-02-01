@@ -120,7 +120,6 @@ void BybitTrade::init() {
 }
 
 bool BybitTrade::is_ready() {
-    return true;
     return self.is_ready.load();
 }
 
@@ -215,7 +214,7 @@ void BybitTrade::on_open() {
     json_obj["req_id"] = self.reqid;
     json_obj["op"] = "auth";
 
-    auto exipres = core::time::Time().to_nanoseconds() + 1000;
+    auto exipres = core::time::Time().to_milliseconds() + 1000;
     json_obj["args"] = {
         self.api_key,
         exipres,
