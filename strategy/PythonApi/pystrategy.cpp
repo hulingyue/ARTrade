@@ -268,6 +268,30 @@ PYBIND11_MODULE(pystrategy, m) {
         .def_readwrite("traded", &OrderObj::traded)
         .def_readwrite("revoked", &OrderObj::revoked);
 
+    py::class_<CancelObj, Command_base>(m, "CancelObj")
+        .def(py::init<>())
+        .def_property("symbol",
+            [](const CancelObj &mb) { return py::str(mb.symbol); },
+            [](CancelObj &mb, const py::str &s) {
+                strncpy(mb.symbol, s.cast<std::string>().c_str(), sizeof(mb.symbol));
+            }
+        )
+        .def_property("exchange",
+            [](const CancelObj &mb) { return py::str(mb.exchange); },
+            [](CancelObj &mb, const py::str &s) {
+                strncpy(mb.exchange, s.cast<std::string>().c_str(), sizeof(mb.exchange));
+            }
+        )
+        .def_property("msg",
+            [](const CancelObj &mb) { return py::str(mb.msg); },
+            [](CancelObj &mb, const py::str &s) {
+                strncpy(mb.msg, s.cast<std::string>().c_str(), sizeof(mb.msg));
+            }
+        )
+        .def_readwrite("client_id", &CancelObj::client_id)
+        .def_readwrite("order_id", &CancelObj::order_id)
+        .def_readwrite("status", &CancelObj::status);
+
     py::class_<Strategy, std::shared_ptr<Strategy>>(m, "Strategy")
         .def(py::init<>())
         .def("project_name", (std::string (Strategy::*)()) &Strategy::project_name)
