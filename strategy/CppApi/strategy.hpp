@@ -44,12 +44,12 @@ public:
         return command_channel->write(obj);
     }
 
-    virtual bool order() final {
-        return false;
+    virtual bool order(core::datas::OrderObj &obj) final {
+        return command_channel->write(obj);
     }
 
-    virtual bool cancel() final {
-        return false;
+    virtual bool cancel(core::datas::CancelObj &obj) final {
+        return command_channel->write(obj);
     }
 
     virtual void monitor() final {
