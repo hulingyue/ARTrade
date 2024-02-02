@@ -34,7 +34,7 @@ struct Self {
 };
 
 void update_headers(Self *self, const nlohmann::json& parameters, const std::string method) {
-    std::string timestamp = std::to_string(core::time::Time().to_nanoseconds());
+    std::string timestamp = std::to_string(core::time::Time().to_milliseconds());
 
     std::string sign;
     static const std::string recv_window = "5000";
