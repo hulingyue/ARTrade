@@ -5,4 +5,5 @@ from .pystrategy import MarketOperateResult,\
     OrderType, OrderTIF, OrderStatus
 from .pystrategy import MarketType, Market_base, Market_bbo, \
     Market_depth, Market_kline
-from .pystrategy import CommandType, Command_base, SymbolObj
+from .pystrategy import CommandType, Command_base, SymbolObj, \
+    OrderObj, CancelObj
