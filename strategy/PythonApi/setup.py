@@ -9,7 +9,6 @@ setup(
     platforms='Linux',
     packages=['pystrategy'],
     package_data={'pystrategy': ['pystrategy.cpython-310-x86_64-linux-gnu.so']},
-    ext_modules=[Extension('pystrategy.pystrategy', ['pystrategy/pystrategy.cpython-310-x86_64-linux-gnu.so'])],
     install_requires=[
         'numpy',
     ],

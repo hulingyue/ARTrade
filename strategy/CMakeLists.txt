@@ -40,7 +40,7 @@ add_custom_command(
     TARGET ${PYModuleName}
     POST_BUILD
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/../PythonApi
-    COMMAND python3 setup.py sdist --dist-dir pystrategy
+    COMMAND python3 setup.py bdist_wheel --dist-dir pystrategy
     COMMENT "Running setuptools sdist command"
 )
 
