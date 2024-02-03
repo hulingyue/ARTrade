@@ -27,10 +27,10 @@ HttpClient::~HttpClient() {
         delete self.ssl_client;
         self.ssl_client = nullptr;
     }
-    // if (&self) delete &self;
+    if (&self) delete &self;
 }
 
-HttpClient HttpClient::set_uri(const std::string uri) {
+HttpClient& HttpClient::set_uri(const std::string uri) {
     std::regex rgx("(https?://)?([^/]+)");
     std::smatch match;
 
@@ -42,19 +42,19 @@ HttpClient HttpClient::set_uri(const std::string uri) {
     return *this;
 }
 
-HttpClient HttpClient::set_host(const std::string host) {
+HttpClient& HttpClient::set_host(const std::string host) {
     self.host = host;
     spdlog::info("{} host: {}", LOGHEAD, self.host);
     return *this;
 }
 
-HttpClient HttpClient::set_header(const httplib::Headers headers) {
+HttpClient& HttpClient::set_header(const httplib::Headers headers) {
     spdlog::info("{}", LOGHEAD);
     self.headers = headers;
     return *this;
 }
 
-HttpClient HttpClient::update_header(const httplib::Headers headers) {
+HttpClient& HttpClient::update_header(const httplib::Headers headers) {
     for (auto it = headers.begin(); it != headers.end(); it++) {
         auto range = self.headers.equal_range(it->first);
         for (auto r_it = range.first; r_it != range.second; r_it++) {

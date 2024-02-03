@@ -14,11 +14,11 @@ public:
     virtual ~HttpClient();
 
 public:
-    HttpClient set_uri(const std::string uri);
-    HttpClient set_host(const std::string host);
-    HttpClient set_header(const httplib::Headers headers);
+    HttpClient& set_uri(const std::string uri);
+    HttpClient& set_host(const std::string host);
+    HttpClient& set_header(const httplib::Headers headers);
 
-    HttpClient update_header(const httplib::Headers headers);
+    HttpClient& update_header(const httplib::Headers headers);
 
     httplib::Result get(const std::string path);
     httplib::Result get(const std::string path, const httplib::Params params);
