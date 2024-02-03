@@ -1,8 +1,8 @@
-from setuptools import setup, Extension
+from setuptools import setup
 
 setup(
     name='pystrategy',
-    version='1.0',
+    version="1.0.1",
     description="The python api for ARTrade's Strategy",
     url='https://github.com/hulingyue/ARTrade',
     license='MIT',
