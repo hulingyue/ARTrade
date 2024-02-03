@@ -207,7 +207,12 @@ void Modules::run() {
             }
             case core::datas::CommandType::ORDER: {
                 core::datas::OrderObj *obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
-                if (obj) {
+                if (!obj) {
+                    spdlog::error("{} ORDER cannot reinterpret memory!", LOGHEAD);
+                    break;
+                }
+
+                if (obj->status == core::datas::OrderStatus::INIT) {
                     core::datas::TradeOperateResult result = self.trade->order(*obj);
                     obj->status = core::datas::OrderStatus::ACCEPTED;
                     if (result.code != 0) {
@@ -220,9 +225,6 @@ void Modules::run() {
                     core::order::Order* order_obj = core::order::Order::get_instance();
                     order_obj->insert(obj->client_id, command_pair);
                     obj->client_id = order_obj->next_client_id();
-                } else {
-                    spdlog::error("{} ORDER cannot reinterpret memory!", LOGHEAD);
-                    break;
                 }
                 break;
             }
