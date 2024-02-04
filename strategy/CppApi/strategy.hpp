@@ -28,8 +28,8 @@ public:
     void set_on_market_kline(std::function<void(core::datas::Market_kline*)> func) { on_market_kline = func; }
     
     void set_on_market(std::function<void()> func) { on_market = func; }
-    void set_on_traded(std::function<void()> func) { on_traded = func; }
-    void set_on_order(std::function<void()> func) { on_order = func; }
+    void set_on_traded(std::function<void(core::datas::OrderObj*)> func) { on_traded = func; }
+    void set_on_order(std::function<void(core::datas::OrderObj*)> func) { on_order = func; }
 
 public:
     virtual bool subscribe(core::datas::SymbolObj symbols) final {
@@ -62,18 +62,42 @@ public:
             std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = command_channel->read_next(command_displacement);
             if (command_pair.first) {
                 switch (command_pair.first->command_type) {
-                case core::datas::CommandType::SUBSCRIBE:
+                case core::datas::CommandType::SUBSCRIBE:{
+                    core::datas::SymbolObj* obj = reinterpret_cast<core::datas::SymbolObj*>(command_pair.first);
                     break;
-                case core::datas::CommandType::UNSUBSCRIBE:
+                }
+                case core::datas::CommandType::UNSUBSCRIBE:{
                     break;
-                case core::datas::CommandType::ORDER:
+                }
+                case core::datas::CommandType::ORDER:{
+                    core::datas::OrderObj* obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
+                    if (!obj) { break; }
+                    _exists_orders[obj] = obj->status;
+                    if (on_order) { on_order(obj); }
                     break;
-                case core::datas::CommandType::CANCEL:
+                }
+                case core::datas::CommandType::CANCEL:{
+                    core::datas::CancelObj* obj = reinterpret_cast<core::datas::CancelObj*>(command_pair.first);
                     break;
+                }
                 default:
                     break;
                 }
                 continue;
+            }
+
+            // check exists command status
+            for (auto &item: _exists_orders) {
+                if (item.first->status == item.second) { continue; }
+                item.second = item.first->status;
+                if (on_order) { on_order(item.first); }
+
+                if (item.second == core::datas::OrderStatus::REJECTED
+                || item.second == core::datas::OrderStatus::FILLED
+                || item.second == core::datas::OrderStatus::CANCEL
+                ) {
+                    _exists_orders.erase(item.first);
+                }
             }
 
             /*****************/
@@ -151,6 +175,8 @@ private:
     std::string _project_name;
     core::datas::MessageType _message_type;
 
+    std::unordered_map<core::datas::OrderObj*, core::datas::OrderStatus> _exists_orders;
+
 private:
     std::function<void()> task;
 
@@ -159,8 +185,8 @@ private:
     std::function<void(core::datas::Market_kline*)> on_market_kline;
 
     std::function<void()> on_market;
-    std::function<void()> on_traded;
-    std::function<void()> on_order;
+    std::function<void(core::datas::OrderObj*)> on_traded;
+    std::function<void(core::datas::OrderObj*)> on_order;
 };
 
 #undef LOGHEAD
