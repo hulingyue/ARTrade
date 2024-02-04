@@ -213,6 +213,9 @@ void Modules::run() {
                 }
 
                 if (obj->status == core::datas::OrderStatus::INIT) {
+                    core::order::Order* order_obj = core::order::Order::get_instance();
+                    obj->client_id = order_obj->next_client_id();
+                    order_obj->insert(obj->client_id, command_pair);
                     core::datas::TradeOperateResult result = self.trade->order(*obj);
                     obj->status = core::datas::OrderStatus::ACCEPTED;
                     if (result.code != 0) {
@@ -220,11 +223,9 @@ void Modules::run() {
                         memset(obj->msg, 0, core::datas::ORDER_MSG_MAX_SIZE);
                         memcpy(obj->msg, result.msg.c_str(), core::datas::ORDER_MSG_MAX_SIZE);
                         // obj->msg[core::datas::ORDER_MSG_MAX_SIZE - 1] = '\0';
+                        command_pair.second->status = core::datas::CommandStatus::INVALID;
                         break;
                     }
-                    core::order::Order* order_obj = core::order::Order::get_instance();
-                    order_obj->insert(obj->client_id, command_pair);
-                    obj->client_id = order_obj->next_client_id();
                 }
                 break;
             }
