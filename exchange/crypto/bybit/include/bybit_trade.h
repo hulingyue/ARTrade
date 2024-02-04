@@ -15,8 +15,8 @@ public:
 
     bool is_ready() override;
 
-    TradeOperateResult order(core::datas::OrderObj const &order) override;
-    TradeOperateResult cancel(core::datas::CancelObj const &order) override;
+    TradeOperateResult order(core::datas::OrderObj &order) override;
+    TradeOperateResult cancel(core::datas::CancelObj &order) override;
 
     void interval_1s();
 

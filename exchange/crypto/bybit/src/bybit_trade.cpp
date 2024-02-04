@@ -123,7 +123,7 @@ bool BybitTrade::is_ready() {
     return self.is_ready.load();
 }
 
-TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
+TradeOperateResult BybitTrade::order(core::datas::OrderObj &order) {
     std::string path = "/v5/order/create";
 
     nlohmann::json parameters = {
@@ -157,16 +157,8 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
             if (result.code == 0) {
                 std::string order_id = j_msg.value("result", nlohmann::json::object()).value("orderId", "");
                 std::string order_link_id = j_msg.value("result", nlohmann::json::object()).value("orderLinkId", "0");
-                std::cout << j_msg.dump() << std::endl;
-                std::cout << order_link_id << std::endl;
-                std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*> command_pair = core::order::Order::get_instance()->find(std::stoi(order_link_id));
-                if (command_pair.first) {
-                    core::datas::OrderObj* order_obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
-                    if (std::to_string(order_obj->client_id) == order_id) {
-                        memcpy(order_obj->order_id, order_link_id.c_str(), core::datas::ORDERID_MAX_SIZE);
-                        order_obj->order_id[core::datas::ORDERID_MAX_SIZE - 1] = '\0';
-                    }
-                }
+                memcpy(order.order_id, order_id.c_str(), core::datas::ORDERID_MAX_SIZE);
+                order.order_id[core::datas::ORDERID_MAX_SIZE - 1] = '\0';
             }
         }
 
@@ -185,7 +177,7 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj const &order) {
     return result;
 }
 
-TradeOperateResult BybitTrade::cancel(core::datas::CancelObj const &order) {
+TradeOperateResult BybitTrade::cancel(core::datas::CancelObj &order) {
     std::string path = "/v5/order/cancel";
 
     nlohmann::json parameters = {
