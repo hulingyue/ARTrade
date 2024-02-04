@@ -88,16 +88,18 @@ public:
             }
 
             // check exists command status
-            for (auto &item: _exists_orders) {
-                if (item.first->status == item.second) { continue; }
-                item.second = item.first->status;
-                if (on_order) { on_order(item.first); }
+            for (auto it = _exists_orders.begin(); it != _exists_orders.end();) {
+                if (it->first->status == it->second) { continue; }
+                it->second = it->first->status;
+                if (on_order) { on_order(it->first); }
 
-                if (item.second == core::datas::OrderStatus::REJECTED
-                || item.second == core::datas::OrderStatus::FILLED
-                || item.second == core::datas::OrderStatus::CANCEL
+                if (it->second == core::datas::OrderStatus::REJECTED
+                || it->second == core::datas::OrderStatus::FILLED
+                || it->second == core::datas::OrderStatus::CANCEL
                 ) {
-                    _exists_orders.erase(item.first);
+                    it = _exists_orders.erase(it);
+                } else {
+                    it++;
                 }
             }
 
