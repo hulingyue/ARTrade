@@ -73,7 +73,7 @@ public:
                 case core::datas::CommandType::ORDER:{
                     core::datas::OrderObj* obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
                     if (!obj) { break; }
-                    _exists_orders[obj] = obj->status;
+                    _exists_orders[obj] = *obj;
                     if (on_order) { on_order(obj); }
                     break;
                 }
@@ -89,13 +89,13 @@ public:
 
             // check exists command status
             for (auto it = _exists_orders.begin(); it != _exists_orders.end();) {
-                if (it->first->status == it->second) { continue; }
-                it->second = it->first->status;
+                if (*(it->first) == it->second) { continue; }
+                it->second = *(it->first);
                 if (on_order) { on_order(it->first); }
 
-                if (it->second == core::datas::OrderStatus::REJECTED
-                || it->second == core::datas::OrderStatus::FILLED
-                || it->second == core::datas::OrderStatus::CANCEL
+                if (it->first->status == core::datas::OrderStatus::REJECTED
+                || it->first->status == core::datas::OrderStatus::FILLED
+                || it->first->status == core::datas::OrderStatus::CANCEL
                 ) {
                     it = _exists_orders.erase(it);
                 } else {
@@ -178,7 +178,7 @@ private:
     std::string _project_name;
     core::datas::MessageType _message_type;
 
-    std::unordered_map<core::datas::OrderObj*, core::datas::OrderStatus> _exists_orders;
+    std::unordered_map<core::datas::OrderObj*, core::datas::OrderObj> _exists_orders;
 
 private:
     std::function<void()> task;
