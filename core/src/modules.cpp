@@ -6,6 +6,7 @@
 #include "core/config.h"
 #include "core/util.h"
 #include "core/order.hpp"
+#include "core/time.hpp"
 
 
 #define LOGHEAD "[Modules::" + std::string(__func__) + "]"
@@ -213,9 +214,8 @@ void Modules::run() {
                 }
 
                 if (obj->status == core::datas::OrderStatus::INIT) {
-                    core::order::Order* order_obj = core::order::Order::get_instance();
-                    obj->client_id = order_obj->next_client_id();
-                    order_obj->insert(obj->client_id, command_pair);
+                    // use nanoseconds as client_id
+                    obj->client_id = core::time::Time().to_nanoseconds();
                     core::datas::TradeOperateResult result = self.trade->order(*obj);
                     obj->status = core::datas::OrderStatus::ACCEPTED;
                     if (result.code != 0) {
