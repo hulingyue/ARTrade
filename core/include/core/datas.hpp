@@ -185,6 +185,22 @@ struct alignas(64) OrderObj : public Command_base {
     double quantity; // order origin count
     double traded; // turnover 
     double revoked; // success cancel turnover
+
+    bool operator==(const OrderObj& other) const {
+        return (
+            side == other.side
+            && offset == other.offset
+            && type == other.type
+            && status == other.status
+            && tif == other.tif
+            && std::string(order_id) == std::string(other.order_id)
+            && client_id == other.client_id
+            && price == other.price
+            && quantity == other.quantity
+            && traded == other.traded
+            && revoked == other.revoked
+        );
+    }
 };
 
 struct alignas(64) CancelObj : public Command_base {
