@@ -1,3 +1,5 @@
+#ifndef CORE_TIME
+#define CORE_TIME
 #include <iostream>
 #include <ctime>
 #include <chrono>
@@ -84,3 +86,4 @@ private:
 };
 
 } // namespace core::time
+#endif
