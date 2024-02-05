@@ -192,7 +192,7 @@ void BybitMarket::on_message(const std::string &msg) {
     std::smatch match;
 
     if (!std::regex_search(topic, match, pattern)) {
-        spdlog::info("{} msg: {}", LOGHEAD, msg);
+        // spdlog::info("{} msg: {}", LOGHEAD, msg);
         return;
     }
     
