@@ -231,6 +231,32 @@ void BybitTrade::on_close() {
 void BybitTrade::on_message(std::string const &msg) {
     nlohmann::json message = nlohmann::json::parse(msg);
 
+    std::string topic = message.value("topic", "");
+    if (topic.length() > 0) {
+        spdlog::info("{} topic: {} msg: {}", LOGHEAD, topic, msg);
+        uint64_t creation_time = message["creationTime"].get<uint64_t>();
+        nlohmann::json data = message["data"];
+
+        if (topic == "execution") { // 成交
+            std::string order_id = data["orderId"].get<std::string>();
+            std::string order_link_id = data["orderLinkId"].get<std::string>();
+
+            std::string exec_id = data["execId"].get<std::string>();
+            std::string exec_price = data["execPrice"].get<std::string>();
+            std::string exec_quantity = data["execQty"].get<std::string>();
+
+        } else if (topic == "order") { // 订单
+
+        } else if (topic == "position") { // 仓位
+
+        } else if (topic == "wallet") { // 钱包
+
+        } else if (topic == "greeks") { // 期权相关
+
+        }
+        return;
+    }
+
     std::string op = message.value("op", "");
     if (op.length() > 0) {
         bool status = message.value("success", false);
