@@ -279,7 +279,9 @@ void BybitTrade::on_message(std::string const &msg) {
                 }
 
                 obj->traded = std::stod(data["cumExecQty"].get<std::string>());
-                obj->avg_price = std::stod(data["avgPrice"].get<std::string>());
+                std::string avg_price = data["avgPrice"].get<std::string>();
+                avg_price = !avg_price.empty() ? avg_price : "0";
+                obj->avg_price = std::stod(avg_price);
 
                 return;
             } else if (topic == "position") { // 仓位
