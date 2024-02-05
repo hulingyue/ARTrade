@@ -188,7 +188,10 @@ struct alignas(64) OrderObj : public Command_base {
 
     bool operator==(const OrderObj& other) const {
         return (
-            side == other.side
+            std::string(symbol) == std::string(other.symbol)
+            && std::string(exchange) == std::string(other.exchange)
+            && std::string(msg) == std::string(other.msg)
+            && side == other.side
             && offset == other.offset
             && type == other.type
             && status == other.status
