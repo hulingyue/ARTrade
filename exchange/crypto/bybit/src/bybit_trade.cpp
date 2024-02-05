@@ -254,12 +254,16 @@ void BybitTrade::on_message(std::string const &msg) {
         for (auto &data: datas) {
             if (topic == "execution") { // 成交
                 std::string order_id = data["orderId"].get<std::string>();
-                std::string order_link_id = data["orderLinkId"].get<std::string>();
+                std::string client_id = data["orderLinkId"].get<std::string>();
+                auto obj = core::order::Order::get_instance()->find(client_id);
+                if (obj == nullptr) { return; }
 
-                std::string exec_id = data["execId"].get<std::string>();
-                std::string exec_price = data["execPrice"].get<std::string>();
-                std::string exec_quantity = data["execQty"].get<std::string>();
+                double exec_price = std::stod(data["execPrice"].get<std::string>());
+                double exec_quantity = std::stod(data["execQty"].get<std::string>());
 
+                obj->avg_price = ((obj->avg_price * obj->traded) + (exec_price * exec_quantity)) / (obj->traded + exec_quantity);
+                obj->traded = obj->traded + exec_quantity;
+                obj->status = core::datas::OrderStatus::PARTIALLYFILLED;
             } else if (topic == "order") { // 订单
                 std::string client_id = data["orderLinkId"].get<std::string>();
                 auto obj = core::order::Order::get_instance()->find(client_id);
