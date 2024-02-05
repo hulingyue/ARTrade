@@ -126,6 +126,24 @@ bool BybitTrade::is_ready() {
 TradeOperateResult BybitTrade::order(core::datas::OrderObj &order) {
     std::string path = "/v5/order/create";
 
+    TradeOperateResult result {
+        .code = -1,
+        .msg = ""
+    };
+
+    bool is_open = true;
+    if (order.offset == core::datas::OrderOffset::OPEN) {
+        is_open = false;
+    } else if (order.offset == core::datas::OrderOffset::CLOSE
+        || order.offset == core::datas::OrderOffset::CLOSETODAY
+        || order.offset == core::datas::OrderOffset::CLOSEYESTERDAY
+    ) {
+        is_open = true;
+    } else {
+        result.msg = "unknow offset!";
+        return result;
+    }
+
     nlohmann::json parameters = {
         {"orderLinkId", std::to_string(order.client_id)},
         {"category", self.category},
@@ -134,16 +152,12 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj &order) {
         {"orderType", type_to_bybit(order.type)},
         {"qty", std::to_string(order.quantity)},
         {"price", std::to_string(order.price)},
-        {"timeInForce", tif_to_bybit(order.tif)}
+        {"timeInForce", tif_to_bybit(order.tif)},
+        {"reduceOnly", is_open}
     };
 
     update_headers(&self, parameters, "POST");
     httplib::Result res = self.http_client.post(path, parameters.dump());
-
-    TradeOperateResult result {
-        .code = -1,
-        .msg = ""
-    };
 
     if (res) {
         result.code = res->status;
