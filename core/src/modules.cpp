@@ -216,8 +216,8 @@ void Modules::run() {
                     auto order_instance = core::order::Order::get_instance();
                     obj->client_id = order_instance->next_client_id();
                     order_instance->insert(obj->client_id, obj);
+                    obj->status = core::datas::OrderStatus::PANDING;
                     core::datas::TradeOperateResult result = self.trade->order(*obj);
-                    obj->status = core::datas::OrderStatus::ACCEPTED;
                     if (result.code != 0) {
                         obj->status = core::datas::OrderStatus::REJECTED;
                         memset(obj->msg, 0, core::datas::ORDER_MSG_MAX_SIZE);
