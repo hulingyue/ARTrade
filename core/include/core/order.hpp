@@ -5,12 +5,10 @@
 #include <atomic>
 #include <unordered_map>
 #include "core/datas.hpp"
+#include "core/time.hpp"
 
 
 namespace core::order {
-
-using command_pair_type = std::pair<core::datas::Command_base*, core::datas::CommandDataHeader*>;
-
 class Order final {
 private:
     Order() = default;
@@ -33,49 +31,51 @@ public:
         return instance.load();
     }
 
-    inline bool exist(const uint64_t client_id) { return (map_orders.find(client_id) != map_orders.end()); }
-    
-    inline void insert_or_update(const uint64_t client_id, const command_pair_type command_pair) {
-        map_orders[client_id] = command_pair;
-        if (client_id > client_id_index.load()) {
-            client_id_index.store(client_id);
-        }
+    inline bool exist(const uint64_t client_id) {
+        return (map_orders.find(client_id) != map_orders.end());
     }
     
-    inline bool insert(const uint64_t client_id, const command_pair_type command_pair) {
+    inline void insert_or_update(const uint64_t client_id, core::datas::OrderObj* obj) {
+        map_orders[client_id] = obj;
+    }
+    
+    inline bool insert(const uint64_t client_id, core::datas::OrderObj* obj) {
         if (exist(client_id)) { return false; }
-        map_orders[client_id] = command_pair;
-        if (client_id > client_id_index.load()) {
-            client_id_index.store(client_id);
-        }
+        map_orders[client_id] = obj;
         return true;
     }
     
-    inline bool update(const uint64_t client_id, const command_pair_type command_pair) {
+    inline bool update(const uint64_t client_id, core::datas::OrderObj* obj) {
         if (!exist(client_id)) { return false; }
-        map_orders[client_id] = command_pair;
+        map_orders[client_id] = obj;
         return true;
      }
     
-    inline bool remove(const uint64_t client_id) { return (map_orders.erase(client_id) > 0); }
+    inline bool remove(const uint64_t client_id) {
+        return (map_orders.erase(client_id) > 0);
+    }
     
     inline bool clean() {
         map_orders.clear();
         return map_orders.empty();
     }
 
-    inline command_pair_type find(const uint64_t client_id) {
+    core::datas::OrderObj* find(const uint64_t client_id) {
         auto iterator = map_orders.find(client_id);
         if (iterator == map_orders.end()) {
-            return std::make_pair(nullptr, nullptr);
+            return nullptr;
         }
         return iterator->second;
     }
 
-    inline uint64_t next_client_id() { return (client_id_index.load() + 1) % UINT64_MAX; }
+    inline uint64_t next_client_id() {
+        constexpr uint64_t key = UINT64_MAX / 1000;
+        client_id_index.store((client_id_index.load() + 1) % 1000);
+        return (((core::time::Time().to_nanoseconds() % key) * 100) + client_id_index.load());
+    }
 
 private:
-    std::unordered_map<uint64_t, command_pair_type> map_orders;
+    std::unordered_map<uint64_t, core::datas::OrderObj*> map_orders;
     std::atomic<uint64_t> client_id_index = 1;
 };
 } // namespace core::order
