@@ -183,6 +183,7 @@ struct alignas(64) OrderObj : public Command_base {
 
     double price;
     double quantity; // order origin count
+    double avg_price;
     double traded; // turnover 
     double revoked; // success cancel turnover
 
@@ -200,6 +201,7 @@ struct alignas(64) OrderObj : public Command_base {
             && client_id == other.client_id
             && price == other.price
             && quantity == other.quantity
+            && avg_price == other.avg_price
             && traded == other.traded
             && revoked == other.revoked
         );

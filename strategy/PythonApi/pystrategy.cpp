@@ -265,6 +265,7 @@ PYBIND11_MODULE(pystrategy, m) {
         )
         .def_readwrite("price", &OrderObj::price)
         .def_readwrite("quantity", &OrderObj::quantity)
+        .def_readwrite("avg_price", &OrderObj::avg_price)
         .def_readwrite("traded", &OrderObj::traded)
         .def_readwrite("revoked", &OrderObj::revoked);
 
