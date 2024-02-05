@@ -235,24 +235,46 @@ void BybitTrade::on_message(std::string const &msg) {
     if (topic.length() > 0) {
         spdlog::info("{} topic: {} msg: {}", LOGHEAD, topic, msg);
         uint64_t creation_time = message["creationTime"].get<uint64_t>();
-        nlohmann::json data = message["data"];
+        nlohmann::json datas = message["data"];
 
-        if (topic == "execution") { // 成交
-            std::string order_id = data["orderId"].get<std::string>();
-            std::string order_link_id = data["orderLinkId"].get<std::string>();
+        for (auto &data: datas) {
+            if (topic == "execution") { // 成交
+                std::string order_id = data["orderId"].get<std::string>();
+                std::string order_link_id = data["orderLinkId"].get<std::string>();
 
-            std::string exec_id = data["execId"].get<std::string>();
-            std::string exec_price = data["execPrice"].get<std::string>();
-            std::string exec_quantity = data["execQty"].get<std::string>();
+                std::string exec_id = data["execId"].get<std::string>();
+                std::string exec_price = data["execPrice"].get<std::string>();
+                std::string exec_quantity = data["execQty"].get<std::string>();
 
-        } else if (topic == "order") { // 订单
+            } else if (topic == "order") { // 订单
+                std::string client_id = data["orderLinkId"].get<std::string>();
+                auto obj = core::order::Order::get_instance()->find(client_id);
+                if (obj == nullptr) { return; }
 
-        } else if (topic == "position") { // 仓位
+                std::string status = data["orderStatus"].get<std::string>();
+                if (status == "New") {
+                    obj->status = core::datas::OrderStatus::ACCEPTED;
+                } else if (status == "PartiallyFilled") {
+                    obj->status = core::datas::OrderStatus::PARTIALLYFILLED;
+                } else if (status == "Filled") {
+                    obj->status = core::datas::OrderStatus::FILLED;
+                } else if (status == "Cancelled" && status == "PartiallyFilledCanceled") {
+                    obj->status = core::datas::OrderStatus::CANCEL;
+                } else if (status == "Rejected") {
+                    obj->status = core::datas::OrderStatus::REJECTED;
+                }
 
-        } else if (topic == "wallet") { // 钱包
+                std::string cumExecQty = data["cumExecQty"].get<std::string>();
+                obj->traded = std::stod(cumExecQty);
 
-        } else if (topic == "greeks") { // 期权相关
+                return;
+            } else if (topic == "position") { // 仓位
 
+            } else if (topic == "wallet") { // 钱包
+
+            } else if (topic == "greeks") { // 期权相关
+
+            }
         }
         return;
     }
