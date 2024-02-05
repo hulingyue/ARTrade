@@ -24,15 +24,15 @@ class MyStrategy(Strategy):
         obj = OrderObj()
         obj.status = OrderStatus.INIT
         obj.command_type = CommandType.ORDER
-        obj.symbol = "BTCUSDT"
+        obj.symbol = "ARPAUSDT"
         obj.exchange = "Bybit"
         obj.type = OrderType.MARKET
         obj.side = OrderSide.BUY
         obj.offset = OrderOffset.OPEN
         obj.tif = OrderTIF.GTC
         obj.client_id = 0
-        obj.price = 40000
-        obj.quantity = 0.001
+        obj.price = 0.05525
+        obj.quantity = 1000.0
         self.order(obj)
         while True:
             pass
@@ -56,9 +56,11 @@ class MyStrategy(Strategy):
             "price": obj.price,
             "quantity": obj.quantity,
             "traded": obj.traded,
+            "avg_price": obj.avg_price,
             "revoked": obj.revoked
         })
         print(message)
+        print()
         pass
 
 if __name__ == "__main__":
