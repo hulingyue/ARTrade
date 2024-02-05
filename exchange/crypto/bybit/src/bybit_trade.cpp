@@ -278,8 +278,8 @@ void BybitTrade::on_message(std::string const &msg) {
                     obj->status = core::datas::OrderStatus::REJECTED;
                 }
 
-                std::string cumExecQty = data["cumExecQty"].get<std::string>();
-                obj->traded = std::stod(cumExecQty);
+                obj->traded = std::stod(data["cumExecQty"].get<std::string>());
+                obj->avg_price = std::stod(data["avgPrice"].get<std::string>());
 
                 return;
             } else if (topic == "position") { // 仓位
