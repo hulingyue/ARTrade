@@ -45,15 +45,17 @@ class MyStrategy(Strategy):
 
         avgs = list()
         ratios = list()
+
+        print("数据准备中....")
+        while len(self.ticker) < self.ticker_capacity or not self.start:
+            pass
         
+        print("数据准备完成....")
         while True:
             avgs.clear()
             ratios.clear()
 
             time.sleep(0.1)
-            if len(self.ticker) < self.ticker_capacity or not self.start:
-                print(len(self.ticker))
-                continue
 
             self.ticker = self.ticker[-1 * self.ticker_capacity:]
             
@@ -67,51 +69,52 @@ class MyStrategy(Strategy):
             for index in range(0, len(ratios)):
                 sign = sign + (1 if ratios[index] > 0 else -1) * round((0.8 + index / 100), 2)
 
-            if abs(sign) < self.ratio_threshold:
+            # 超出阈值或者信号反转
+            if abs(sign) >= self.ratio_threshold or (self.status == Status.Buyed and sign < 0) or (self.status == Status.Selled and sign > 0):
+                order_obj = OrderObj()
+                order_obj.status = OrderStatus.INIT
+                order_obj.command_type = CommandType.ORDER
+                order_obj.symbol = self.symbol
+                order_obj.exchange = "Bybit"
+                order_obj.type = OrderType.MARKET
+                order_obj.tif = OrderTIF.GTC
+                order_obj.client_id = 0
+                order_obj.price = 1000.0
+                order_obj.quantity = 1.0
+                
                 print(f"sign: {round(sign, 2)} {abs(sign) < self.ratio_threshold}")
-                print(ratios, end="\n\n")
-                continue
-                
-                
-            order_obj = OrderObj()
-            order_obj.status = OrderStatus.INIT
-            order_obj.command_type = CommandType.ORDER
-            order_obj.symbol = self.symbol
-            order_obj.exchange = "Bybit"
-            order_obj.type = OrderType.MARKET
-            order_obj.tif = OrderTIF.GTC
-            order_obj.client_id = 0
-            order_obj.price = 1000.0
-            order_obj.quantity = 0.1
-            
-            if ratios[-1] > 0:
-                # 开多 或 平空 或者持仓不动
-                if self.status == Status.NONE: # 无有效持仓 -> 开多
-                    self.status = Status.Buying
-                    order_obj.side = OrderSide.BUY
-                    order_obj.offset = OrderOffset.OPEN
-                elif self.status == Status.Selled: # 持仓反方向 -> 平空
-                    self.status = Status.Selling
-                    order_obj.side = OrderSide.SELL
-                    order_obj.offset = OrderOffset.CLOSE
-                    order_obj.quantity = order_obj.quantity * 2
-                else: # 持仓不动
-                    continue
-            else:
-                # 开空 或 平多 或者持仓不动
-                if self.status == Status.NONE: # 无有效持仓 -> 开空
-                    self.status = Status.Selling
-                    order_obj.side = OrderSide.SELL
-                    order_obj.offset = OrderOffset.OPEN
-                elif self.status == Status.Buyed: # 持仓反方向 -> 平多
-                    self.status = Status.Buying
-                    order_obj.side = OrderSide.BUY
-                    order_obj.offset = OrderOffset.CLOSE
-                    order_obj.quantity = order_obj.quantity * 2
+                if sign > 0:
+                    # 开多 或 平空 或者持仓不动
+                    if self.status == Status.NONE: # 无有效持仓 -> 开多
+                        order_obj.side = OrderSide.BUY
+                        order_obj.offset = OrderOffset.OPEN
+                        print(f"【多】开多！！ quantity: {order_obj.quantity}")
+                        self.status = Status.Buying
+                    elif self.status == Status.Selled: # 持仓反方向 -> 平空
+                        order_obj.side = OrderSide.BUY
+                        order_obj.offset = OrderOffset.CLOSE
+                        print(f"【多】平空！！ quantity: {order_obj.quantity}")
+                        self.status = Status.Selling
+                    else: # 持仓不动
+                        print(f"【多】持仓不动 status: {self.status}")
+                        continue
                 else:
-                    continue
-            
-            self.order(order_obj)
+                    # 开空 或 平多 或者持仓不动
+                    if self.status == Status.NONE: # 无有效持仓 -> 开空
+                        order_obj.side = OrderSide.SELL
+                        order_obj.offset = OrderOffset.OPEN
+                        print(f"【空】开空！！ quantity: {order_obj.quantity}")
+                        self.status = Status.Selling
+                    elif self.status == Status.Buyed: # 持仓反方向 -> 平多
+                        order_obj.side = OrderSide.SELL
+                        order_obj.offset = OrderOffset.CLOSE
+                        print(f"【空】平多！！ quantity: {order_obj.quantity}")
+                        self.status = Status.Buying
+                    else:
+                        print(f"【空】持仓不动 status: {self.status}")
+                        continue
+
+                self.order(order_obj)
 
     def on_market_bbo(self, bbo: Market_bbo):
         self.ticker.append(bbo.price)
@@ -123,10 +126,13 @@ class MyStrategy(Strategy):
         if obj.status == OrderStatus.REJECTED:
             self.status = Status.NONE
         elif obj.status == OrderStatus.FILLED or obj.status == OrderStatus.CANCEL:
-            if obj.side == OrderSide.BUY:
-                self.status = Status.Buyed
-            elif obj.side == OrderSide.SELL:
-                self.status == Status.Selled
+            if obj.offset == OrderOffset.OPEN:
+                if obj.side == OrderSide.BUY:
+                    self.status = Status.Buyed
+                elif obj.side == OrderSide.SELL:
+                    self.status = Status.Selled
+            else:
+                self.status = Status.NONE
 
         message = json.dumps({
             "symbol": obj.symbol,
@@ -145,7 +151,7 @@ class MyStrategy(Strategy):
             "avg_price": obj.avg_price,
             "revoked": obj.revoked
         })
-        print(message)
+        print(message, " - ", self.status)
         print()
         pass
 
