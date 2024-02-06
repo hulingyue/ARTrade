@@ -27,9 +27,9 @@ static inline core::datas::OrderSide side_from_bybit(std::string_view const side
 /* order type */
 static inline std::string type_to_bybit(core::datas::OrderType const type) {
     if (type == core::datas::OrderType::LIMIT) {
-        return "Market";
-    } else if (type == core::datas::OrderType::MARKET) {
         return "Limit";
+    } else if (type == core::datas::OrderType::MARKET) {
+        return "Market";
     }
 
     return "";
