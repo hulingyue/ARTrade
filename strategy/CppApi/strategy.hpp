@@ -112,21 +112,21 @@ public:
                 case core::datas::MarketType::Bbo: {
                     core::datas::Market_bbo* obj = reinterpret_cast<core::datas::Market_bbo*>(market_pair.first);
                     if (obj && on_market_bbo) {
-                        on_market_bbo(std::move(obj));
+                        on_market_bbo(obj);
                     }
                     break;
                 }
                 case core::datas::MarketType::Depth: {
                     core::datas::Market_depth* obj = reinterpret_cast<core::datas::Market_depth*>(market_pair.first);
                     if (obj && on_market_depth) {
-                        on_market_depth(std::move(obj));
+                        on_market_depth(obj);
                     }
                     break;
                 }
                 case core::datas::MarketType::Kline: {
                     core::datas::Market_kline* obj = reinterpret_cast<core::datas::Market_kline*>(market_pair.first);
                     if (obj && on_market_kline) {
-                        on_market_kline(std::move(obj));
+                        on_market_kline(obj);
                     }
                     break;
                 }
