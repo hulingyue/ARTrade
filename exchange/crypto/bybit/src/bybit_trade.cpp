@@ -264,6 +264,8 @@ void BybitTrade::on_message(std::string const &msg) {
                 obj->avg_price = ((obj->avg_price * obj->traded) + (exec_price * exec_quantity)) / (obj->traded + exec_quantity);
                 obj->traded = obj->traded + exec_quantity;
                 obj->status = core::datas::OrderStatus::PARTIALLYFILLED;
+
+                continue;
             } else if (topic == "order") { // 订单
                 std::string client_id = data["orderLinkId"].get<std::string>();
                 auto obj = core::order::Order::get_instance()->find(client_id);
@@ -287,13 +289,13 @@ void BybitTrade::on_message(std::string const &msg) {
                 avg_price = !avg_price.empty() ? avg_price : "0";
                 obj->avg_price = std::stod(avg_price);
 
-                return;
+                continue;
             } else if (topic == "position") { // 仓位
-
+                continue;
             } else if (topic == "wallet") { // 钱包
-
+                continue;
             } else if (topic == "greeks") { // 期权相关
-
+                continue;
             }
         }
         return;
