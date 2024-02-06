@@ -91,11 +91,11 @@ public:
             for (auto it = _exists_orders.begin(); it != _exists_orders.end();) {
                 if (*(it->first) == it->second) { continue; }
                 it->second = *(it->first);
-                if (on_order) { on_order(it->first); }
+                if (on_order) { on_order(&it->second); }
 
-                if (it->first->status == core::datas::OrderStatus::REJECTED
-                || it->first->status == core::datas::OrderStatus::FILLED
-                || it->first->status == core::datas::OrderStatus::CANCEL
+                if (it->second.status == core::datas::OrderStatus::REJECTED
+                || it->second.status == core::datas::OrderStatus::FILLED
+                || it->second.status == core::datas::OrderStatus::CANCEL
                 ) {
                     it = _exists_orders.erase(it);
                 } else {
