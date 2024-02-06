@@ -95,6 +95,7 @@ class MyStrategy(Strategy):
                     self.status = Status.Selling
                     order_obj.side = OrderSide.SELL
                     order_obj.offset = OrderOffset.CLOSE
+                    order_obj.quantity = order_obj.quantity * 2
                 else: # 持仓不动
                     continue
             else:
@@ -107,6 +108,7 @@ class MyStrategy(Strategy):
                     self.status = Status.Buying
                     order_obj.side = OrderSide.BUY
                     order_obj.offset = OrderOffset.CLOSE
+                    order_obj.quantity = order_obj.quantity * 2
                 else:
                     continue
             
