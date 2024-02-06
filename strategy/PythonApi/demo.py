@@ -34,8 +34,7 @@ class MyStrategy(Strategy):
         self.ticker_capacity = 200
         self.ticker_piece_count = 10
         
-        self.threshold = 10
-        self.ratio_threshold = 5
+        self.ratio_threshold = 3
 
     def task(self):
         symbols_obj = SymbolObj()
@@ -68,8 +67,8 @@ class MyStrategy(Strategy):
             for index in range(0, len(ratios)):
                 sign = sign + (1 if ratios[index] > 0 else -1) * round((0.8 + index / 100), 2)
 
-            if (abs(ratios[-1]) < self.threshold) or sign < self.ratio_threshold:
-                print(f"last ratio value: {ratios[-1]} {abs(ratios[-1]) < self.threshold} | sign: {sign} {sign < self.ratio_threshold}")
+            if abs(sign) < self.ratio_threshold:
+                print(f"sign: {round(sign, 2)} {abs(sign) < self.ratio_threshold}")
                 print(ratios, end="\n\n")
                 continue
                 
