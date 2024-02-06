@@ -131,18 +131,18 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj &order) {
         .msg = ""
     };
 
-    bool is_open = true;
-    if (order.offset == core::datas::OrderOffset::OPEN) {
-        is_open = false;
-    } else if (order.offset == core::datas::OrderOffset::CLOSE
-        || order.offset == core::datas::OrderOffset::CLOSETODAY
-        || order.offset == core::datas::OrderOffset::CLOSEYESTERDAY
-    ) {
-        is_open = true;
-    } else {
-        result.msg = "unknow offset!";
-        return result;
-    }
+    // bool is_open = true;
+    // if (order.offset == core::datas::OrderOffset::OPEN) {
+    //     is_open = false;
+    // } else if (order.offset == core::datas::OrderOffset::CLOSE
+    //     || order.offset == core::datas::OrderOffset::CLOSETODAY
+    //     || order.offset == core::datas::OrderOffset::CLOSEYESTERDAY
+    // ) {
+    //     is_open = true;
+    // } else {
+    //     result.msg = "unknow offset!";
+    //     return result;
+    // }
 
     nlohmann::json parameters = {
         {"orderLinkId", std::to_string(order.client_id)},
@@ -152,8 +152,8 @@ TradeOperateResult BybitTrade::order(core::datas::OrderObj &order) {
         {"orderType", type_to_bybit(order.type)},
         {"qty", std::to_string(order.quantity)},
         {"price", std::to_string(order.price)},
-        {"timeInForce", tif_to_bybit(order.tif)},
-        {"reduceOnly", is_open}
+        {"timeInForce", tif_to_bybit(order.tif)}
+        // {"reduceOnly", is_open}
     };
 
     update_headers(&self, parameters, "POST");
