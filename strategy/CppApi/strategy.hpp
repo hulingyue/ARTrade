@@ -73,7 +73,13 @@ public:
                 case core::datas::CommandType::ORDER:{
                     core::datas::OrderObj* obj = reinterpret_cast<core::datas::OrderObj*>(command_pair.first);
                     if (!obj) { break; }
-                    _exists_orders[obj] = *obj;
+                    // Todu: 这是个愚蠢的设计，共享内存增加消息
+                    if (!(obj->status == core::datas::OrderStatus::REJECTED
+                    || obj->status == core::datas::OrderStatus::FILLED
+                    || obj->status == core::datas::OrderStatus::CANCEL
+                    )) {
+                        _exists_orders[obj] = *obj;
+                    }
                     if (on_order) { on_order(obj); }
                     break;
                 }
@@ -88,6 +94,7 @@ public:
             }
 
             // check exists command status
+            // Todu: 这是个愚蠢的设计，共享内存增加消息
             for (auto it = _exists_orders.begin(); it != _exists_orders.end();) {
                 if (*(it->first) == it->second) { continue; }
                 it->second = *(it->first);
