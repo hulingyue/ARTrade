@@ -109,7 +109,7 @@ MarketOperateResult BybitMarket::unsubscribe(const std::vector<std::string> symb
 }
 
 void BybitMarket::interval_1s() {
-    self.interval += 1;
+    self.interval = (self.interval + 1) % INTMAX_MAX;
     if (self.interval % 20 == 0) {
         ping();
     }
