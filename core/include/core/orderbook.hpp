@@ -16,6 +16,7 @@ public:
     SingleOrderBook(int depth, double accuracy, PriceOrder order)
         : _depth(depth), _accuracy(accuracy), _order(order) {
         data = new core::datas::TradePair[depth];
+        std::memset(data, 0, sizeof(core::datas::TradePair) * depth);
     }
 
     ~SingleOrderBook() {
