@@ -46,7 +46,7 @@ public:
         // find & move
         if (_order == PriceOrder::ESC) {
             for (int index = 0; index < _depth; index++) {
-                if (data[index].price <= pair.price) {
+                if (data[index].price >= pair.price) {
                     std::copy(data + index, data + _depth - 1, data + index + 1);
                     data[index] = pair;
                     break;
@@ -54,7 +54,7 @@ public:
             }
         } else if (_order == PriceOrder::DESC) {
             for (int index = 0; index < _depth; index++) {
-                if (data[index].price >= pair.price) {
+                if (data[index].price <= pair.price) {
                     std::copy(data + index, data + _depth - 1, data + index + 1);
                     data[index] = pair;
                     break;
