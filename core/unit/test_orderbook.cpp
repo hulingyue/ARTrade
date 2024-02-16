@@ -97,8 +97,3 @@ TEST_F(OrderbookManagerTest, UpdateTest_3) {
     spdlog::info("[bids] price: {} quantity: {}", bids->price, bids->quantity);
 }
 
-
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
