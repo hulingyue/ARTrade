@@ -157,7 +157,7 @@ public:
 
     std::pair<core::datas::TradePair*, core::datas::TradePair*> get(std::string symbol, int depth, double accuracy=0.00001) {
         // key_exist_or_create(symbol, depth, accuracy);
-        auto orderbook = _map[symbol][depth];
+        // auto orderbook = _map[symbol][depth];
         return std::make_pair(get_asks(symbol, depth, accuracy), get_bids(symbol, depth, accuracy));
     }
 
