@@ -18,7 +18,7 @@ protected:
 
 TEST_F(OrderbookManagerTest, UpdateTest_1) {
     int depth = 1;
-    manager.key_exist_or_create(symbol, depth, 0.000001);
+    manager.key_exist_or_create(symbol, depth);
     
     core::datas::TradePair ask_pair[] = {{ .price = 50000.01, .quantity = 1.01 }};
     core::datas::TradePair bid_pair[] = {{ .price = 49999.99, .quantity = 1.51 }};
@@ -63,7 +63,7 @@ TEST_F(OrderbookManagerTest, UpdateTest_1) {
 
 TEST_F(OrderbookManagerTest, UpdateTest_3) {
     int depth = 3;
-    manager.key_exist_or_create(symbol, depth, 0.000001);
+    manager.key_exist_or_create(symbol, depth);
 
     core::datas::TradePair ask_pair[] = {
         { .price = 50000.02, .quantity = 1.01 },

@@ -233,7 +233,7 @@ void BybitMarket::on_message(const std::string &msg) {
                 }
             };
 
-            self.orderbook.key_exist_or_create(symbols, orderbook_depth, 0.00001);
+            self.orderbook.key_exist_or_create(symbols, orderbook_depth);
             save_pairs(message["data"]["a"], symbols, "asks");
             self.orderbook.init_asks(symbols, obj.asks, orderbook_depth);
 
