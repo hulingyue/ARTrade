@@ -2,8 +2,8 @@
 [中文](#金蟾量化)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
 [한국어](#두꺼비계량화)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
 
-### [Artrade-docker](https://github.com/hulingyue/ARTrade-docker)
-### [QuantPlatform](https://github.com/hulingyue/QuantPlatform)
+### [Artrade-docker [In planning]](https://github.com/hulingyue/ARTrade-docker)
+### [QuantPlatform [developing]](https://github.com/hulingyue/QuantPlatform)
 
 # English
 ### 1. Moral
