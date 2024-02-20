@@ -57,7 +57,11 @@ public:
 
         // exist
         if (it != map.end()) {
-            _prices[it->second].quantity = pair.quantity;
+            if (pair.quantity > ACCURACY) {
+                _prices[it->second].quantity = pair.quantity;
+            } else {
+                pop_order({pair.price, _prices[it->second].quantity});
+            }
             return;
         }
 
@@ -190,7 +194,7 @@ public:
         return std::make_pair(get_asks(symbol, depth), get_bids(symbol, depth));
     }
 
-    void key_exist_or_create(std::string symbol, int depth, double accuracy) {
+    void key_exist_or_create(std::string symbol, int depth) {
         auto it = _map.find(symbol);
         if (it == _map.end()) {
             _map[symbol] = new OrderBook();
