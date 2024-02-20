@@ -27,7 +27,7 @@ public:
     }
 
     double best_price() noexcept {
-        return static_cast<double>((_prices[0].price * 1.0) / MULTIPLE);
+        return _prices[0].price;
     }
 
     core::datas::TradePair best_pair() noexcept {
@@ -45,7 +45,7 @@ public:
     
         for (int index = 0; index < std::min(size, depth); index++) {
             long price = static_cast<long>(pairs[index].price * MULTIPLE);
-            _prices[index].price = price;
+            _prices[index].price = pairs[index].price;
             _prices[index].quantity = pairs[index].quantity;
             map[price] = index;
         }
@@ -84,7 +84,7 @@ public:
         for (int index = 0; index < depth; index++) {
             if ((order == PriceOrder::ESC && price < _prices[index].price) || (order == PriceOrder::DESC && price > _prices[index].price)) {
                 memcpy(_prices + index + 1, _prices + index, (depth - index - 1) * sizeof(core::datas::TradePair));
-                _prices[index].price = price;
+                _prices[index].price = pair.price;
                 _prices[index].quantity = pair.quantity;
                 map[price] = index;
                 return;
