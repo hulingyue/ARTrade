@@ -32,16 +32,14 @@ public:
     void set_on_order(std::function<void(core::datas::OrderObj*)> func) { on_order = func; }
 
 public:
-    virtual bool subscribe(core::datas::SymbolObj symbols) final {
-        core::datas::SymbolObj obj = std::move(symbols);
-        obj.command_type = core::datas::CommandType::SUBSCRIBE;
-        return command_channel->write(obj);
+    virtual bool subscribe(core::datas::SymbolObj& symbols) final {
+        symbols.command_type = core::datas::CommandType::SUBSCRIBE;
+        return command_channel->write(symbols);
     }
 
-    virtual bool unsubscribe(core::datas::SymbolObj symbols) final {
-        core::datas::SymbolObj obj = std::move(symbols);
-        obj.command_type = core::datas::CommandType::UNSUBSCRIBE;
-        return command_channel->write(obj);
+    virtual bool unsubscribe(core::datas::SymbolObj& symbols) final {
+        symbols.command_type = core::datas::CommandType::UNSUBSCRIBE;
+        return command_channel->write(symbols);
     }
 
     virtual bool order(core::datas::OrderObj &obj) final {
