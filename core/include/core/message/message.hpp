@@ -12,6 +12,13 @@ constexpr int KB = 1024;
 constexpr int MB = 1024 * KB;
 constexpr int GB = 1024 * MB;
 
+constexpr int MarketBboSize = sizeof(core::datas::Market_bbo);
+constexpr int MarketDepthSize = sizeof(core::datas::Market_depth);
+constexpr int MarketKlineSize = sizeof(core::datas::Market_kline);
+
+constexpr int SymbolObjSize = sizeof(core::datas::SymbolObj);
+constexpr int OrderObjSize = sizeof(core::datas::OrderObj);
+constexpr int CancelObjSize = sizeof(core::datas::CancelObj);
 
 namespace {
 using namespace core::message::sharememory;
@@ -120,11 +127,11 @@ public:
         core::datas::MarketDataHeader* _header = reinterpret_cast<core::datas::MarketDataHeader*>(target_address);
         if (_header == nullptr) { return std::make_pair(nullptr, nullptr); }
 
-        if (_header->type == core::datas::MarketType::Bbo && _header->data_size == sizeof(core::datas::Market_bbo)) {
+        if (_header->type == core::datas::MarketType::Bbo && _header->data_size == MarketBboSize) {
             return std::make_pair(reinterpret_cast<core::datas::Market_bbo*>(target_address + MarketDataHeaderSize), _header);
-        } else if (_header->type == core::datas::MarketType::Depth && _header->data_size == sizeof(core::datas::Market_depth)) {
+        } else if (_header->type == core::datas::MarketType::Depth && _header->data_size == MarketDepthSize) {
             return std::make_pair(reinterpret_cast<core::datas::Market_depth*>(target_address + MarketDataHeaderSize), _header);
-        } else if (_header->type == core::datas::MarketType::Kline && _header->data_size == sizeof(core::datas::Market_kline)) {
+        } else if (_header->type == core::datas::MarketType::Kline && _header->data_size == MarketKlineSize) {
             return std::make_pair(reinterpret_cast<core::datas::Market_kline*>(target_address + MarketDataHeaderSize), _header);
         }
 
@@ -156,14 +163,14 @@ private:
 
         int _market_size = 0;
         core::datas::MarketType _type = core::datas::MarketType::Unknow;
-        if (std::is_same<T, core::datas::Market_bbo>::value) {
-            _market_size = sizeof(core::datas::Market_bbo);
+        if constexpr (std::is_same<T, core::datas::Market_bbo>::value) {
+            _market_size = MarketBboSize;
             _type = core::datas::MarketType::Bbo;
-        } else if (std::is_same<T, core::datas::Market_depth>::value) {
-            _market_size = sizeof(core::datas::Market_depth);
+        } else if constexpr (std::is_same<T, core::datas::Market_depth>::value) {
+            _market_size = MarketDepthSize;
             _type = core::datas::MarketType::Depth;
-        } else if (std::is_same<T, core::datas::Market_kline>::value) {
-            _market_size = sizeof(core::datas::Market_kline);
+        } else if constexpr (std::is_same<T, core::datas::Market_kline>::value) {
+            _market_size = MarketKlineSize;
             _type = core::datas::MarketType::Kline;
         } else {
             spdlog::error("{} unsupport type", LOGHEAD);
@@ -173,13 +180,12 @@ private:
         int length = _market_size + MarketDataHeaderSize;
         if (!apply(length)) {
             // cover
-            header->is_cover = true;
+            std::cout << "cover" << std::endl;
+            // header->is_cover = true;
             header->data_next_displacement = header->data_front_displacement;
 
             if (!apply(length)) { return false; }
-        }
 
-        if (header->is_cover) {
             core::datas::MarketDataHeader* earliest_header = reinterpret_cast<core::datas::MarketDataHeader*>(earliest_address());
             header->data_earliest_displacement = header->data_earliest_displacement + earliest_header->data_size + MarketDataHeaderSize;
             if (header->data_earliest_displacement >= header->data_tail_displacement) {
@@ -201,7 +207,7 @@ private:
         return true;
     }
 
-    bool apply(int length) {
+    inline bool apply(int length) {
         // return (((next_address() + length) - address) <= size);
         return ((header->data_next_displacement + length) <= header->data_tail_displacement);
     }
@@ -229,9 +235,9 @@ public:
             return std::make_pair(reinterpret_cast<core::datas::SymbolObj*>(target_address + CommandDataHeaderSize), _header);
         } else if (_header->type == core::datas::CommandType::UNSUBSCRIBE) {
             return std::make_pair(reinterpret_cast<core::datas::SymbolObj*>(target_address + CommandDataHeaderSize), _header);
-        } else if (_header->type == core::datas::CommandType::ORDER && _header->data_size == sizeof(core::datas::OrderObj)) {
+        } else if (_header->type == core::datas::CommandType::ORDER && _header->data_size == OrderObjSize) {
             return std::make_pair(reinterpret_cast<core::datas::OrderObj*>(target_address + CommandDataHeaderSize), _header);
-        } else if (_header->type == core::datas::CommandType::CANCEL && _header->data_size == sizeof(core::datas::CancelObj)) {
+        } else if (_header->type == core::datas::CommandType::CANCEL && _header->data_size == CancelObjSize) {
             return std::make_pair(reinterpret_cast<core::datas::CancelObj*>(target_address + CommandDataHeaderSize), _header);
         }
 
@@ -262,14 +268,14 @@ private:
 
         int _command_size = 0;
         core::datas::CommandType _type = core::datas::CommandType::UNKNOW;
-        if (std::is_same<T, core::datas::SymbolObj>::value) {
-            _command_size = sizeof(core::datas::SymbolObj);
+        if constexpr (std::is_same<T, core::datas::SymbolObj>::value) {
+            _command_size = SymbolObjSize;
             _type = value.command_type;
-        } else if (std::is_same<T, core::datas::OrderObj>::value) {
-            _command_size = sizeof(core::datas::OrderObj);
+        } else if constexpr (std::is_same<T, core::datas::OrderObj>::value) {
+            _command_size = OrderObjSize;
             _type = core::datas::CommandType::ORDER;
-        } else if (std::is_same<T, core::datas::CancelObj>::value) {
-            _command_size = sizeof(core::datas::CancelObj);
+        } else if constexpr (std::is_same<T, core::datas::CancelObj>::value) {
+            _command_size = CancelObjSize;
             _type = core::datas::CommandType::CANCEL;
         } else {
             spdlog::error("{} unsupport type", LOGHEAD);
@@ -298,7 +304,7 @@ private:
         return true;
     }
 
-    bool apply(int length) {
+    inline bool apply(int length) {
         if (earliest_address() <= next_address()) {
             return static_cast<int>(tail_address() - next_address()) >= length;
         } else {
